@@ -10,17 +10,18 @@ Follow these steps to start integrating with Kotani Pay's payment platform.
 ### Step 1: Create an integrator account
 
 <AccordionGroup>
-  <Accordion icon="user-plus" title="Register your business">
+  <Accordion title="Register your business" icon="user-plus">
     Create an integrator account to access the Kotani Pay API platform. Use the
     [Create Integrator](/v3/api-reference/authentication/login) endpoint to
     register your business.
   </Accordion>
-  <Accordion icon="key" title="Get your API credentials">
+  <Accordion title="Get your API credentials" icon="key">
     1. Login to your account using the [Authentication
-    Login](/v3/api-reference/authentication/login) endpoint 2. Generate an API
-    key using the [Generate API
-    Key](/v3/api-reference/authentication/generate-key) endpoint 3. Store your
-    credentials securely
+       Login](/v3/api-reference/authentication/login) endpoint 2. Generate an API
+       key using the [Generate API
+       Key](/v3/api-reference/authentication/generate-key) endpoint 3. Store your
+       credentials securely
+
     <Tip>
       Keep your API keys secure and never expose them in client-side code.
     </Tip>
@@ -30,14 +31,14 @@ Follow these steps to start integrating with Kotani Pay's payment platform.
 ### Step 2: Test the integration
 
 <AccordionGroup>
-  <Accordion icon="flask" title="Use the sandbox environment">
+  <Accordion title="Use the sandbox environment" icon="flask">
     Test your integration using our sandbox environment:
-    
-    **Base URL**: `https://sandbox-api.kotanipay.io`
-    
+
+    **Base URL**: `https://sandbox-api.kotanipay.com`
+
     Start with the [Health Check](/v3/api-reference/system/health) endpoint to verify connectivity.
   </Accordion>
-  <Accordion icon="credit-card" title="Make your first deposit">
+  <Accordion title="Make your first deposit" icon="credit-card">
     Try initiating a deposit using the [Initiate Deposit](/v3/api-reference/deposits/initiate) endpoint.
 
     1. Create a mobile money customer
@@ -45,17 +46,19 @@ Follow these steps to start integrating with Kotani Pay's payment platform.
     3. Check the deposit status
     4. Handle webhook notifications
 
-    <Tip>Start with small amounts for testing!</Tip>
-
+    <Tip>
+      Start with small amounts for testing\!
+    </Tip>
   </Accordion>
 </AccordionGroup>
 
 ### Step 3: Go live
 
-<Accordion icon="rocket" title="Deploy to production">
-  1. Switch to the production base URL: `https://api.kotanipay.io` 2. Update
-  your API credentials for production 3. Configure your webhook endpoints 4.
-  Start processing real transactions
+<Accordion title="Deploy to production" icon="rocket">
+  1. Switch to the production base URL: `https://api.kotanipay.com `
+  2. Update your API credentials for production 
+  3. Configure your webhook endpoints 
+  4. Start processing real transactions
 </Accordion>
 
 ## Next steps
@@ -66,25 +69,13 @@ Explore our comprehensive API documentation:
   <Card title="API Reference" icon="code" href="/v3/api-reference/introduction">
     Complete API endpoint documentation
   </Card>
-  <Card
-    title="Deposits"
-    icon="arrow-down"
-    href="/v3/api-reference/deposits/initiate"
-  >
+  <Card title="Deposits" icon="arrow-down" href="/v3/api-reference/deposits/initiate">
     Learn how to handle deposits
   </Card>
-  <Card
-    title="Payouts"
-    icon="arrow-up"
-    href="/v3/api-reference/payouts/initiate"
-  >
+  <Card title="Payouts" icon="arrow-up" href="/v3/api-reference/payouts/initiate">
     Process payouts to customers
   </Card>
-  <Card
-    title="Webhooks"
-    icon="webhook"
-    href="/v3/api-reference/webhooks/notifications"
-  >
+  <Card title="Webhooks" icon="webhook" href="/v3/api-reference/webhooks/notifications">
     Set up real-time notifications
   </Card>
 </CardGroup>

@@ -16,15 +16,15 @@
   },
   "servers": [
     {
-      "url": "https://api.kotanipay.io",
+      "url": "https://api.kotanipay.com",
       "description": "Production"
     },
     {
-      "url": "https://sandbox-api.kotanipay.io",
+      "url": "https://sandbox-api.kotanipay.com",
       "description": "Sandbox"
     },
     {
-      "url": "https://staging-api.kotanipay.io",
+      "url": "https://staging-api.kotanipay.com",
       "description": "Staging"
     }
   ],
