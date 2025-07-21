@@ -1,0 +1,61 @@
+---
+title: "API Reference"
+description: "Kotani Pay API endpoints for digital asset transactions using local payment channels"
+---
+
+<Note>
+  Welcome to the Kotani Pay API reference. Our API enables businesses to
+  purchase digital assets using local payment channels such as mobile money and
+  bank transfers.
+</Note>
+
+## Welcome
+
+Kotani Pay provides a comprehensive API platform that supports various use cases including remittance, forex arbitrage, lending, insurance, savings, social protection, business financing, and gig work.
+
+Our API documentation is built using OpenAPI specifications to provide you with:
+
+- Interactive API playground
+- Comprehensive endpoint documentation
+- Code examples in multiple languages
+- Real-time testing capabilities
+
+<Card
+  title="Kotani Pay API Endpoints"
+  icon="api"
+  href="/v3/api-reference/openapi.json"
+>
+  View the complete OpenAPI specification
+</Card>
+
+## Base URLs
+
+**Sandbox Environment:** `https://sandbox-api.kotanipay.io`  
+**Production Environment:** `https://api.kotanipay.io`
+
+## Authentication
+
+All API endpoints require authentication using JWT Bearer tokens. You can obtain an access token by:
+
+1. Creating an integrator account
+2. Logging in to get a JWT token
+3. Generating an API key for ongoing operations
+
+```json
+"security": [
+  {
+    "JWT": []
+  }
+]
+```
+
+## Getting Started
+
+1. **Create an Integrator Account** - Register your business to access the API
+2. **Login** - Authenticate to receive your JWT token
+3. **Generate API Key** - Create an API key for secure transaction processing
+4. **Start Integrating** - Begin making API calls to process transactions
+
+## Support
+
+Need help getting started? Contact our support team at sales@kotanipay.com or visit our website at https://kotanipay.com

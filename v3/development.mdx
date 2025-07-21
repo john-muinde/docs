@@ -1,0 +1,96 @@
+---
+title: "Development Guide"
+description: "Development best practices for Kotani Pay API v3 integration"
+---
+
+<Info>
+  **Prerequisites**: - Valid Kotani Pay integrator account - API credentials
+  (JWT token and API key) - Development environment setup
+</Info>
+
+Follow these guidelines for effective development with Kotani Pay API v3.
+
+<Steps>
+<Step title="Set up your environment">
+
+Start with the sandbox environment for development and testing:
+
+```bash
+BASE_URL=https://sandbox-api.kotanipay.io
+```
+
+</Step>
+
+<Step title="Authenticate your requests">
+
+Include your JWT token in the Authorization header:
+
+```bash
+curl -X GET "https://sandbox-api.kotanipay.io/health" \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -H "Content-Type: application/json"
+```
+
+</Step>
+
+<Step title="Handle responses properly">
+
+All Kotani Pay API responses follow this structure:
+
+```json
+{
+  "success": true,
+  "message": "Operation completed successfully",
+  "data": {
+    // Response data here
+  }
+}
+```
+
+</Step>
+</Steps>
+
+## Error Handling
+
+Kotani Pay API uses standard HTTP status codes and consistent error format:
+
+```json
+{
+  "success": false,
+  "message": "Error description",
+  "data": {}
+}
+```
+
+Common status codes:
+
+- `200` - Success
+- `400` - Bad Request
+- `401` - Unauthorized
+- `404` - Not Found
+- `500` - Internal Server Error
+
+## Rate Limiting
+
+Be mindful of API rate limits to ensure smooth integration:
+
+- Implement exponential backoff for retries
+- Cache responses when appropriate
+- Use webhooks instead of polling for status updates
+
+## Testing
+
+Use our comprehensive test endpoints:
+
+<Card title="Health Check" icon="heart" href="/v3/api-reference/system/health">
+  Verify API connectivity and service status
+</Card>
+
+## Going to Production
+
+When ready to deploy:
+
+1. Update base URL to production: `https://api.kotanipay.io`
+2. Replace sandbox credentials with production credentials
+3. Configure production webhook endpoints
+4. Enable monitoring and logging

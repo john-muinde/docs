@@ -1,0 +1,87 @@
+---
+title: "Webhooks"
+description: "Setting up and handling webhook notifications from Kotani Pay"
+---
+
+Webhooks allow Kotani Pay to notify your application in real-time when events occur, such as when a transaction is completed or fails.
+
+## Setting Up Webhooks
+
+To receive webhooks, you need to:
+
+1. **Configure a webhook endpoint** in your application
+2. **Register the endpoint** with Kotani Pay through the dashboard or API
+3. **Verify webhook signatures** to ensure authenticity
+
+## Webhook Events
+
+Kotani Pay sends webhooks for the following events:
+
+| Event Type              | Description                                   |
+| ----------------------- | --------------------------------------------- |
+| `transaction.completed` | A transaction has been successfully completed |
+| `transaction.failed`    | A transaction has failed                      |
+| `transaction.pending`   | A transaction is pending confirmation         |
+| `deposit.completed`     | A deposit has been completed                  |
+| `withdrawal.completed`  | A withdrawal has been completed               |
+
+## Webhook Payload
+
+All webhooks include a standard payload structure:
+
+```json
+{
+  "event_type": "transaction.completed",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "data": {
+    "transaction_id": "txn_1234567890",
+    "reference_id": "ref_abc123",
+    "amount": 1000,
+    "currency": "KES",
+    "status": "completed",
+    "phone_number": "+254712345678"
+  },
+  "signature": "sha256=abc123..."
+}
+```
+
+## Verifying Webhooks
+
+To verify that a webhook came from Kotani Pay, validate the signature:
+
+```javascript
+const crypto = require("crypto");
+
+function verifyWebhookSignature(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac("sha256", secret)
+    .update(payload)
+    .digest("hex");
+
+  return `sha256=${expectedSignature}` === signature;
+}
+
+// Express.js example
+app.post("/webhook", express.raw({ type: "application/json" }), (req, res) => {
+  const signature = req.headers["x-kotani-signature"];
+  const payload = req.body;
+
+  if (!verifyWebhookSignature(payload, signature, process.env.WEBHOOK_SECRET)) {
+    return res.status(401).send("Invalid signature");
+  }
+
+  // Process the webhook
+  const event = JSON.parse(payload);
+  console.log("Received webhook:", event.event_type);
+
+  res.status(200).send("OK");
+});
+```
+
+## Best Practices
+
+1. **Always verify signatures** to ensure webhook authenticity
+2. **Respond quickly** (within 10 seconds) to acknowledge receipt
+3. **Handle duplicate events** idempotently
+4. **Log webhook events** for debugging and audit purposes
+5. **Implement retry logic** for failed webhook processing

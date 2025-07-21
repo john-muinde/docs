@@ -1,0 +1,40 @@
+---
+title: "Error Handling"
+description: "Understanding Kotani Pay API error responses and how to handle them"
+---
+
+The Kotani Pay API uses conventional HTTP response codes to indicate the success or failure of an API request. In general:
+
+- **2xx** codes indicate success
+- **4xx** codes indicate an error that failed given the information provided
+- **5xx** codes indicate an error with Kotani Pay's servers
+
+## Error Response Format
+
+All error responses follow a consistent format:
+
+```json
+{
+  "status": "error",
+  "message": "A human-readable error message",
+  "error_code": "SPECIFIC_ERROR_CODE",
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
+
+## Common Error Codes
+
+| Code                   | Description                                |
+| ---------------------- | ------------------------------------------ |
+| `INVALID_API_KEY`      | The provided API key is invalid or expired |
+| `INSUFFICIENT_BALANCE` | Insufficient balance in the wallet         |
+| `INVALID_PHONE_NUMBER` | The phone number format is invalid         |
+| `TRANSACTION_FAILED`   | The transaction could not be processed     |
+| `RATE_LIMITED`         | Too many requests - rate limit exceeded    |
+
+## Best Practices
+
+1. **Always check the response status** before processing the response body
+2. **Implement retry logic** for 5xx errors with exponential backoff
+3. **Log error responses** for debugging and monitoring
+4. **Handle rate limiting** by implementing proper backoff strategies
