@@ -1,0 +1,50 @@
+---
+title: "Webhook Notifications"
+description: "Receive real-time notifications about transaction status updates and other events."
+---
+
+Kotani Pay sends webhook notifications to inform your application about various events such as transaction status updates, payment confirmations, and other important system events.
+
+## Webhook Events
+
+You can configure webhook endpoints in your dashboard to receive notifications for:
+
+- **Transaction Status Updates**: Notifications when deposits, withdrawals, or transfers change status
+- **Payment Confirmations**: Real-time confirmations of successful payments
+- **KYC Status Changes**: Updates when customer KYC verification status changes
+- **System Events**: Important system notifications and maintenance updates
+
+## Webhook Format
+
+All webhooks are sent as HTTP POST requests with the following structure:
+
+```json
+{
+  "event": "transaction.status.updated",
+  "data": {
+    "reference_id": "ABC123",
+    "status": "COMPLETED",
+    "amount": 1000,
+    "currency": "KES",
+    "timestamp": "2025-01-01T00:00:00Z"
+  },
+  "signature": "sha256=abc123..."
+}
+```
+
+## Security
+
+All webhook payloads are signed with your webhook secret. Verify the signature to ensure the webhook is from Kotani Pay:
+
+1. Get the signature from the `X-Kotani-Signature` header
+2. Calculate the expected signature using your webhook secret
+3. Compare the signatures to verify authenticity
+
+## Configuration
+
+Configure your webhook endpoints in the Kotani Pay dashboard:
+
+1. Log into your dashboard
+2. Navigate to Settings > Webhooks
+3. Add your webhook URL and select events
+4. Save your webhook secret for signature verification

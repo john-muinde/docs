@@ -1,0 +1,71 @@
+---
+title: "Rate Limits"
+description: "Understanding Kotani Pay API rate limits and best practices"
+---
+
+To ensure fair usage and system stability, the Kotani Pay API implements rate limiting on all endpoints.
+
+## Rate Limit Structure
+
+The API uses a sliding window rate limit with the following defaults:
+
+- **Production**: 1000 requests per minute per API key
+- **Sandbox**: 100 requests per minute per API key
+
+## Rate Limit Headers
+
+Every API response includes rate limit information in the headers:
+
+```http
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 999
+X-RateLimit-Reset: 1642234800
+```
+
+| Header                  | Description                                              |
+| ----------------------- | -------------------------------------------------------- |
+| `X-RateLimit-Limit`     | Maximum number of requests allowed in the current window |
+| `X-RateLimit-Remaining` | Number of requests remaining in the current window       |
+| `X-RateLimit-Reset`     | Unix timestamp when the rate limit window resets         |
+
+## Handling Rate Limits
+
+When you exceed the rate limit, the API returns a `429 Too Many Requests` response:
+
+```json
+{
+  "status": "error",
+  "message": "Rate limit exceeded",
+  "error_code": "RATE_LIMITED",
+  "retry_after": 60
+}
+```
+
+## Best Practices
+
+1. **Monitor rate limit headers** in your responses
+2. **Implement exponential backoff** when rate limited
+3. **Cache responses** when possible to reduce API calls
+4. **Batch operations** where the API supports it
+5. **Use webhooks** instead of polling for status updates
+
+## Example: Handling Rate Limits
+
+```javascript
+async function makeAPIRequest(url, options) {
+  try {
+    const response = await fetch(url, options);
+
+    if (response.status === 429) {
+      const retryAfter = response.headers.get("Retry-After") || 60;
+      await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000));
+      return makeAPIRequest(url, options); // Retry
+    }
+
+    return response;
+  } catch (error) {
+    console.error("API request failed:", error);
+    throw error;
+  }
+}
+```

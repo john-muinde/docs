@@ -1,115 +1,228 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
-  "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+  "name": "Kotani Pay",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
   },
   "favicon": "/favicon.svg",
-  "navigation": {
-    "tabs": [
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+  "colors": {
+    "primary": "#0084FF",
+    "light": "#33A0FF",
+    "dark": "#0066CC"
   },
   "navbar": {
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:sales@kotanipay.com"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://dashboard.kotanipay.com"
     }
+  },
+  "navigation": {
+    "versions": [
+      {
+        "version": "Production",
+        "tabs": [
+          {
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": ["v3/overview", "v3/quickstart", "v3/development"]
+              },
+              {
+                "group": "Essentials",
+                "pages": [
+                  "v3/essentials/error-handling",
+                  "v3/essentials/rate-limits",
+                  "v3/essentials/webhooks"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "API Reference",
+            "groups": [
+              {
+                "group": "Introduction",
+                "pages": ["v3/api-reference/introduction"]
+              },
+              {
+                "group": "Authentication",
+                "pages": [
+                  "v3/api-reference/authentication/login",
+                  "v3/api-reference/authentication/generate-key",
+                  "v3/api-reference/authentication/refresh-token"
+                ]
+              },
+              {
+                "group": "Health & System",
+                "pages": [
+                  "v3/api-reference/system/health",
+                  "v3/api-reference/system/providers"
+                ]
+              },
+              {
+                "group": "Integrator Management",
+                "pages": [
+                  "v3/api-reference/integrator/create",
+                  "v3/api-reference/integrator/get"
+                ]
+              },
+              {
+                "group": "Wallet Management",
+                "pages": [
+                  {
+                    "group": "Fiat Wallets",
+                    "pages": [
+                      "v3/api-reference/wallets/fiat/create",
+                      "v3/api-reference/wallets/fiat/get",
+                      "v3/api-reference/wallets/fiat/update",
+                      "v3/api-reference/wallets/fiat/list",
+                      "v3/api-reference/wallets/fiat/get-by-currency",
+                      "v3/api-reference/wallets/fiat/transfer-deposit-balance"
+                    ]
+                  },
+                  {
+                    "group": "Crypto Wallets",
+                    "pages": [
+                      "v3/api-reference/wallets/crypto/list",
+                      "v3/api-reference/wallets/crypto/get"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Customer Management",
+                "pages": [
+                  {
+                    "group": "Mobile Money Customers",
+                    "pages": [
+                      "v3/api-reference/customers/mobile-money/create",
+                      "v3/api-reference/customers/mobile-money/get",
+                      "v3/api-reference/customers/mobile-money/update",
+                      "v3/api-reference/customers/mobile-money/list",
+                      "v3/api-reference/customers/mobile-money/get-by-phone"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Transactions - Deposits",
+                "pages": [
+                  "v3/api-reference/deposits/initiate",
+                  "v3/api-reference/deposits/status",
+                  "v3/api-reference/deposits/mobile-money",
+                  "v3/api-reference/deposits/mobile-money-status",
+                  "v3/api-reference/deposits/bank-checkout",
+                  "v3/api-reference/deposits/bank-checkout-status",
+                  "v3/api-reference/deposits/card",
+                  "v3/api-reference/deposits/card-status"
+                ]
+              },
+              {
+                "group": "Transactions - Withdrawals",
+                "pages": [
+                  "v3/api-reference/withdrawals/mobile-money",
+                  "v3/api-reference/withdrawals/mobile-money-status",
+                  "v3/api-reference/withdrawals/bank-v2",
+                  "v3/api-reference/withdrawals/bank-status",
+                  "v3/api-reference/withdrawals/supporting-banks"
+                ]
+              },
+              {
+                "group": "Payouts",
+                "pages": [
+                  "v3/api-reference/payouts/initiate",
+                  "v3/api-reference/payouts/status"
+                ]
+              },
+              {
+                "group": "On-Ramp & Off-Ramp",
+                "pages": [
+                  "v3/api-reference/onramp/create",
+                  "v3/api-reference/onramp/status",
+                  "v3/api-reference/onramp/crypto",
+                  "v3/api-reference/onramp/crypto-status",
+                  "v3/api-reference/offramp/create",
+                  "v3/api-reference/offramp/status",
+                  "v3/api-reference/offramp/cancel"
+                ]
+              },
+              {
+                "group": "Exchange Rates",
+                "pages": [
+                  "v3/api-reference/rates/get-rate",
+                  "v3/api-reference/rates/get-all-rates",
+                  "v3/api-reference/rates/onramp-rate",
+                  "v3/api-reference/rates/offramp-rate",
+                  "v3/api-reference/rates/fiat-to-fiat"
+                ]
+              },
+              {
+                "group": "KYC & Compliance",
+                "pages": [
+                  "v3/api-reference/kyc/create-basic-details",
+                  "v3/api-reference/kyc/create-address",
+                  "v3/api-reference/kyc/create-document",
+                  "v3/api-reference/kyc/get-status",
+                  "v3/api-reference/kyc/get-integrator-users"
+                ]
+              },
+              {
+                "group": "Cross-Border Payments",
+                "pages": [
+                  "v3/api-reference/cross-border/generate-invoice",
+                  "v3/api-reference/cross-border/get-invoice",
+                  "v3/api-reference/cross-border/pay-invoice",
+                  "v3/api-reference/cross-border/pay-invoice-status"
+                ]
+              },
+              {
+                "group": "Webhooks",
+                "pages": ["v3/api-reference/webhooks/notifications"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "version": "Staging",
+        "tabs": [
+          {
+            "tab": "Documentation",
+            "groups": [
+              {
+                "group": "Getting Started",
+                "pages": ["v3/overview"]
+              }
+            ]
+          },
+          {
+            "tab": "API Reference",
+            "groups": [
+              {
+                "group": "Introduction",
+                "pages": ["v3/api-reference/introduction"]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/kotanipay",
+      "github": "https://github.com/kotanipay",
+      "linkedin": "https://linkedin.com/company/kotanipay"
     }
   }
 }
