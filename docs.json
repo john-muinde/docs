@@ -22,7 +22,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.kotanipay.com"
+      "href": "https://backoffice.kotanipay.com"
     }
   },
   "navigation": {
@@ -188,29 +188,6 @@
               {
                 "group": "Webhooks",
                 "pages": ["v3/api-reference/webhooks/notifications"]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "version": "Staging",
-        "tabs": [
-          {
-            "tab": "Documentation",
-            "groups": [
-              {
-                "group": "Getting Started",
-                "pages": ["v3/overview"]
-              }
-            ]
-          },
-          {
-            "tab": "API Reference",
-            "groups": [
-              {
-                "group": "Introduction",
-                "pages": ["v3/api-reference/introduction"]
               }
             ]
           }
