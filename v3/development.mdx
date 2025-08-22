@@ -16,7 +16,7 @@ Follow these guidelines for effective development with Kotani Pay API v3.
 Start with the sandbox environment for development and testing:
 
 ```bash
-BASE_URL=https://sandbox-api.kotanipay.io
+BASE_URL=https://sandbox-api.kotanipay.com
 ```
 
 </Step>
@@ -26,7 +26,7 @@ BASE_URL=https://sandbox-api.kotanipay.io
 Include your JWT token in the Authorization header:
 
 ```bash
-curl -X GET "https://sandbox-api.kotanipay.io/health" \
+curl -X GET "https://sandbox-api.kotanipay.com/health" \
   -H "Authorization: Bearer <your-jwt-token>" \
   -H "Content-Type: application/json"
 ```
@@ -90,7 +90,7 @@ Use our comprehensive test endpoints:
 
 When ready to deploy:
 
-1. Update base URL to production: `https://api.kotanipay.io`
+1. Update base URL to production: `https://api.kotanipay.com`
 2. Replace sandbox credentials with production credentials
 3. Configure production webhook endpoints
 4. Enable monitoring and logging
