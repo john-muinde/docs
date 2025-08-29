@@ -16,7 +16,7 @@
   },
   "servers": [
     {
-      "url": "https://api.kotanipay.com",
+      "url": "https://sandbox-api.kotanipay.com",
       "description": "Production"
     }
   ],

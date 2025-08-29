@@ -21,14 +21,14 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
+      "label": "Live Dashboard",
       "href": "https://backoffice.kotanipay.com"
     }
   },
   "navigation": {
     "versions": [
       {
-        "version": "Production",
+        "version": "Sandbox",
         "tabs": [
           {
             "tab": "Documentation",
