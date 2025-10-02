@@ -1,0 +1,112 @@
+---
+title: "Run in Postman"
+description: "Fork our complete API collection and start testing immediately"
+---
+
+# 🚀 Run in Postman
+
+Get started with the Kotani Pay API instantly using our comprehensive Postman collection. No setup required - just fork and start testing!
+
+<Card
+  title="Fork Kotani Pay API Collection"
+  icon="external-link"
+  href="https://app.getpostman.com/run-collection/30841547-726e952e-e744-45ec-9204-1df4aba5e919?action=collection%2Ffork&source=rip_markdown"
+>
+  Fork the complete API collection with 57+ endpoints and pre-configured
+  environments
+</Card>
+
+## What's Included
+
+<AccordionGroup>
+  <Accordion title="Complete API Coverage" icon="api">
+    - **57 Endpoints** organized by functionality
+    - **Authentication flows** for login and API key generation
+    - **Wallet management** for both fiat and crypto assets
+    - **Payment processing** including deposits, withdrawals, and payouts
+    - **KYC compliance** endpoints for customer verification
+    - **Cross-border payments** and invoice management
+    - **Real-time webhooks** for transaction updates
+  </Accordion>
+
+{" "}
+<Accordion title="Pre-configured Environments" icon="settings">
+  - **Sandbox Environment**: `https://sandbox-api.kotanipay.com` - **Production
+  Environment**: `https://api.kotanipay.com` - **Environment Variables**:
+  Pre-set for immediate use - **Authentication Tokens**: Automatically managed -
+  **Base URLs**: Ready for both testing and production
+</Accordion>
+
+  <Accordion title="Sample Data & Examples" icon="code">
+    - **Request Bodies**: Example data for all endpoints
+    - **Response Examples**: Expected API responses
+    - **Error Scenarios**: Common error cases and handling
+    - **Workflow Examples**: End-to-end transaction flows
+    - **Test Scripts**: Automated assertion checks
+  </Accordion>
+</AccordionGroup>
+
+## Quick Setup Guide
+
+<Steps>
+  <Step title="Fork the Collection">
+    Click the "Fork Kotani Pay API Collection" button above to add the
+    collection to your Postman workspace.
+  </Step>
+
+  <Step title="Import Environments">
+    Both sandbox and production environments will be automatically imported with
+    the collection.
+  </Step>
+
+  <Step title="Configure API Keys">
+    Update the environment variables with your API credentials: - `api_key`:
+    Your API key from the authentication flow - `jwt_token`: Will be
+    auto-populated after login - `base_url`: Already configured for each
+    environment
+  </Step>
+
+  <Step title="Start Testing">
+    Begin with the Health Check endpoint to verify your setup, then explore
+    other endpoints organized by category.
+  </Step>
+</Steps>
+
+## Testing Workflow
+
+<Tabs>
+  <Tab title="Authentication">
+    1. **Create Integrator**: Register your business account 2. **Login**: Get
+    your JWT token for API access 3. **Generate API Key**: Create a secure key
+    for transactions 4. **Verify Setup**: Test with any endpoint to confirm
+    authentication
+  </Tab>
+
+  <Tab title="Deposits">
+    1. **Create Customer**: Add a mobile money customer 2. **Initiate Deposit**:
+    Start a deposit transaction 3. **Check Status**: Monitor transaction
+    progress 4. **Handle Webhooks**: Process real-time updates
+  </Tab>
+
+  <Tab title="Payouts">
+    1. **Verify Balance**: Check wallet balance 2. **Initiate Payout**: Send
+    money to customers 3. **Track Status**: Monitor payout progress 4. **Confirm
+    Completion**: Verify successful transfer
+  </Tab>
+</Tabs>
+
+<Warning>
+  Always use the **sandbox environment** for testing to avoid processing real
+  transactions. Switch to production only when you're ready to go live.
+</Warning>
+
+## Need Help?
+
+- **API Documentation**: Explore our [complete API reference](/v3/api-reference/introduction)
+- **Quick Start Guide**: Follow our [step-by-step quickstart](/v3/quickstart)
+- **Support**: Contact us at sales@kotanipay.com
+
+<Tip>
+  The Postman collection includes automated authentication token management, so
+  you don't need to manually handle JWT tokens for most requests.
+</Tip>

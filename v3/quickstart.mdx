@@ -7,6 +7,57 @@ description: "Get started with Kotani Pay API v3 in minutes"
 
 Follow these steps to start integrating with Kotani Pay's payment platform.
 
+## 🚀 Try the API with Postman
+
+Test our API endpoints instantly using our comprehensive Postman collection. Fork the collection to your workspace and start experimenting with real API calls without writing any code.
+
+<Card
+  title="Run in Postman"
+  icon="external-link"
+  href="https://app.getpostman.com/run-collection/30841547-726e952e-e744-45ec-9204-1df4aba5e919?action=collection%2Ffork&source=rip_markdown"
+>
+  Fork the complete Kotani Pay API collection with 57+ endpoints and
+  pre-configured environments
+</Card>
+
+<AccordionGroup>
+  <Accordion title="What's included in the collection" icon="package">
+    - **Complete API Coverage**: All 57 endpoints organized by functionality
+    - **Environment Variables**: Pre-configured sandbox and production environments  
+    - **Authentication Flow**: Automated token management and API key setup
+    - **Sample Data**: Example request bodies and expected responses
+    - **Workflow Examples**: Common integration patterns and use cases
+  </Accordion>
+
+  <Accordion title="How to fork and use the collection" icon="code-fork">
+    1. **Fork the collection**: Click the "Run in Postman" button above
+    2. **Choose your workspace**: Select or create a Postman workspace  
+    3. **Import environments**: Both sandbox and production environments will be imported
+    4. **Set up credentials**: Add your API keys to the environment variables
+    5. **Start testing**: Begin with the Health Check endpoint to verify setup
+
+    <Warning>
+      Make sure to use the **sandbox environment** for testing to avoid processing real transactions.
+    </Warning>
+
+  </Accordion>
+
+  <Accordion title="Environment setup guide" icon="settings">
+    After forking, update these environment variables in Postman:
+
+    **Sandbox Environment:**
+    - `base_url`: `https://sandbox-api.kotanipay.com`
+    - `api_key`: Your sandbox API key (get this from Step 1 below)
+    - `jwt_token`: Will be auto-populated after login
+
+    **Production Environment:**
+    - `base_url`: `https://api.kotanipay.com`
+    - `api_key`: Your production API key
+    - `jwt_token`: Will be auto-populated after login
+
+  </Accordion>
+</AccordionGroup>
+
 ### Step 1: Create an integrator account
 
 <AccordionGroup>
@@ -25,6 +76,7 @@ Follow these steps to start integrating with Kotani Pay's payment platform.
     <Tip>
       Keep your API keys secure and never expose them in client-side code.
     </Tip>
+
   </Accordion>
 </AccordionGroup>
 
@@ -37,6 +89,7 @@ Follow these steps to start integrating with Kotani Pay's payment platform.
     **Base URL**: `https://sandbox-api.kotanipay.com`
 
     Start with the [Health Check](/v3/api-reference/system/health) endpoint to verify connectivity.
+
   </Accordion>
   <Accordion title="Make your first deposit" icon="credit-card">
     Try initiating a deposit using the [Initiate Deposit](/v3/api-reference/deposits/initiate) endpoint.
@@ -49,16 +102,16 @@ Follow these steps to start integrating with Kotani Pay's payment platform.
     <Tip>
       Start with small amounts for testing\!
     </Tip>
+
   </Accordion>
 </AccordionGroup>
 
 ### Step 3: Go live
 
 <Accordion title="Deploy to production" icon="rocket">
-  1. Switch to the production base URL: `https://api.kotanipay.com `
-  2. Update your API credentials for production 
-  3. Configure your webhook endpoints 
-  4. Start processing real transactions
+  1. Switch to the production base URL: `https://api.kotanipay.com ` 2. Update
+  your API credentials for production 3. Configure your webhook endpoints 4.
+  Start processing real transactions
 </Accordion>
 
 ## Next steps
@@ -69,13 +122,25 @@ Explore our comprehensive API documentation:
   <Card title="API Reference" icon="code" href="/v3/api-reference/introduction">
     Complete API endpoint documentation
   </Card>
-  <Card title="Deposits" icon="arrow-down" href="/v3/api-reference/deposits/initiate">
+  <Card
+    title="Deposits"
+    icon="arrow-down"
+    href="/v3/api-reference/deposits/initiate"
+  >
     Learn how to handle deposits
   </Card>
-  <Card title="Payouts" icon="arrow-up" href="/v3/api-reference/payouts/initiate">
+  <Card
+    title="Payouts"
+    icon="arrow-up"
+    href="/v3/api-reference/payouts/initiate"
+  >
     Process payouts to customers
   </Card>
-  <Card title="Webhooks" icon="webhook" href="/v3/api-reference/webhooks/notifications">
+  <Card
+    title="Webhooks"
+    icon="webhook"
+    href="/v3/api-reference/webhooks/notifications"
+  >
     Set up real-time notifications
   </Card>
 </CardGroup>
