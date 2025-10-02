@@ -51,16 +51,8 @@
             "tab": "API Reference",
             "groups": [
               {
-                "group": "Introduction",
+                "group": "Getting Started",
                 "pages": ["v3/api-reference/introduction"]
-              },
-              {
-                "group": "Authentication",
-                "pages": [
-                  "v3/api-reference/authentication/login",
-                  "v3/api-reference/authentication/generate-key",
-                  "v3/api-reference/authentication/refresh-token"
-                ]
               },
               {
                 "group": "Health & System",
@@ -70,71 +62,96 @@
                 ]
               },
               {
-                "group": "Integrator Management",
+                "group": "Authentication & Setup",
                 "pages": [
+                  "v3/api-reference/authentication/login",
+                  "v3/api-reference/authentication/generate-key",
+                  "v3/api-reference/authentication/refresh-token",
+                  "v3/api-reference/authentication/human-verify",
                   "v3/api-reference/integrator/create",
                   "v3/api-reference/integrator/get"
                 ]
               },
               {
-                "group": "Wallet Management",
+                "group": "Exchange Rates",
                 "pages": [
-                  {
-                    "group": "Fiat Wallets",
-                    "pages": [
-                      "v3/api-reference/wallets/fiat/create",
-                      "v3/api-reference/wallets/fiat/get",
-                      "v3/api-reference/wallets/fiat/update",
-                      "v3/api-reference/wallets/fiat/list",
-                      "v3/api-reference/wallets/fiat/get-by-currency",
-                      "v3/api-reference/wallets/fiat/transfer-deposit-balance"
-                    ]
-                  },
-                  {
-                    "group": "Crypto Wallets",
-                    "pages": [
-                      "v3/api-reference/wallets/crypto/list",
-                      "v3/api-reference/wallets/crypto/get"
-                    ]
-                  }
+                  "v3/api-reference/rates/get-all-rates",
+                  "v3/api-reference/rates/get-rate",
+                  "v3/api-reference/rates/onramp-rate",
+                  "v3/api-reference/rates/offramp-rate",
+                  "v3/api-reference/rates/fiat-to-fiat"
+                ]
+              },
+              {
+                "group": "Fiat Wallets",
+                "pages": [
+                  "v3/api-reference/wallets/fiat/create",
+                  "v3/api-reference/wallets/fiat/list",
+                  "v3/api-reference/wallets/fiat/get",
+                  "v3/api-reference/wallets/fiat/get-by-currency",
+                  "v3/api-reference/wallets/fiat/update",
+                  "v3/api-reference/wallets/fiat/transfer-deposit-balance"
+                ]
+              },
+              {
+                "group": "Crypto Wallets",
+                "pages": [
+                  "v3/api-reference/wallets/crypto/create",
+                  "v3/api-reference/wallets/crypto/list",
+                  "v3/api-reference/wallets/crypto/get"
                 ]
               },
               {
                 "group": "Customer Management",
                 "pages": [
-                  {
-                    "group": "Mobile Money Customers",
-                    "pages": [
-                      "v3/api-reference/customers/mobile-money/create",
-                      "v3/api-reference/customers/mobile-money/get",
-                      "v3/api-reference/customers/mobile-money/update",
-                      "v3/api-reference/customers/mobile-money/list",
-                      "v3/api-reference/customers/mobile-money/get-by-phone"
-                    ]
-                  }
+                  "v3/api-reference/customers/mobile-money/create",
+                  "v3/api-reference/customers/mobile-money/list",
+                  "v3/api-reference/customers/mobile-money/get",
+                  "v3/api-reference/customers/mobile-money/get-by-phone",
+                  "v3/api-reference/customers/mobile-money/update"
                 ]
               },
               {
-                "group": "Transactions - Deposits",
+                "group": "Mobile Money Deposits",
                 "pages": [
-                  "v3/api-reference/deposits/initiate",
-                  "v3/api-reference/deposits/status",
                   "v3/api-reference/deposits/mobile-money",
-                  "v3/api-reference/deposits/mobile-money-status",
+                  "v3/api-reference/deposits/mobile-money-status"
+                ]
+              },
+              {
+                "group": "Bank Deposits",
+                "pages": [
                   "v3/api-reference/deposits/bank-checkout",
-                  "v3/api-reference/deposits/bank-checkout-status",
+                  "v3/api-reference/deposits/bank-checkout-status"
+                ]
+              },
+              {
+                "group": "Card Deposits",
+                "pages": [
                   "v3/api-reference/deposits/card",
                   "v3/api-reference/deposits/card-status"
                 ]
               },
               {
-                "group": "Transactions - Withdrawals",
+                "group": "General Deposits",
+                "pages": [
+                  "v3/api-reference/deposits/initiate",
+                  "v3/api-reference/deposits/status"
+                ]
+              },
+              {
+                "group": "Mobile Money Withdrawals",
                 "pages": [
                   "v3/api-reference/withdrawals/mobile-money",
-                  "v3/api-reference/withdrawals/mobile-money-status",
+                  "v3/api-reference/withdrawals/mobile-money-status"
+                ]
+              },
+              {
+                "group": "Bank Withdrawals",
+                "pages": [
+                  "v3/api-reference/withdrawals/supporting-banks",
                   "v3/api-reference/withdrawals/bank-v2",
-                  "v3/api-reference/withdrawals/bank-status",
-                  "v3/api-reference/withdrawals/supporting-banks"
+                  "v3/api-reference/withdrawals/bank-status"
                 ]
               },
               {
@@ -145,25 +162,29 @@
                 ]
               },
               {
-                "group": "On-Ramp & Off-Ramp",
+                "group": "Onramp (Buy Crypto)",
                 "pages": [
                   "v3/api-reference/onramp/create",
                   "v3/api-reference/onramp/status",
                   "v3/api-reference/onramp/crypto",
-                  "v3/api-reference/onramp/crypto-status",
+                  "v3/api-reference/onramp/crypto-status"
+                ]
+              },
+              {
+                "group": "Offramp (Sell Crypto)",
+                "pages": [
                   "v3/api-reference/offramp/create",
                   "v3/api-reference/offramp/status",
                   "v3/api-reference/offramp/cancel"
                 ]
               },
               {
-                "group": "Exchange Rates",
+                "group": "Cross-Border Payments",
                 "pages": [
-                  "v3/api-reference/rates/get-rate",
-                  "v3/api-reference/rates/get-all-rates",
-                  "v3/api-reference/rates/onramp-rate",
-                  "v3/api-reference/rates/offramp-rate",
-                  "v3/api-reference/rates/fiat-to-fiat"
+                  "v3/api-reference/cross-border/generate-invoice",
+                  "v3/api-reference/cross-border/get-invoice",
+                  "v3/api-reference/cross-border/pay-invoice",
+                  "v3/api-reference/cross-border/pay-invoice-status"
                 ]
               },
               {
@@ -177,16 +198,7 @@
                 ]
               },
               {
-                "group": "Cross-Border Payments",
-                "pages": [
-                  "v3/api-reference/cross-border/generate-invoice",
-                  "v3/api-reference/cross-border/get-invoice",
-                  "v3/api-reference/cross-border/pay-invoice",
-                  "v3/api-reference/cross-border/pay-invoice-status"
-                ]
-              },
-              {
-                "group": "Webhooks",
+                "group": "Webhooks & Notifications",
                 "pages": ["v3/api-reference/webhooks/notifications"]
               }
             ]
