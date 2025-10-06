@@ -3,48 +3,79 @@ title: "Webhook Notifications"
 description: "Receive real-time notifications about transaction status updates and other events."
 ---
 
-Kotani Pay sends webhook notifications to inform your application about various events such as transaction status updates, payment confirmations, and other important system events.
+Kotani Pay sends webhook notifications to inform your application about key lifecycle events—transaction status changes, payment confirmations, compliance updates, and scheduled system announcements. Use these callbacks to drive your automations instead of polling for status.
 
-## Webhook Events
+## Supported Events
 
-You can configure webhook endpoints in your dashboard to receive notifications for:
+Configure one webhook endpoint per environment from the dashboard and opt in to any combination of events:
 
-- **Transaction Status Updates**: Notifications when deposits, withdrawals, or transfers change status
-- **Payment Confirmations**: Real-time confirmations of successful payments
-- **KYC Status Changes**: Updates when customer KYC verification status changes
-- **System Events**: Important system notifications and maintenance updates
+- **Transaction Status Updates** – Deposit, withdrawal, or transfer status changes (e.g., `PENDING` → `COMPLETED`)
+- **Payment Confirmations** – Real-time acknowledgements when a payment settles on- or off-chain
+- **KYC Status Changes** – Triggers when a customer's verification outcome changes
+- **System Events** – Low-volume operational notices and maintenance alerts
 
-## Webhook Format
+## Payload Format
 
-All webhooks are sent as HTTP POST requests with the following structure:
+Webhooks are sent as HTTP `POST` requests with a JSON payload. The request body includes the event name, data payload, and a convenience copy of the signature. The canonical signature is delivered in the `X-Kotani-Signature` header.
 
 ```json
 {
   "event": "transaction.status.updated",
   "data": {
-    "reference_id": "ABC123",
-    "status": "COMPLETED",
-    "amount": 1000,
-    "currency": "KES",
+    "referenceId": "ABC123",
+    "depositStatus": "COMPLETED",
     "timestamp": "2025-01-01T00:00:00Z"
   },
   "signature": "sha256=abc123..."
 }
 ```
 
-## Security
+> **Tip:** The payload's `signature` field is provided for quick sanity checks, but the header is the source of truth for verification.
 
-All webhook payloads are signed with your webhook secret. Verify the signature to ensure the webhook is from Kotani Pay:
+## Verifying Signatures
 
-1. Get the signature from the `X-Kotani-Signature` header
-2. Calculate the expected signature using your webhook secret
-3. Compare the signatures to verify authenticity
+Every payload is signed with your dashboard-configured webhook secret. Validate the signature before acting on the event:
 
-## Configuration
+1. Read the request body as a **raw string** before parsing or mutating it.
+2. Compute an HMAC-SHA256 digest: `sha256=HMAC(secret, rawBody)`.
+3. Compare the digest with the `X-Kotani-Signature` header using a timing-safe comparison.
 
-Configure your webhook endpoints in the Kotani Pay dashboard:
+### Node.js helper
 
-1. Log into your dashboard
-2. Navigate to Settings > Webhooks
-3. Add your webhook URL and select events
-4. Save your webhook secret for signature verification
+```ts
+import crypto from "crypto";
+
+export function verifyWebhook({ secret, rawBody, headerSignature }: {
+  secret: string;
+  rawBody: string | Buffer;
+  headerSignature: string;
+}) {
+  const normalizedBody = Buffer.isBuffer(rawBody)
+    ? rawBody
+    : Buffer.from(rawBody, "utf8");
+
+  const computed =
+    "sha256=" +
+    crypto.createHmac("sha256", secret).update(normalizedBody).digest("hex");
+
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(computed),
+      Buffer.from(headerSignature.trim())
+    );
+  } catch {
+    return false;
+  }
+}
+```
+
+## Configuring Webhooks
+
+1. Log into the Kotani Pay dashboard.
+2. Navigate to **Settings → Webhooks**.
+3. Provide a publicly reachable HTTPS URL.
+4. Select the events you want to subscribe to.
+5. Copy or generate a signing secret and store it securely (e.g., an environment variable).
+6. Save your changes.
+
+You can rotate the secret at any time; remember to update your verification logic before applying the new secret in production.
