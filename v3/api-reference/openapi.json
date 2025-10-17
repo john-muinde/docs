@@ -1,30 +1,6 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/v3/authorization/permission": {
-      "post": {
-        "operationId": "RolesPermissionsController_createPermission_api/v3",
-        "parameters": [],
-        "responses": { "201": { "description": "" } },
-        "tags": ["RolesPermissions"]
-      }
-    },
-    "/api/v3/authorization/role": {
-      "post": {
-        "operationId": "RolesPermissionsController_createRole_api/v3",
-        "parameters": [],
-        "responses": { "201": { "description": "" } },
-        "tags": ["RolesPermissions"]
-      }
-    },
-    "/api/v3/authorization/assign": {
-      "post": {
-        "operationId": "RolesPermissionsController_assign_api/v3",
-        "parameters": [],
-        "responses": { "201": { "description": "" } },
-        "tags": ["RolesPermissions"]
-      }
-    },
     "/api/v3/rate/{from}/{to}": {
       "get": {
         "description": "An integrator can use this endpoint to get the exchange rate between two currencies",
@@ -307,6 +283,102 @@
         "security": [{ "JWT": [] }],
         "summary": "Get all exchange rates",
         "tags": ["RATES"]
+      }
+    },
+    "/api/v3/public/rate/{from}/{to}": {
+      "get": {
+        "description": "Public endpoint for getting exchange rates between two currencies. Used for payment link checkout currency conversion display.",
+        "operationId": "PublicRateController_getPublicRate_api/v3",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "path",
+            "description": "Source currency code (e.g., USD, KES)",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "path",
+            "description": "Target currency code (e.g., KES, USD)",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Available exchange rate."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/RateResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": {
+                      "type": "string",
+                      "example": "Exchange rate not found"
+                    },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get public exchange rate (no auth required)",
+        "tags": ["PUBLIC RATES"]
+      }
+    },
+    "/api/v3/public/rate": {
+      "get": {
+        "description": "Public endpoint for getting all available exchange rates. Useful for dropdown displays or rate comparison.",
+        "operationId": "PublicRateController_getPublicRates_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Available exchange rates."
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RateResponseDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get all public exchange rates (no auth required)",
+        "tags": ["PUBLIC RATES"]
       }
     },
     "/api/v3/wallet/fiat": {
@@ -1021,6 +1093,90 @@
         },
         "security": [{ "JWT": [] }],
         "summary": "Get an Integrator Details.",
+        "tags": ["INTEGRATOR"]
+      }
+    },
+    "/api/v3/integrator/webhook": {
+      "patch": {
+        "description": "Allows an integrator to update their default webhook URL, secret, and event subscriptions.",
+        "operationId": "IntegratorController_updateWebhookSettings_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIntegratorWebhookDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Integrator webhook settings updated successfully."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/IntegratorResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Bad Request" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Not Found" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Update webhook configuration",
         "tags": ["INTEGRATOR"]
       }
     },
@@ -2138,6 +2294,152 @@
         "tags": ["CUSTOMER - MOBILE MONEY"]
       }
     },
+    "/api/v3/customer/validate/mobile-money": {
+      "post": {
+        "description": "Validates a mobile money account by checking the phone number format and country support. Optionally verifies if the account exists and returns account holder information.",
+        "operationId": "AccountValidationController_validateMobileMoneyAccount_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateMobileMoneyAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Mobile money account validated successfully."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ValidateAccountResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid request"
+                    },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Validate mobile money account",
+        "tags": ["CUSTOMER - VALIDATION"]
+      }
+    },
+    "/api/v3/customer/validate/bank": {
+      "post": {
+        "description": "Validates a bank account by checking the account number format, bank code, and country support. Returns validation status and bank information.",
+        "operationId": "AccountValidationController_validateBankAccount_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateBankAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Bank account validated successfully."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ValidateAccountResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid request"
+                    },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Validate bank account",
+        "tags": ["CUSTOMER - VALIDATION"]
+      }
+    },
     "/api/v3/withdraw/mobile-money": {
       "post": {
         "description": "This api will withdraw fiat from the integrator’s fiat wallet to the customer’s mobile money wallet.",
@@ -2404,6 +2706,312 @@
         "security": [{ "JWT": [] }],
         "summary": "GET SUPPORTING BANKS",
         "tags": ["WITHDRAW V2"]
+      }
+    },
+    "/api/v3/kpglbpay/success": {
+      "get": {
+        "operationId": "GlobPayController_success_get",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "post": {
+        "operationId": "GlobPayController_success_post",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "put": {
+        "operationId": "GlobPayController_success_put",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "delete": {
+        "operationId": "GlobPayController_success_delete",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "patch": {
+        "operationId": "GlobPayController_success_patch",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "options": {
+        "operationId": "GlobPayController_success_options",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "head": {
+        "operationId": "GlobPayController_success_head",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "search": {
+        "operationId": "GlobPayController_success_search",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      }
+    },
+    "/api/v3/kpglbpay/failed": {
+      "get": {
+        "operationId": "GlobPayController_failed_get",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "post": {
+        "operationId": "GlobPayController_failed_post",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "put": {
+        "operationId": "GlobPayController_failed_put",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "delete": {
+        "operationId": "GlobPayController_failed_delete",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "patch": {
+        "operationId": "GlobPayController_failed_patch",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "options": {
+        "operationId": "GlobPayController_failed_options",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "head": {
+        "operationId": "GlobPayController_failed_head",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "search": {
+        "operationId": "GlobPayController_failed_search",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      }
+    },
+    "/api/v3/kpglbpay/customer-redirect/{orderId}": {
+      "get": {
+        "operationId": "GlobPayController_customerRedirect_get",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "post": {
+        "operationId": "GlobPayController_customerRedirect_post",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "put": {
+        "operationId": "GlobPayController_customerRedirect_put",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "delete": {
+        "operationId": "GlobPayController_customerRedirect_delete",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "patch": {
+        "operationId": "GlobPayController_customerRedirect_patch",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "options": {
+        "operationId": "GlobPayController_customerRedirect_options",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "head": {
+        "operationId": "GlobPayController_customerRedirect_head",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "search": {
+        "operationId": "GlobPayController_customerRedirect_search",
+        "parameters": [
+          {
+            "name": "orderId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      }
+    },
+    "/api/v3/kpglbpay/callback": {
+      "get": {
+        "operationId": "GlobPayController_callback_get",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "post": {
+        "operationId": "GlobPayController_callback_post",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "put": {
+        "operationId": "GlobPayController_callback_put",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "delete": {
+        "operationId": "GlobPayController_callback_delete",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "patch": {
+        "operationId": "GlobPayController_callback_patch",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "options": {
+        "operationId": "GlobPayController_callback_options",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "head": {
+        "operationId": "GlobPayController_callback_head",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "search": {
+        "operationId": "GlobPayController_callback_search",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      }
+    },
+    "/api/v3/kpglbpay/{path}": {
+      "get": {
+        "operationId": "GlobPayController_catchAll_get",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "post": {
+        "operationId": "GlobPayController_catchAll_post",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "put": {
+        "operationId": "GlobPayController_catchAll_put",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "delete": {
+        "operationId": "GlobPayController_catchAll_delete",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "patch": {
+        "operationId": "GlobPayController_catchAll_patch",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "options": {
+        "operationId": "GlobPayController_catchAll_options",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "head": {
+        "operationId": "GlobPayController_catchAll_head",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
+      },
+      "search": {
+        "operationId": "GlobPayController_catchAll_search",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["GlobPay"]
       }
     },
     "/api/v3/kyc": {
@@ -2728,9 +3336,454 @@
         "tags": ["HEALTH"]
       }
     },
+    "/api/v3/customer/support/countries": {
+      "get": {
+        "description": "Returns a list of all supported countries with their configurations. Supports filtering by service type, currency, country code, and active status. Data is aggregated from the Provider Registry for real-time accuracy. The isEnabled flag indicates whether the authenticated integrator has this service enabled and providers attached.",
+        "operationId": "CountrySupportController_getSupportedCountries_api/v3",
+        "parameters": [
+          {
+            "name": "serviceType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by service type",
+            "schema": {
+              "example": "WITHDRAW",
+              "type": "string",
+              "enum": ["DEPOSIT", "CARD_DEPOSIT", "WITHDRAW", "DETAILS"]
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "Filter by currency",
+            "schema": {
+              "example": "KES",
+              "type": "string",
+              "enum": [
+                "KES",
+                "GHS",
+                "NGN",
+                "ZAR",
+                "ZAR",
+                "USD",
+                "XOF",
+                "ZMW",
+                "XAF",
+                "SLE",
+                "CDF",
+                "TZS",
+                "UGX",
+                "EGP",
+                "MWK",
+                "RWF",
+                "ETB",
+                "MZN",
+                "LSL",
+                "GNF"
+              ]
+            }
+          },
+          {
+            "name": "countryCode",
+            "required": false,
+            "in": "query",
+            "description": "Filter by country code (e.g., KE, NG, GH)",
+            "schema": { "example": "KE", "type": "string" }
+          },
+          {
+            "name": "isActive",
+            "required": false,
+            "in": "query",
+            "description": "Filter by active status",
+            "schema": { "example": true, "type": "boolean" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Countries retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CountrySupportResponseDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid query parameters"
+                    },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Get supported countries",
+        "tags": ["CUSTOMER - COUNTRY SUPPORT"]
+      }
+    },
+    "/api/v3/customer/support/countries/{countryCode}": {
+      "get": {
+        "description": "Returns comprehensive details about a specific country including supported currencies, networks, and service availability. The isEnabled flag indicates whether the authenticated integrator has each service enabled and providers attached.",
+        "operationId": "CountrySupportController_getCountryDetails_api/v3",
+        "parameters": [
+          {
+            "name": "countryCode",
+            "required": true,
+            "in": "path",
+            "description": "Country code (e.g., KE, NG, GH)",
+            "schema": { "example": "KE", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Country details retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": {
+                      "type": "string",
+                      "example": "Country not found"
+                    },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Get detailed country information",
+        "tags": ["CUSTOMER - COUNTRY SUPPORT"]
+      }
+    },
+    "/api/v3/customer/support/networks/{countryCode}": {
+      "get": {
+        "description": "Returns all active mobile money networks available in a specific country, aggregated from all providers. Indicates if network selection is required.",
+        "operationId": "CountrySupportController_getNetworkAvailability_api/v3",
+        "parameters": [
+          {
+            "name": "countryCode",
+            "required": true,
+            "in": "path",
+            "description": "Country code (e.g., KE, NG, GH)",
+            "schema": { "example": "KE", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Networks retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/NetworkAvailabilityResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Get available networks for a country",
+        "tags": ["CUSTOMER - COUNTRY SUPPORT"]
+      }
+    },
+    "/api/v3/customer/support/banks": {
+      "get": {
+        "description": "Returns a list of all supported banks with optional filtering by currency or search term. Banks are sourced from the centralized bank data registry.",
+        "operationId": "CountrySupportController_getBanks_api/v3",
+        "parameters": [
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "Filter by currency",
+            "schema": {
+              "example": "KES",
+              "type": "string",
+              "enum": [
+                "KES",
+                "GHS",
+                "NGN",
+                "ZAR",
+                "ZAR",
+                "USD",
+                "XOF",
+                "ZMW",
+                "XAF",
+                "SLE",
+                "CDF",
+                "TZS",
+                "UGX",
+                "EGP",
+                "MWK",
+                "RWF",
+                "ETB",
+                "MZN",
+                "LSL",
+                "GNF"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search bank by name",
+            "schema": { "example": "equity", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Banks retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BankResponseDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid query parameters"
+                    },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Get available banks",
+        "tags": ["CUSTOMER - COUNTRY SUPPORT"]
+      }
+    },
+    "/api/v3/customer/support/services/deposit": {
+      "get": {
+        "description": "Returns all countries that support deposit (onramp) services with their configurations.",
+        "operationId": "CountrySupportController_getDepositConfiguration_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Deposit configuration retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ServiceConfigurationResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Get deposit service configuration",
+        "tags": ["CUSTOMER - COUNTRY SUPPORT"]
+      }
+    },
+    "/api/v3/customer/support/services/withdraw": {
+      "get": {
+        "description": "Returns all countries that support withdraw (offramp) services with their configurations.",
+        "operationId": "CountrySupportController_getWithdrawConfiguration_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Withdraw configuration retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ServiceConfigurationResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Get withdraw service configuration",
+        "tags": ["CUSTOMER - COUNTRY SUPPORT"]
+      }
+    },
     "/api/v3/offramp": {
       "post": {
-        "description": "This endpoint will create a offramp request for a customer",
+        "description": "This endpoint will create a offramp request for a customer. If the fiat transfer fails after successful crypto receipt, an automatic refund will be initiated after 5 minutes. Use the refund-status endpoint to check refund status.",
         "operationId": "OffRampController_createOfframp_api/v3",
         "parameters": [],
         "requestBody": {
@@ -2793,6 +3846,54 @@
         },
         "security": [{ "JWT": [] }],
         "summary": "Offramp Request",
+        "tags": ["OFFRAMP"]
+      }
+    },
+    "/api/v3/offramp/transactions": {
+      "get": {
+        "description": "This endpoint will return all offramp transactions for the integrator.",
+        "operationId": "OffRampController_getIntegratorOfframps_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Offramp transactions retrieved"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OfframpResponseDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Get Integrator Offramp Transactions",
         "tags": ["OFFRAMP"]
       }
     },
@@ -2913,6 +4014,91 @@
         },
         "security": [{ "JWT": [] }],
         "summary": "Cancel Offramp Transaction",
+        "tags": ["OFFRAMP"]
+      }
+    },
+    "/api/v3/offramp/refund-status/{referenceId}": {
+      "get": {
+        "description": "Get the status of an onchain refund. Refunds are automatically initiated 5 minutes after a failed transaction if the crypto was successfully received but fiat transfer failed.",
+        "operationId": "OffRampController_getRefundStatus_api/v3",
+        "parameters": [
+          {
+            "name": "referenceId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "security": [{ "JWT": [] }],
+        "summary": "Get Refund Status",
+        "tags": ["OFFRAMP"]
+      }
+    },
+    "/api/v3/offramp/retry-refund/{referenceId}": {
+      "post": {
+        "description": "Retry a failed crypto refund for an offramp transaction. Can be retried up to 3 times.",
+        "operationId": "OffRampController_retryRefund_api/v3",
+        "parameters": [
+          {
+            "name": "referenceId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": {
+                      "type": "string",
+                      "example": "Cannot retry refund"
+                    },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": {
+                      "type": "string",
+                      "example": "Reference Id not found"
+                    },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Retry Failed Refund",
         "tags": ["OFFRAMP"]
       }
     },
@@ -3218,6 +4404,464 @@
         "security": [{ "JWT": [] }],
         "summary": "Get Status Response",
         "tags": ["ONRAMP"]
+      }
+    },
+    "/api/v3/dashboard/bulk-payments/api/transactions/{transactionId}": {
+      "get": {
+        "operationId": "ApiBulkPaymentsController_getTransactionById_api/v3",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkPaymentTransactionResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get transaction details with batches",
+        "tags": ["API Bulk Payments"]
+      }
+    },
+    "/api/v3/dashboard/bulk-payments/api/transactions": {
+      "get": {
+        "operationId": "ApiBulkPaymentsController_getTransactions_api/v3",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by status",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "Filter by currency",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "KES",
+                "GHS",
+                "NGN",
+                "ZAR",
+                "ZAR",
+                "USD",
+                "XOF",
+                "ZMW",
+                "XAF",
+                "SLE",
+                "CDF",
+                "TZS",
+                "UGX",
+                "EGP",
+                "MWK",
+                "RWF",
+                "ETB",
+                "MZN",
+                "LSL",
+                "GNF"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Transactions retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get paginated transactions",
+        "tags": ["API Bulk Payments"]
+      }
+    },
+    "/api/v3/dashboard/bulk-payments/api/wallets": {
+      "get": {
+        "operationId": "ApiBulkPaymentsController_getAvailableWallets_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Available wallets retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AvailableWalletDto" }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get available wallets for bulk payments",
+        "tags": ["API Bulk Payments"]
+      }
+    },
+    "/api/v3/dashboard/bulk-payments/api/validate-csv": {
+      "post": {
+        "operationId": "ApiBulkPaymentsController_validateCSV_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "CSV validation results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CSVValidationResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Validate CSV file for bulk payments with multi-currency support",
+        "tags": ["API Bulk Payments"]
+      }
+    },
+    "/api/v3/dashboard/bulk-payments/api/batches/create": {
+      "post": {
+        "operationId": "ApiBulkPaymentsController_createBatches_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBulkPaymentRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created bulk payment batch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BulkPaymentBatchResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Create bulk payment batches",
+        "tags": ["API Bulk Payments"]
+      }
+    },
+    "/api/v3/dashboard/bulk-payments/api/preview": {
+      "post": {
+        "operationId": "ApiBulkPaymentsController_previewBatch_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBulkPaymentRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preview of bulk payment batch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkPaymentPreviewDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Preview bulk payment batches",
+        "tags": ["API Bulk Payments"]
+      }
+    },
+    "/api/v3/dashboard/bulk-payments/api/batches": {
+      "get": {
+        "operationId": "ApiBulkPaymentsController_getBatches_api/v3",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by status",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "Filter by currency",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "KES",
+                "GHS",
+                "NGN",
+                "ZAR",
+                "ZAR",
+                "USD",
+                "XOF",
+                "ZMW",
+                "XAF",
+                "SLE",
+                "CDF",
+                "TZS",
+                "UGX",
+                "EGP",
+                "MWK",
+                "RWF",
+                "ETB",
+                "MZN",
+                "LSL",
+                "GNF"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bulk payment batches retrieved successfully"
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get bulk payment batches",
+        "tags": ["API Bulk Payments"]
+      }
+    },
+    "/api/v3/dashboard/bulk-payments/api/stats": {
+      "get": {
+        "operationId": "ApiBulkPaymentsController_getStats_api/v3",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by status",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "Filter by currency",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "KES",
+                "GHS",
+                "NGN",
+                "ZAR",
+                "ZAR",
+                "USD",
+                "XOF",
+                "ZMW",
+                "XAF",
+                "SLE",
+                "CDF",
+                "TZS",
+                "UGX",
+                "EGP",
+                "MWK",
+                "RWF",
+                "ETB",
+                "MZN",
+                "LSL",
+                "GNF"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bulk payment statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BulkPaymentStatsDto" }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get bulk payment statistics",
+        "tags": ["API Bulk Payments"]
+      }
+    },
+    "/api/v3/dashboard/bulk-payments/api/batches/{batchId}": {
+      "get": {
+        "operationId": "ApiBulkPaymentsController_getBatchById_api/v3",
+        "parameters": [
+          {
+            "name": "batchId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bulk payment batch retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkPaymentDetailsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get bulk payment batch by ID",
+        "tags": ["API Bulk Payments"]
+      }
+    },
+    "/api/v3/dashboard/bulk-payments/api/batches/{batchId}/process": {
+      "post": {
+        "operationId": "ApiBulkPaymentsController_processBatch_api/v3",
+        "parameters": [
+          {
+            "name": "batchId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Bulk payment batch processed successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Process a bulk payment batch",
+        "tags": ["API Bulk Payments"]
+      }
+    },
+    "/api/v3/dashboard/bulk-payments/api/batches/{batchId}/payments": {
+      "get": {
+        "operationId": "ApiBulkPaymentsController_getBatchPayments_api/v3",
+        "parameters": [
+          {
+            "name": "batchId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by status",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "Filter by currency",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "KES",
+                "GHS",
+                "NGN",
+                "ZAR",
+                "ZAR",
+                "USD",
+                "XOF",
+                "ZMW",
+                "XAF",
+                "SLE",
+                "CDF",
+                "TZS",
+                "UGX",
+                "EGP",
+                "MWK",
+                "RWF",
+                "ETB",
+                "MZN",
+                "LSL",
+                "GNF"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Batch payments retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get payments for a specific batch",
+        "tags": ["API Bulk Payments"]
       }
     },
     "/api/v3/cross-boarder/invoice": {
@@ -3946,6 +5590,7 @@
           "CUSD",
           "USDC",
           "USDT",
+          "USDT0",
           "SAT",
           "BTC",
           "HASH",
@@ -3954,7 +5599,8 @@
           "USDGLO",
           "CKES",
           "CGHS",
-          "MSAT"
+          "MSAT",
+          "XLM"
         ],
         "description": "The currency of the wallet"
       },
@@ -4027,9 +5673,21 @@
           },
           "tokenBalance": {
             "description": "The token balance of the wallet",
-            "example": [{ "token": "USDT", "balance": "1000" }],
+            "example": [
+              { "token": "USDT", "balance": "1000", "fiatValue": "1000" }
+            ],
             "type": "array",
             "items": { "type": "string" }
+          },
+          "fiatBalance": {
+            "type": "number",
+            "description": "Total fiat value of the wallet balances (USD)",
+            "example": 1000
+          },
+          "fiatCurrency": {
+            "type": "string",
+            "description": "Fiat currency used for wallet balance conversion",
+            "example": "USD"
           }
         },
         "required": ["name", "balance", "type", "coin", "id"]
@@ -4105,9 +5763,21 @@
           },
           "tokenBalance": {
             "description": "The token balance of the wallet",
-            "example": [{ "token": "USDT", "balance": "1000" }],
+            "example": [
+              { "token": "USDT", "balance": "1000", "fiatValue": "1000" }
+            ],
             "type": "array",
             "items": { "type": "string" }
+          },
+          "fiatBalance": {
+            "type": "number",
+            "description": "Total fiat value of the wallet balances (USD)",
+            "example": 1000
+          },
+          "fiatCurrency": {
+            "type": "string",
+            "description": "Fiat currency used for wallet balance conversion",
+            "example": "USD"
           }
         },
         "required": ["name", "balance", "type", "coin", "id"]
@@ -4144,6 +5814,25 @@
             "type": "string",
             "description": "phone",
             "example": "+xxx xxx xxx xxx"
+          },
+          "webhook_url": {
+            "type": "string",
+            "description": "Default webhook callback URL",
+            "example": "https://example.com/kotani/webhooks"
+          },
+          "webhook_events": {
+            "type": "array",
+            "description": "Webhook events this integrator is subscribed to",
+            "example": ["transaction.status.updated", "payment.confirmed"],
+            "items": {
+              "type": "string",
+              "enum": [
+                "transaction.status.updated",
+                "payment.confirmed",
+                "kyc.status.changed",
+                "system.event"
+              ]
+            }
           }
         },
         "required": [
@@ -4191,6 +5880,30 @@
             "type": "string",
             "description": "country_code",
             "example": "US"
+          },
+          "webhook_url": {
+            "type": "string",
+            "description": "Default webhook callback URL",
+            "example": "https://example.com/kotani/webhooks"
+          },
+          "webhook_secret": {
+            "type": "string",
+            "description": "Shared secret used to sign webhook payloads",
+            "example": "whsec_xxx"
+          },
+          "webhook_events": {
+            "type": "array",
+            "description": "Webhook events this integrator is subscribed to",
+            "example": ["transaction.status.updated", "payment.confirmed"],
+            "items": {
+              "type": "string",
+              "enum": [
+                "transaction.status.updated",
+                "payment.confirmed",
+                "kyc.status.changed",
+                "system.event"
+              ]
+            }
           }
         },
         "required": [
@@ -4202,6 +5915,35 @@
           "phone",
           "country_code"
         ]
+      },
+      "UpdateIntegratorWebhookDto": {
+        "type": "object",
+        "properties": {
+          "webhook_url": {
+            "type": "string",
+            "description": "Default webhook callback URL",
+            "example": "https://example.com/kotani/webhooks"
+          },
+          "webhook_secret": {
+            "type": "string",
+            "description": "Shared secret used to sign webhook payloads",
+            "example": "whsec_1234567890abcdef"
+          },
+          "webhook_events": {
+            "type": "array",
+            "description": "Webhook events this integrator should receive",
+            "example": ["transaction.status.updated"],
+            "items": {
+              "type": "string",
+              "enum": [
+                "transaction.status.updated",
+                "payment.confirmed",
+                "kyc.status.changed",
+                "system.event"
+              ]
+            }
+          }
+        }
       },
       "ApiKeyResponseDto": {
         "type": "object",
@@ -4347,7 +6089,8 @@
           "ERROR_OCCURRED",
           "REQUIRE_REVIEW",
           "SUCCESS",
-          "RETRY"
+          "RETRY",
+          "PERMANENTLY_FAILED"
         ]
       },
       "DepositStatusResponseDto": {
@@ -4378,6 +6121,23 @@
             "description": "reference id",
             "example": "5f9b2c7b9c9d6b0017b4e6b1"
           },
+          "provider": { "type": "string" },
+          "providerReference": { "type": "string" },
+          "providerRequest": { "type": "string" },
+          "providerResponse": { "type": "string" },
+          "callbackUrlStatus": { "type": "number" },
+          "callbackResponse": { "type": "string" },
+          "callbackPayload": { "type": "object" },
+          "transactionError": { "type": "string" },
+          "retries": { "type": "number" },
+          "network": { "type": "string" },
+          "currency": { "type": "string" },
+          "environment": { "type": "string" },
+          "integratorsAmount": { "type": "number" },
+          "wallet": { "type": "object" },
+          "customer": { "type": "object" },
+          "paymentLinkTransaction": { "type": "object" },
+          "updatedAt": { "type": "string" },
           "status": {
             "allOf": [{ "$ref": "#/components/schemas/DEPOSIT_STATUS" }]
           },
@@ -4641,7 +6401,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2025-10-02T09:40:22.591Z"
+            "example": "2025-10-17T11:45:24.660Z"
           },
           "transactionCost": {
             "type": "number",
@@ -4703,7 +6463,8 @@
               "UG",
               "EG",
               "RW",
-              "COD"
+              "COD",
+              "USA"
             ],
             "example": "GHA or KE"
           },
@@ -4764,7 +6525,8 @@
               "UG",
               "EG",
               "RW",
-              "COD"
+              "COD",
+              "USA"
             ],
             "example": "GHA or KE"
           },
@@ -4823,7 +6585,8 @@
               "UG",
               "EG",
               "RW",
-              "COD"
+              "COD",
+              "USA"
             ],
             "example": "GHA or KE"
           },
@@ -4860,6 +6623,131 @@
           "email": { "type": "string", "example": "john.doe@example.com" }
         },
         "required": ["phone_number", "country_code"]
+      },
+      "ValidateAccountResponseDto": {
+        "type": "object",
+        "properties": {
+          "isValid": {
+            "type": "boolean",
+            "description": "Validation status",
+            "example": true
+          },
+          "accountName": {
+            "type": "string",
+            "description": "Account holder name (if available)"
+          },
+          "accountType": {
+            "type": "string",
+            "description": "Account type",
+            "enum": ["mobile_money", "bank"]
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional validation details"
+          }
+        },
+        "required": ["isValid", "accountType"]
+      },
+      "ValidateMobileMoneyAccountDto": {
+        "type": "object",
+        "properties": {
+          "phone_number": {
+            "type": "string",
+            "description": "Phone number to validate",
+            "example": "+254712345678"
+          },
+          "country_code": {
+            "type": "string",
+            "enum": [
+              "GHA",
+              "NG",
+              "KE",
+              "ZA",
+              "CIV",
+              "ZM",
+              "CMR",
+              "COD",
+              "SEN",
+              "TZ",
+              "MWI",
+              "UG",
+              "EG",
+              "RW",
+              "COD",
+              "USA"
+            ],
+            "description": "Country code",
+            "example": "KE"
+          },
+          "network": {
+            "type": "string",
+            "enum": [
+              "MTN",
+              "AIRTEL",
+              "VODAFONE",
+              "TIGO",
+              "ORANGE",
+              "NOT_SUPPORTED",
+              "ZAMTEL",
+              "MPESA",
+              "CHECKOUT",
+              "BKTRX",
+              "CRDTRX",
+              "MOOV",
+              "TMONEY",
+              "FREE",
+              "EXPRESSO",
+              "HALOPESA",
+              "VODACOM"
+            ],
+            "description": "Mobile money network (required for some countries like Ghana)",
+            "example": "MPESA"
+          }
+        },
+        "required": ["phone_number", "country_code"]
+      },
+      "ValidateBankAccountDto": {
+        "type": "object",
+        "properties": {
+          "account_number": {
+            "type": "string",
+            "description": "Bank account number",
+            "example": "1234567890"
+          },
+          "bank_code": {
+            "type": "string",
+            "description": "Bank code or institution ID",
+            "example": "KCB"
+          },
+          "country_code": {
+            "type": "string",
+            "enum": [
+              "GHA",
+              "NG",
+              "KE",
+              "ZA",
+              "CIV",
+              "ZM",
+              "CMR",
+              "COD",
+              "SEN",
+              "TZ",
+              "MWI",
+              "UG",
+              "EG",
+              "RW",
+              "COD",
+              "USA"
+            ],
+            "description": "Country code",
+            "example": "KE"
+          },
+          "account_name": {
+            "type": "string",
+            "description": "Account holder name (optional, for name matching)"
+          }
+        },
+        "required": ["account_number", "bank_code", "country_code"]
       },
       "WithdrawResponseDto": {
         "type": "object",
@@ -5006,7 +6894,7 @@
       },
       "PAYMENT_METHOD": {
         "type": "string",
-        "enum": ["mobile_money", "bank"],
+        "enum": ["mobile_money", "bank", "card", "crypto"],
         "description": "Payment method"
       },
       "PaymentProviderDto": {
@@ -5183,6 +7071,139 @@
           "document"
         ]
       },
+      "CountrySupportResponseDto": {
+        "type": "object",
+        "properties": {
+          "countryCode": {
+            "type": "string",
+            "description": "Country code",
+            "example": "KE"
+          },
+          "isoName": {
+            "type": "string",
+            "description": "ISO country name",
+            "example": "KEN"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code",
+            "example": "KES"
+          },
+          "serviceType": {
+            "type": "string",
+            "description": "Service type",
+            "example": "WITHDRAW"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Is the country active for this service",
+            "example": true
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "description": "Is this service enabled for the authenticated integrator",
+            "example": true
+          },
+          "requiresNetwork": {
+            "type": "boolean",
+            "description": "Requires network selection for mobile money",
+            "example": false
+          },
+          "requiresAccountName": {
+            "type": "boolean",
+            "description": "Requires account name for mobile money",
+            "example": false
+          },
+          "availableNetworks": {
+            "description": "Available networks for this country",
+            "example": ["MPESA", "AIRTEL"],
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": [
+          "countryCode",
+          "isoName",
+          "currency",
+          "serviceType",
+          "isActive",
+          "isEnabled",
+          "requiresNetwork",
+          "requiresAccountName"
+        ]
+      },
+      "NetworkAvailabilityResponseDto": {
+        "type": "object",
+        "properties": {
+          "countryCode": {
+            "type": "string",
+            "description": "Country code",
+            "example": "KE"
+          },
+          "networks": {
+            "description": "Available networks",
+            "example": ["MPESA", "AIRTEL"],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "isRequired": {
+            "type": "boolean",
+            "description": "Whether network selection is required",
+            "example": false
+          }
+        },
+        "required": ["countryCode", "networks", "isRequired"]
+      },
+      "BankResponseDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "Bank code",
+            "example": 68
+          },
+          "name": {
+            "type": "string",
+            "description": "Bank name",
+            "example": "Equity Bank"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency this bank operates in",
+            "example": "KES"
+          },
+          "bankGroupId": {
+            "type": "string",
+            "description": "Bank group ID (if applicable)"
+          },
+          "universalBranchCode": {
+            "type": "string",
+            "description": "Universal branch code (if applicable)"
+          }
+        },
+        "required": ["code", "name", "currency"]
+      },
+      "ServiceConfigurationResponseDto": {
+        "type": "object",
+        "properties": {
+          "serviceType": {
+            "type": "string",
+            "description": "Service type",
+            "example": "WITHDRAW"
+          },
+          "countries": {
+            "description": "List of active countries for this service",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "totalCountries": {
+            "type": "number",
+            "description": "Total count of active countries",
+            "example": 8
+          }
+        },
+        "required": ["serviceType", "countries", "totalCountries"]
+      },
       "OfframpResponseDto": {
         "type": "object",
         "properties": {
@@ -5217,7 +7238,24 @@
             "description": "Onchain status"
           },
           "rate": { "type": "object", "description": "Rate" },
-          "escrowAddress": { "type": "string", "description": "Escrow address" }
+          "escrowAddress": {
+            "type": "string",
+            "description": "Escrow address"
+          },
+          "usingIntegratedWallet": {
+            "type": "boolean",
+            "description": "Whether using integrated crypto wallet flow"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation timestamp"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update timestamp"
+          }
         },
         "required": [
           "referenceId",
@@ -5301,18 +7339,27 @@
           "referenceId": { "type": "string", "description": "Reference ID" },
           "senderAddress": {
             "type": "string",
-            "description": "Sender address"
+            "description": "Sender address (optional - if not provided, will use integrator crypto wallet)"
           },
           "callbackUrl": { "type": "string", "description": "Callback Url" },
-          "rateId": { "type": "string", "description": "Rate ID" }
+          "rateId": { "type": "string", "description": "Rate ID" },
+          "refundInitiated": {
+            "type": "boolean",
+            "description": "Whether refund has been initiated"
+          },
+          "refundStatus": { "type": "string", "description": "Refund status" },
+          "refundTransactionHash": {
+            "type": "string",
+            "description": "Refund transaction hash"
+          },
+          "refundAmount": { "type": "number", "description": "Refund amount" }
         },
         "required": [
           "cryptoAmount",
           "currency",
           "chain",
           "token",
-          "referenceId",
-          "senderAddress"
+          "referenceId"
         ]
       },
       "OnrampCryptoResponseDto": {
@@ -5550,6 +7597,538 @@
           "rate",
           "fiatAmount",
           "cryptoAmount"
+        ]
+      },
+      "BulkPaymentProgressDto": {
+        "type": "object",
+        "properties": {
+          "step": { "type": "string", "description": "Step name" },
+          "status": { "type": "string", "description": "Step status" },
+          "message": { "type": "string", "description": "Progress message" },
+          "startedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "When step started"
+          },
+          "completedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "When step completed"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional step details"
+          }
+        },
+        "required": [
+          "step",
+          "status",
+          "message",
+          "startedAt",
+          "completedAt",
+          "details"
+        ]
+      },
+      "BulkPaymentBatchResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Batch ID" },
+          "batchName": { "type": "string", "description": "Batch name" },
+          "status": { "type": "string", "description": "Batch status" },
+          "totalAmount": { "type": "number", "description": "Total amount" },
+          "totalPayments": {
+            "type": "number",
+            "description": "Total payments count"
+          },
+          "successfulPayments": {
+            "type": "number",
+            "description": "Successful payments count"
+          },
+          "failedPayments": {
+            "type": "number",
+            "description": "Failed payments count"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Created date"
+          },
+          "progress": {
+            "description": "Progress tracking",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/BulkPaymentProgressDto" }
+          }
+        },
+        "required": [
+          "id",
+          "batchName",
+          "status",
+          "totalAmount",
+          "totalPayments",
+          "successfulPayments",
+          "failedPayments",
+          "createdAt",
+          "progress"
+        ]
+      },
+      "BulkPaymentTransactionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Transaction ID" },
+          "transactionName": {
+            "type": "string",
+            "description": "Transaction name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Transaction description"
+          },
+          "status": { "type": "string", "description": "Transaction status" },
+          "fileName": { "type": "string", "description": "File name" },
+          "totalBatches": { "type": "number", "description": "Total batches" },
+          "totalRecipients": {
+            "type": "number",
+            "description": "Total recipients"
+          },
+          "totalAmount": { "type": "number", "description": "Total amount" },
+          "currencies": {
+            "description": "Currencies involved",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "completedBatches": {
+            "type": "number",
+            "description": "Completed batches count"
+          },
+          "failedBatches": {
+            "type": "number",
+            "description": "Failed batches count"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Created date"
+          },
+          "createdBy": { "type": "string", "description": "Created by" },
+          "batches": {
+            "description": "Batches in this transaction",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BulkPaymentBatchResponseDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "transactionName",
+          "description",
+          "status",
+          "fileName",
+          "totalBatches",
+          "totalRecipients",
+          "totalAmount",
+          "currencies",
+          "completedBatches",
+          "failedBatches",
+          "createdAt",
+          "createdBy"
+        ]
+      },
+      "AvailableWalletDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Wallet ID" },
+          "name": { "type": "string", "description": "Wallet name" },
+          "currency": {
+            "type": "string",
+            "description": "Wallet currency",
+            "enum": [
+              "KES",
+              "GHS",
+              "NGN",
+              "ZAR",
+              "ZAR",
+              "USD",
+              "XOF",
+              "ZMW",
+              "XAF",
+              "SLE",
+              "CDF",
+              "TZS",
+              "UGX",
+              "EGP",
+              "MWK",
+              "RWF",
+              "ETB",
+              "MZN",
+              "LSL",
+              "GNF"
+            ]
+          },
+          "balance": { "type": "number", "description": "Available balance" }
+        },
+        "required": ["id", "name", "currency", "balance"]
+      },
+      "CSVValidationResponseDto": {
+        "type": "object",
+        "properties": {
+          "isValid": {
+            "type": "boolean",
+            "description": "Whether CSV is valid"
+          },
+          "totalRecords": {
+            "type": "number",
+            "description": "Total records in CSV"
+          },
+          "currencies": {
+            "description": "Currencies found in CSV",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "errors": {
+            "description": "Validation errors if any",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "warnings": {
+            "description": "Validation warnings if any",
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "currencyBreakdown": {
+            "type": "object",
+            "description": "Currency breakdown"
+          },
+          "fileHash": {
+            "type": "string",
+            "description": "File hash for duplicate detection"
+          },
+          "isDuplicate": {
+            "type": "boolean",
+            "description": "Whether file is duplicate"
+          }
+        },
+        "required": [
+          "isValid",
+          "totalRecords",
+          "currencies",
+          "errors",
+          "warnings",
+          "currencyBreakdown",
+          "fileHash",
+          "isDuplicate"
+        ]
+      },
+      "BulkPaymentRecipientDto": {
+        "type": "object",
+        "properties": {
+          "recipientName": {
+            "type": "string",
+            "description": "Recipient full name"
+          },
+          "recipientEmail": {
+            "type": "string",
+            "description": "Recipient email address"
+          },
+          "recipientPhone": {
+            "type": "string",
+            "description": "Recipient phone number"
+          },
+          "amount": { "type": "number", "description": "Payment amount" },
+          "currency": {
+            "type": "string",
+            "description": "Payment currency",
+            "enum": [
+              "KES",
+              "GHS",
+              "NGN",
+              "ZAR",
+              "ZAR",
+              "USD",
+              "XOF",
+              "ZMW",
+              "XAF",
+              "SLE",
+              "CDF",
+              "TZS",
+              "UGX",
+              "EGP",
+              "MWK",
+              "RWF",
+              "ETB",
+              "MZN",
+              "LSL",
+              "GNF"
+            ]
+          },
+          "reference": {
+            "type": "string",
+            "description": "Unique payment reference"
+          }
+        },
+        "required": [
+          "recipientName",
+          "recipientEmail",
+          "recipientPhone",
+          "amount",
+          "currency",
+          "reference"
+        ]
+      },
+      "CurrencyWalletSelectionDto": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "Currency code",
+            "enum": [
+              "KES",
+              "GHS",
+              "NGN",
+              "ZAR",
+              "ZAR",
+              "USD",
+              "XOF",
+              "ZMW",
+              "XAF",
+              "SLE",
+              "CDF",
+              "TZS",
+              "UGX",
+              "EGP",
+              "MWK",
+              "RWF",
+              "ETB",
+              "MZN",
+              "LSL",
+              "GNF"
+            ]
+          },
+          "walletId": { "type": "string", "description": "Selected wallet ID" }
+        },
+        "required": ["currency", "walletId"]
+      },
+      "CreateBulkPaymentRequestDto": {
+        "type": "object",
+        "properties": {
+          "batchName": { "type": "string", "description": "Batch name" },
+          "batchDescription": {
+            "type": "string",
+            "description": "Batch description"
+          },
+          "recipients": {
+            "description": "Recipients list",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/BulkPaymentRecipientDto" }
+          },
+          "walletSelections": {
+            "description": "Currency wallet selections",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CurrencyWalletSelectionDto"
+            }
+          },
+          "callbackUrl": {
+            "type": "string",
+            "description": "Callback URL for notifications"
+          },
+          "integratorId": {
+            "type": "string",
+            "description": "For admin use - integrator ID"
+          }
+        },
+        "required": ["batchName", "recipients", "walletSelections"]
+      },
+      "CurrencyBreakdownDto": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "Currency",
+            "enum": [
+              "KES",
+              "GHS",
+              "NGN",
+              "ZAR",
+              "ZAR",
+              "USD",
+              "XOF",
+              "ZMW",
+              "XAF",
+              "SLE",
+              "CDF",
+              "TZS",
+              "UGX",
+              "EGP",
+              "MWK",
+              "RWF",
+              "ETB",
+              "MZN",
+              "LSL",
+              "GNF"
+            ]
+          },
+          "recipientCount": {
+            "type": "number",
+            "description": "Number of recipients"
+          },
+          "totalAmount": {
+            "type": "number",
+            "description": "Total amount for this currency"
+          },
+          "walletId": { "type": "string", "description": "Selected wallet ID" },
+          "recipients": {
+            "description": "Recipients for this currency",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/BulkPaymentRecipientDto" }
+          }
+        },
+        "required": [
+          "currency",
+          "recipientCount",
+          "totalAmount",
+          "walletId",
+          "recipients"
+        ]
+      },
+      "BulkPaymentPreviewDto": {
+        "type": "object",
+        "properties": {
+          "totalBatches": {
+            "type": "number",
+            "description": "Total batches to be created"
+          },
+          "totalRecipients": {
+            "type": "number",
+            "description": "Total recipients across all batches"
+          },
+          "currencyBreakdown": {
+            "description": "Breakdown by currency - never add amounts from different currencies",
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CurrencyBreakdownDto" }
+          }
+        },
+        "required": ["totalBatches", "totalRecipients", "currencyBreakdown"]
+      },
+      "BulkPaymentStatsDto": {
+        "type": "object",
+        "properties": {
+          "totalBatches": { "type": "number", "description": "Total batches" },
+          "totalSuccessfulPayments": {
+            "type": "number",
+            "description": "Total successful payments"
+          },
+          "totalFailedPayments": {
+            "type": "number",
+            "description": "Total failed payments"
+          },
+          "averageBatchSize": {
+            "type": "number",
+            "description": "Average batch size"
+          },
+          "successRate": {
+            "type": "number",
+            "description": "Success rate percentage"
+          },
+          "currencyBreakdown": {
+            "type": "object",
+            "description": "Currency breakdown",
+            "example": {
+              "KES": {
+                "totalAmount": 50000,
+                "totalBatches": 3,
+                "totalPayments": 25
+              },
+              "ZMW": {
+                "totalAmount": 15000,
+                "totalBatches": 1,
+                "totalPayments": 10
+              }
+            }
+          }
+        },
+        "required": [
+          "totalBatches",
+          "totalSuccessfulPayments",
+          "totalFailedPayments",
+          "averageBatchSize",
+          "successRate",
+          "currencyBreakdown"
+        ]
+      },
+      "BulkPaymentDetailsResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Payment ID" },
+          "recipientName": {
+            "type": "string",
+            "description": "Recipient name"
+          },
+          "recipientEmail": {
+            "type": "string",
+            "description": "Recipient email"
+          },
+          "recipientPhone": {
+            "type": "string",
+            "description": "Recipient phone"
+          },
+          "amount": { "type": "number", "description": "Payment amount" },
+          "currency": {
+            "type": "string",
+            "description": "Currency",
+            "enum": [
+              "KES",
+              "GHS",
+              "NGN",
+              "ZAR",
+              "ZAR",
+              "USD",
+              "XOF",
+              "ZMW",
+              "XAF",
+              "SLE",
+              "CDF",
+              "TZS",
+              "UGX",
+              "EGP",
+              "MWK",
+              "RWF",
+              "ETB",
+              "MZN",
+              "LSL",
+              "GNF"
+            ]
+          },
+          "reference": { "type": "string", "description": "Payment reference" },
+          "status": { "type": "string", "description": "Payment status" },
+          "customerKey": {
+            "type": "string",
+            "description": "Customer key if created"
+          },
+          "withdrawalId": {
+            "type": "string",
+            "description": "Withdrawal ID if processed"
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Error message if failed"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Created date"
+          }
+        },
+        "required": [
+          "id",
+          "recipientName",
+          "recipientEmail",
+          "recipientPhone",
+          "amount",
+          "currency",
+          "reference",
+          "status",
+          "createdAt"
         ]
       },
       "FiatToFiatInvoiceResponseDto": {

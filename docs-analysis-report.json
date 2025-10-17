@@ -1,0 +1,3044 @@
+{
+  "summary": {
+    "totalEndpoints": 119,
+    "documentedPages": 67,
+    "totalTags": 22,
+    "missingDocsCount": 118,
+    "completeDocsCount": 1
+  },
+  "missingDocs": [
+    {
+      "tag": "RATES",
+      "endpoint": {
+        "path": "/api/v3/rate/{from}/{to}",
+        "method": "GET",
+        "operationId": "RateController_getRates_api/v3",
+        "summary": "Get exchange rate",
+        "tags": [
+          "RATES"
+        ],
+        "description": "An integrator can use this endpoint to get the exchange rate between two currencies"
+      },
+      "slug": "v3/api-reference/rates/get-exchange-rate",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "RATES",
+      "endpoint": {
+        "path": "/api/v3/rate/onramp",
+        "method": "POST",
+        "operationId": "RateController_getOnrampRates_api/v3",
+        "summary": "Get Onramp Exchange rate",
+        "tags": [
+          "RATES"
+        ],
+        "description": "An integrator can use this endpoint to get the exchange rate between two currencies"
+      },
+      "slug": "v3/api-reference/rates/get-onramp-exchange-rate",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "RATES",
+      "endpoint": {
+        "path": "/api/v3/rate/offramp",
+        "method": "POST",
+        "operationId": "RateController_getOffRampRates_api/v3",
+        "summary": "Get Offramp Exchange rate",
+        "tags": [
+          "RATES"
+        ],
+        "description": "An integrator can use this endpoint to get the exchange rate between two currencies"
+      },
+      "slug": "v3/api-reference/rates/get-offramp-exchange-rate",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "RATES",
+      "endpoint": {
+        "path": "/api/v3/rate/fiat",
+        "method": "POST",
+        "operationId": "RateController_getFiatToFiatRate_api/v3",
+        "summary": "Get Fiat to Fiat exchange rate",
+        "tags": [
+          "RATES"
+        ],
+        "description": "An integrator can use this endpoint to get the exchange rate between two fiat currencies"
+      },
+      "slug": "v3/api-reference/rates/get-fiat-to-fiat-exchange-rate",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "RATES",
+      "endpoint": {
+        "path": "/api/v3/rate",
+        "method": "GET",
+        "operationId": "RateController_rates_api/v3",
+        "summary": "Get all exchange rates",
+        "tags": [
+          "RATES"
+        ],
+        "description": "An integrator can use this endpoint to get all the exchange rates available"
+      },
+      "slug": "v3/api-reference/rates/get-all-exchange-rates",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "PUBLIC RATES",
+      "endpoint": {
+        "path": "/api/v3/public/rate/{from}/{to}",
+        "method": "GET",
+        "operationId": "PublicRateController_getPublicRate_api/v3",
+        "summary": "Get public exchange rate (no auth required)",
+        "tags": [
+          "PUBLIC RATES"
+        ],
+        "description": "Public endpoint for getting exchange rates between two currencies. Used for payment link checkout currency conversion display."
+      },
+      "slug": "v3/api-reference/rates/get-public-exchange-rate-no-auth-required",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "PUBLIC RATES",
+      "endpoint": {
+        "path": "/api/v3/public/rate",
+        "method": "GET",
+        "operationId": "PublicRateController_getPublicRates_api/v3",
+        "summary": "Get all public exchange rates (no auth required)",
+        "tags": [
+          "PUBLIC RATES"
+        ],
+        "description": "Public endpoint for getting all available exchange rates. Useful for dropdown displays or rate comparison."
+      },
+      "slug": "v3/api-reference/rates/get-all-public-exchange-rates-no-auth-required",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "FIAT WALLET",
+      "endpoint": {
+        "path": "/api/v3/wallet/fiat",
+        "method": "POST",
+        "operationId": "FiatWalletController_createFiatWallet_api/v3",
+        "summary": "Create a Fiat Wallet",
+        "tags": [
+          "FIAT WALLET"
+        ],
+        "description": "This endpoint will create a fiat wallet for the integrator."
+      },
+      "slug": "v3/api-reference/wallets/fiat/create-a-fiat-wallet",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "FIAT WALLET",
+      "endpoint": {
+        "path": "/api/v3/wallet/fiat",
+        "method": "GET",
+        "operationId": "FiatWalletController_getUsersFiatWallet_api/v3",
+        "summary": "Get Integrator Fiat Wallets",
+        "tags": [
+          "FIAT WALLET"
+        ],
+        "description": "This endpoint will return all the fiat wallets created by the integrator."
+      },
+      "slug": "v3/api-reference/wallets/fiat/get-integrator-fiat-wallets",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "FIAT WALLET",
+      "endpoint": {
+        "path": "/api/v3/wallet/fiat/{id}",
+        "method": "GET",
+        "operationId": "FiatWalletController_getFiatWallet_api/v3",
+        "summary": "Get Integrator Fiat Wallet by Wallet ID",
+        "tags": [
+          "FIAT WALLET"
+        ],
+        "description": "This endpoint will return the fiat wallet created by the integrator."
+      },
+      "slug": "v3/api-reference/wallets/fiat/get-integrator-fiat-wallet-by-wallet-id",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "FIAT WALLET",
+      "endpoint": {
+        "path": "/api/v3/wallet/fiat/{id}",
+        "method": "PATCH",
+        "operationId": "FiatWalletController_updateFiatWallet_api/v3",
+        "summary": "Update Integrator Fiat Wallet by Wallet ID",
+        "tags": [
+          "FIAT WALLET"
+        ],
+        "description": "This endpoint will update the fiat wallet created by the integrator."
+      },
+      "slug": "v3/api-reference/wallets/fiat/update-integrator-fiat-wallet-by-wallet-id",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "FIAT WALLET",
+      "endpoint": {
+        "path": "/api/v3/wallet/fiat/currency/{currency}",
+        "method": "GET",
+        "operationId": "FiatWalletController_getFiatWalletByCurrency_api/v3",
+        "summary": "Get Integrator Fiat Wallet by Currency (optionally by Country)",
+        "tags": [
+          "FIAT WALLET"
+        ],
+        "description": "This endpoint will return the fiat wallet created by the integrator. Optionally filter by country using the \"country\" query parameter."
+      },
+      "slug": "v3/api-reference/wallets/fiat/get-integrator-fiat-wallet-by-currency-optionally-by-country",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CRYPTO WALLET",
+      "endpoint": {
+        "path": "/api/v3/wallet/crypto",
+        "method": "POST",
+        "operationId": "CryptoWalletController_createCryptoWallet_api/v3",
+        "summary": "Create a Crypto wallet",
+        "tags": [
+          "CRYPTO WALLET"
+        ],
+        "description": "The crypto wallet will contain the specified chain and coins an integrator desires to hold and one can create as many wallets as needed."
+      },
+      "slug": "v3/api-reference/wallets/crypto/create-a-crypto-wallet",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CRYPTO WALLET",
+      "endpoint": {
+        "path": "/api/v3/wallet/crypto",
+        "method": "GET",
+        "operationId": "CryptoWalletController_getUsersCryptoWallets_api/v3",
+        "summary": "Get Integrator Crypto Wallets",
+        "tags": [
+          "CRYPTO WALLET"
+        ],
+        "description": "This endpoint will return all the crypto wallets created by the integrator."
+      },
+      "slug": "v3/api-reference/wallets/crypto/get-integrator-crypto-wallets",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CRYPTO WALLET",
+      "endpoint": {
+        "path": "/api/v3/wallet/crypto/{id}",
+        "method": "GET",
+        "operationId": "CryptoWalletController_getFiatWallet_api/v3",
+        "summary": "Get Integrator Crypto Wallet by Wallet ID",
+        "tags": [
+          "CRYPTO WALLET"
+        ],
+        "description": "This endpoint will return the crypto wallet created by the integrator by passing the wallet id."
+      },
+      "slug": "v3/api-reference/wallets/crypto/get-integrator-crypto-wallet-by-wallet-id",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "INTEGRATOR",
+      "endpoint": {
+        "path": "/api/v3/integrator",
+        "method": "POST",
+        "operationId": "IntegratorController_createIntegrator_api/v3",
+        "summary": "Create an integrator",
+        "tags": [
+          "INTEGRATOR"
+        ],
+        "description": "This endpoint will help you create an integrator"
+      },
+      "slug": "v3/api-reference/integrator/create-an-integrator",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "INTEGRATOR",
+      "endpoint": {
+        "path": "/api/v3/integrator",
+        "method": "GET",
+        "operationId": "IntegratorController_getIntegrator_api/v3",
+        "summary": "Get an Integrator Details.",
+        "tags": [
+          "INTEGRATOR"
+        ],
+        "description": "This endpoint is used to retrieve an integrator details"
+      },
+      "slug": "v3/api-reference/integrator/get-an-integrator-details",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "INTEGRATOR",
+      "endpoint": {
+        "path": "/api/v3/integrator/webhook",
+        "method": "PATCH",
+        "operationId": "IntegratorController_updateWebhookSettings_api/v3",
+        "summary": "Update webhook configuration",
+        "tags": [
+          "INTEGRATOR"
+        ],
+        "description": "Allows an integrator to update their default webhook URL, secret, and event subscriptions."
+      },
+      "slug": "v3/api-reference/integrator/update-webhook-configuration",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "AUTHENTICATION",
+      "endpoint": {
+        "path": "/api/v3/auth/login",
+        "method": "POST",
+        "operationId": "AuthController_authLogin_api/v3",
+        "summary": "Authentication Login",
+        "tags": [
+          "AUTHENTICATION"
+        ],
+        "description": "Login to your integrator account. This endpoint allows you to login to your account"
+      },
+      "slug": "v3/api-reference/authentication/authentication-login",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "AUTHENTICATION",
+      "endpoint": {
+        "path": "/api/v3/auth/api-key/secure",
+        "method": "GET",
+        "operationId": "AuthController_generateApiKeySecret_api/v3",
+        "summary": "Generate API Key.",
+        "tags": [
+          "AUTHENTICATION"
+        ],
+        "description": "This endpoint is used to generate an the API Key which can be used to authorize transactions and more"
+      },
+      "slug": "v3/api-reference/authentication/generate-api-key",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "AUTHENTICATION",
+      "endpoint": {
+        "path": "/api/v3/auth/human-verify",
+        "method": "POST",
+        "operationId": "AuthController_humanVerify_api/v3",
+        "summary": "Human verification for suspicious requests",
+        "tags": [
+          "AUTHENTICATION"
+        ],
+        "description": "Complete human verification for magic link requests that were flagged as potentially suspicious"
+      },
+      "slug": "v3/api-reference/authentication/human-verification-for-suspicious-requests",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "AUTHENTICATION",
+      "endpoint": {
+        "path": "/api/v3/auth/refresh-token",
+        "method": "GET",
+        "operationId": "AuthController_refreshToken_api/v3",
+        "summary": "Refresh access token.",
+        "tags": [
+          "AUTHENTICATION"
+        ],
+        "description": "This endpoint is used to refresh the access token using a valid refresh token"
+      },
+      "slug": "v3/api-reference/authentication/refresh-access-token",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "MOBILE MONEY DEPOSIT",
+      "endpoint": {
+        "path": "/api/v3/deposit/mobile-money",
+        "method": "POST",
+        "operationId": "DepositMobileMoneyController_mobileMoney_api/v3",
+        "summary": "Deposit via mobile money",
+        "tags": [
+          "MOBILE MONEY DEPOSIT"
+        ],
+        "description": "An integrator’s customers can initiate a deposit from their respective mobile money wallets.     An STK push will be sent to the customer and the respective amount will be deducted from their mobile money wallets and deposited into the integrator’s fiat wallet"
+      },
+      "slug": "v3/api-reference/deposits/deposit-via-mobile-money",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "MOBILE MONEY DEPOSIT",
+      "endpoint": {
+        "path": "/api/v3/deposit/mobile-money/status/{reference_id}",
+        "method": "GET",
+        "operationId": "DepositMobileMoneyController_getWithdrawalStatus_api/v3",
+        "summary": "Get Deposit on Mobile Money status",
+        "tags": [
+          "MOBILE MONEY DEPOSIT"
+        ],
+        "description": "An integrator can use this endpoint to check the status of a deposit"
+      },
+      "slug": "v3/api-reference/deposits/get-deposit-on-mobile-money-status",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "BANK DEPOSIT(checkout)",
+      "endpoint": {
+        "path": "/api/v3/deposit/bank/checkout",
+        "method": "POST",
+        "operationId": "DepositBankCheckoutController_mobileMoney_api/v3",
+        "summary": "Deposit via bank checkout",
+        "tags": [
+          "BANK DEPOSIT(checkout)"
+        ],
+        "description": "Customer Completed transaction using Checkout Url"
+      },
+      "slug": "v3/api-reference/deposits/deposit-via-bank-checkout",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "BANK DEPOSIT(checkout)",
+      "endpoint": {
+        "path": "/api/v3/deposit/bank/checkout/status/{reference_id}",
+        "method": "GET",
+        "operationId": "DepositBankCheckoutController_getWithdrawalStatus_api/v3",
+        "summary": "Get Deposit status",
+        "tags": [
+          "BANK DEPOSIT(checkout)"
+        ],
+        "description": "An integrator can use this endpoint to check the status of a deposit"
+      },
+      "slug": "v3/api-reference/deposits/get-deposit-status",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CARD DEPOSIT",
+      "endpoint": {
+        "path": "/api/v3/deposit/card",
+        "method": "POST",
+        "operationId": "DepositCardController_mobileMoney_api/v3",
+        "summary": "Deposit via card",
+        "tags": [
+          "CARD DEPOSIT"
+        ],
+        "description": "Customer Completed transaction using Checkout Url"
+      },
+      "slug": "v3/api-reference/deposits/deposit-via-card",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CARD DEPOSIT",
+      "endpoint": {
+        "path": "/api/v3/deposit/card/{reference_id}",
+        "method": "GET",
+        "operationId": "DepositCardController_getWithdrawalStatus_api/v3",
+        "summary": "Get Deposit status",
+        "tags": [
+          "CARD DEPOSIT"
+        ],
+        "description": "An integrator can use this endpoint to check the status of a deposit"
+      },
+      "slug": "v3/api-reference/deposits/get-deposit-status",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - MOBILE MONEY",
+      "endpoint": {
+        "path": "/api/v3/customer/mobile-money",
+        "method": "POST",
+        "operationId": "MobileMoneyCustomerController_createCustomer_api/v3",
+        "summary": "Create a mobile money customer",
+        "tags": [
+          "CUSTOMER - MOBILE MONEY"
+        ],
+        "description": "An integrator can use this endpoint to create the customers who will be either receiving or sending money using mobile money."
+      },
+      "slug": "v3/api-reference/customer---mobile-money/create-a-mobile-money-customer",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - MOBILE MONEY",
+      "endpoint": {
+        "path": "/api/v3/customer/mobile-money",
+        "method": "GET",
+        "operationId": "MobileMoneyCustomerController_getUserCustomers_api/v3",
+        "summary": "Get all mobile money customers",
+        "tags": [
+          "CUSTOMER - MOBILE MONEY"
+        ],
+        "description": "An integrator can use this endpoint to get all the customers who will be either receiving or sending money using mobile money."
+      },
+      "slug": "v3/api-reference/customer---mobile-money/get-all-mobile-money-customers",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - MOBILE MONEY",
+      "endpoint": {
+        "path": "/api/v3/customer/mobile-money/{customer_key}",
+        "method": "PATCH",
+        "operationId": "MobileMoneyCustomerController_updateCustomer_api/v3",
+        "summary": "Update a mobile money customer",
+        "tags": [
+          "CUSTOMER - MOBILE MONEY"
+        ],
+        "description": "An integrator can use this endpoint to update the customers who will be either receiving or sending money using mobile money."
+      },
+      "slug": "v3/api-reference/customer---mobile-money/update-a-mobile-money-customer",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - MOBILE MONEY",
+      "endpoint": {
+        "path": "/api/v3/customer/mobile-money/{customer_key}",
+        "method": "GET",
+        "operationId": "MobileMoneyCustomerController_getCustomerDetails_api/v3",
+        "summary": "Get a mobile money customer by customer key",
+        "tags": [
+          "CUSTOMER - MOBILE MONEY"
+        ],
+        "description": "An integrator can use this endpoint to get the customer who will be either receiving or sending money using mobile money by passing customer key."
+      },
+      "slug": "v3/api-reference/customer---mobile-money/get-a-mobile-money-customer-by-customer-key",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - MOBILE MONEY",
+      "endpoint": {
+        "path": "/api/v3/customer/mobile-money/phone/{phone_number}",
+        "method": "GET",
+        "operationId": "MobileMoneyCustomerController_getCustomerDetailsByPhone_api/v3",
+        "summary": "Get a mobile money customer by Phone",
+        "tags": [
+          "CUSTOMER - MOBILE MONEY"
+        ],
+        "description": "An integrator can use this endpoint to get the customer who will be either receiving or sending money using mobile money by passing phone number."
+      },
+      "slug": "v3/api-reference/customer---mobile-money/get-a-mobile-money-customer-by-phone",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - VALIDATION",
+      "endpoint": {
+        "path": "/api/v3/customer/validate/mobile-money",
+        "method": "POST",
+        "operationId": "AccountValidationController_validateMobileMoneyAccount_api/v3",
+        "summary": "Validate mobile money account",
+        "tags": [
+          "CUSTOMER - VALIDATION"
+        ],
+        "description": "Validates a mobile money account by checking the phone number format and country support. Optionally verifies if the account exists and returns account holder information."
+      },
+      "slug": "v3/api-reference/customer---validation/validate-mobile-money-account",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - VALIDATION",
+      "endpoint": {
+        "path": "/api/v3/customer/validate/bank",
+        "method": "POST",
+        "operationId": "AccountValidationController_validateBankAccount_api/v3",
+        "summary": "Validate bank account",
+        "tags": [
+          "CUSTOMER - VALIDATION"
+        ],
+        "description": "Validates a bank account by checking the account number format, bank code, and country support. Returns validation status and bank information."
+      },
+      "slug": "v3/api-reference/customer---validation/validate-bank-account",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "WITHDRAW",
+      "endpoint": {
+        "path": "/api/v3/withdraw/mobile-money",
+        "method": "POST",
+        "operationId": "WithdrawController_mobileMoney_api/v3",
+        "summary": "Withdraw Fiat to Mobile Money",
+        "tags": [
+          "WITHDRAW"
+        ],
+        "description": "This api will withdraw fiat from the integrator’s fiat wallet to the customer’s mobile money wallet."
+      },
+      "slug": "v3/api-reference/withdraw/withdraw-fiat-to-mobile-money",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "WITHDRAW",
+      "endpoint": {
+        "path": "/api/v3/withdraw/status/{reference_id}",
+        "method": "GET",
+        "operationId": "WithdrawController_getWithdrawalStatus_api/v3",
+        "summary": "Get Withdrawal Mobile Money Status",
+        "tags": [
+          "WITHDRAW"
+        ],
+        "description": "This endpoint will return the status of the withdrawal request."
+      },
+      "slug": "v3/api-reference/withdraw/get-withdrawal-mobile-money-status",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "PAYMENT PROVIDERS",
+      "endpoint": {
+        "path": "/api/v3/providers",
+        "method": "POST",
+        "operationId": "PaymentProviderController_providers_api/v3",
+        "summary": "Get Payment Providers",
+        "tags": [
+          "PAYMENT PROVIDERS"
+        ],
+        "description": "This Api Handles fetching of payment providers"
+      },
+      "slug": "v3/api-reference/payment-providers/get-payment-providers",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "WITHDRAW V2",
+      "endpoint": {
+        "path": "/api/v3/withdraw/v2/bank",
+        "method": "POST",
+        "operationId": "WithdrawTransactionController_mobileMoney_api/v3",
+        "summary": "BANK WITHDRAWAL",
+        "tags": [
+          "WITHDRAW V2"
+        ],
+        "description": "This Api Handles payout to bank, currently only supports SA Banks"
+      },
+      "slug": "v3/api-reference/withdraw-v2/bank-withdrawal",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "WITHDRAW V2",
+      "endpoint": {
+        "path": "/api/v3/withdraw/v2/bank/status/{referenceId}",
+        "method": "GET",
+        "operationId": "WithdrawTransactionController_getWithdrawTransaction_api/v3",
+        "summary": "BANK WITHDRAWAL STATUS",
+        "tags": [
+          "WITHDRAW V2"
+        ],
+        "description": "This Api Handles payout to bank, currently only supports SA Banks"
+      },
+      "slug": "v3/api-reference/withdraw-v2/bank-withdrawal-status",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "WITHDRAW V2",
+      "endpoint": {
+        "path": "/api/v3/withdraw/v2/bank/supporting-banks/{currency}",
+        "method": "GET",
+        "operationId": "WithdrawTransactionController_getSupportingBanksWithCurrency_api/v3",
+        "summary": "GET SUPPORTING BANKS",
+        "tags": [
+          "WITHDRAW V2"
+        ],
+        "description": "This Api Handles fetching of supporting banks"
+      },
+      "slug": "v3/api-reference/withdraw-v2/get-supporting-banks",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/success",
+        "method": "GET",
+        "operationId": "GlobPayController_success_get",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/success",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/success",
+        "method": "POST",
+        "operationId": "GlobPayController_success_post",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/success",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/success",
+        "method": "PUT",
+        "operationId": "GlobPayController_success_put",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/success",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/success",
+        "method": "DELETE",
+        "operationId": "GlobPayController_success_delete",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/success",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/success",
+        "method": "PATCH",
+        "operationId": "GlobPayController_success_patch",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/success",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/success",
+        "method": "OPTIONS",
+        "operationId": "GlobPayController_success_options",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/success",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/success",
+        "method": "HEAD",
+        "operationId": "GlobPayController_success_head",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/success",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/success",
+        "method": "SEARCH",
+        "operationId": "GlobPayController_success_search",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/success",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/failed",
+        "method": "GET",
+        "operationId": "GlobPayController_failed_get",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/failed",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/failed",
+        "method": "POST",
+        "operationId": "GlobPayController_failed_post",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/failed",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/failed",
+        "method": "PUT",
+        "operationId": "GlobPayController_failed_put",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/failed",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/failed",
+        "method": "DELETE",
+        "operationId": "GlobPayController_failed_delete",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/failed",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/failed",
+        "method": "PATCH",
+        "operationId": "GlobPayController_failed_patch",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/failed",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/failed",
+        "method": "OPTIONS",
+        "operationId": "GlobPayController_failed_options",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/failed",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/failed",
+        "method": "HEAD",
+        "operationId": "GlobPayController_failed_head",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/failed",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/failed",
+        "method": "SEARCH",
+        "operationId": "GlobPayController_failed_search",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/failed",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+        "method": "GET",
+        "operationId": "GlobPayController_customerRedirect_get",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/orderId",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+        "method": "POST",
+        "operationId": "GlobPayController_customerRedirect_post",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/orderId",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+        "method": "PUT",
+        "operationId": "GlobPayController_customerRedirect_put",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/orderId",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+        "method": "DELETE",
+        "operationId": "GlobPayController_customerRedirect_delete",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/orderId",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+        "method": "PATCH",
+        "operationId": "GlobPayController_customerRedirect_patch",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/orderId",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+        "method": "OPTIONS",
+        "operationId": "GlobPayController_customerRedirect_options",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/orderId",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+        "method": "HEAD",
+        "operationId": "GlobPayController_customerRedirect_head",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/orderId",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+        "method": "SEARCH",
+        "operationId": "GlobPayController_customerRedirect_search",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/orderId",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/callback",
+        "method": "GET",
+        "operationId": "GlobPayController_callback_get",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/callback",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/callback",
+        "method": "POST",
+        "operationId": "GlobPayController_callback_post",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/callback",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/callback",
+        "method": "PUT",
+        "operationId": "GlobPayController_callback_put",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/callback",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/callback",
+        "method": "DELETE",
+        "operationId": "GlobPayController_callback_delete",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/callback",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/callback",
+        "method": "PATCH",
+        "operationId": "GlobPayController_callback_patch",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/callback",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/callback",
+        "method": "OPTIONS",
+        "operationId": "GlobPayController_callback_options",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/callback",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/callback",
+        "method": "HEAD",
+        "operationId": "GlobPayController_callback_head",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/callback",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/callback",
+        "method": "SEARCH",
+        "operationId": "GlobPayController_callback_search",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/callback",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/{path}",
+        "method": "GET",
+        "operationId": "GlobPayController_catchAll_get",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/path",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/{path}",
+        "method": "POST",
+        "operationId": "GlobPayController_catchAll_post",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/path",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/{path}",
+        "method": "PUT",
+        "operationId": "GlobPayController_catchAll_put",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/path",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/{path}",
+        "method": "DELETE",
+        "operationId": "GlobPayController_catchAll_delete",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/path",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/{path}",
+        "method": "PATCH",
+        "operationId": "GlobPayController_catchAll_patch",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/path",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/{path}",
+        "method": "OPTIONS",
+        "operationId": "GlobPayController_catchAll_options",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/path",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/{path}",
+        "method": "HEAD",
+        "operationId": "GlobPayController_catchAll_head",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/path",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "GlobPay",
+      "endpoint": {
+        "path": "/api/v3/kpglbpay/{path}",
+        "method": "SEARCH",
+        "operationId": "GlobPayController_catchAll_search",
+        "tags": [
+          "GlobPay"
+        ]
+      },
+      "slug": "v3/api-reference/globpay/path",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "KYC",
+      "endpoint": {
+        "path": "/api/v3/kyc",
+        "method": "POST",
+        "operationId": "KycController_createKyc_api/v3",
+        "summary": "Create Kyc Basic Details",
+        "tags": [
+          "KYC"
+        ],
+        "description": "This api will create a new kyc basic details"
+      },
+      "slug": "v3/api-reference/kyc/create-kyc-basic-details",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "KYC",
+      "endpoint": {
+        "path": "/api/v3/kyc/address",
+        "method": "POST",
+        "operationId": "KycController_createAddress_api/v3",
+        "summary": "Create Kyc Address",
+        "tags": [
+          "KYC"
+        ],
+        "description": "This api will create a new kyc address"
+      },
+      "slug": "v3/api-reference/kyc/create-kyc-address",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "KYC",
+      "endpoint": {
+        "path": "/api/v3/kyc/document",
+        "method": "POST",
+        "operationId": "KycController_createDocument_api/v3",
+        "summary": "Create Kyc Document",
+        "tags": [
+          "KYC"
+        ],
+        "description": "This api will create a new kyc document"
+      },
+      "slug": "v3/api-reference/kyc/create-kyc-document",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "KYC",
+      "endpoint": {
+        "path": "/api/v3/kyc/status/{kycId}",
+        "method": "GET",
+        "operationId": "KycController_verifyKyc_api/v3",
+        "summary": "Get Kyc Status",
+        "tags": [
+          "KYC"
+        ],
+        "description": "This api will get kyc status"
+      },
+      "slug": "v3/api-reference/kyc/get-kyc-status",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "KYC",
+      "endpoint": {
+        "path": "/api/v3/kyc/integrator/users",
+        "method": "GET",
+        "operationId": "KycController_integratorKycUsers_api/v3",
+        "summary": "Get Integrator Kyc Users",
+        "tags": [
+          "KYC"
+        ],
+        "description": "This api will get all integrator kyc users"
+      },
+      "slug": "v3/api-reference/kyc/get-integrator-kyc-users",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "HEALTH",
+      "endpoint": {
+        "path": "/health",
+        "method": "GET",
+        "operationId": "HealthController_check",
+        "summary": "Check for the application health",
+        "tags": [
+          "HEALTH"
+        ],
+        "description": "This endpoint is used to check for the health of the application"
+      },
+      "slug": "v3/api-reference/health/check-for-the-application-health",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - COUNTRY SUPPORT",
+      "endpoint": {
+        "path": "/api/v3/customer/support/countries",
+        "method": "GET",
+        "operationId": "CountrySupportController_getSupportedCountries_api/v3",
+        "summary": "Get supported countries",
+        "tags": [
+          "CUSTOMER - COUNTRY SUPPORT"
+        ],
+        "description": "Returns a list of all supported countries with their configurations. Supports filtering by service type, currency, country code, and active status. Data is aggregated from the Provider Registry for real-time accuracy. The isEnabled flag indicates whether the authenticated integrator has this service enabled and providers attached."
+      },
+      "slug": "v3/api-reference/customer---country-support/get-supported-countries",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - COUNTRY SUPPORT",
+      "endpoint": {
+        "path": "/api/v3/customer/support/countries/{countryCode}",
+        "method": "GET",
+        "operationId": "CountrySupportController_getCountryDetails_api/v3",
+        "summary": "Get detailed country information",
+        "tags": [
+          "CUSTOMER - COUNTRY SUPPORT"
+        ],
+        "description": "Returns comprehensive details about a specific country including supported currencies, networks, and service availability. The isEnabled flag indicates whether the authenticated integrator has each service enabled and providers attached."
+      },
+      "slug": "v3/api-reference/customer---country-support/get-detailed-country-information",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - COUNTRY SUPPORT",
+      "endpoint": {
+        "path": "/api/v3/customer/support/networks/{countryCode}",
+        "method": "GET",
+        "operationId": "CountrySupportController_getNetworkAvailability_api/v3",
+        "summary": "Get available networks for a country",
+        "tags": [
+          "CUSTOMER - COUNTRY SUPPORT"
+        ],
+        "description": "Returns all active mobile money networks available in a specific country, aggregated from all providers. Indicates if network selection is required."
+      },
+      "slug": "v3/api-reference/customer---country-support/get-available-networks-for-a-country",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - COUNTRY SUPPORT",
+      "endpoint": {
+        "path": "/api/v3/customer/support/banks",
+        "method": "GET",
+        "operationId": "CountrySupportController_getBanks_api/v3",
+        "summary": "Get available banks",
+        "tags": [
+          "CUSTOMER - COUNTRY SUPPORT"
+        ],
+        "description": "Returns a list of all supported banks with optional filtering by currency or search term. Banks are sourced from the centralized bank data registry."
+      },
+      "slug": "v3/api-reference/customer---country-support/get-available-banks",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - COUNTRY SUPPORT",
+      "endpoint": {
+        "path": "/api/v3/customer/support/services/deposit",
+        "method": "GET",
+        "operationId": "CountrySupportController_getDepositConfiguration_api/v3",
+        "summary": "Get deposit service configuration",
+        "tags": [
+          "CUSTOMER - COUNTRY SUPPORT"
+        ],
+        "description": "Returns all countries that support deposit (onramp) services with their configurations."
+      },
+      "slug": "v3/api-reference/customer---country-support/get-deposit-service-configuration",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CUSTOMER - COUNTRY SUPPORT",
+      "endpoint": {
+        "path": "/api/v3/customer/support/services/withdraw",
+        "method": "GET",
+        "operationId": "CountrySupportController_getWithdrawConfiguration_api/v3",
+        "summary": "Get withdraw service configuration",
+        "tags": [
+          "CUSTOMER - COUNTRY SUPPORT"
+        ],
+        "description": "Returns all countries that support withdraw (offramp) services with their configurations."
+      },
+      "slug": "v3/api-reference/customer---country-support/get-withdraw-service-configuration",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "OFFRAMP",
+      "endpoint": {
+        "path": "/api/v3/offramp",
+        "method": "POST",
+        "operationId": "OffRampController_createOfframp_api/v3",
+        "summary": "Offramp Request",
+        "tags": [
+          "OFFRAMP"
+        ],
+        "description": "This endpoint will create a offramp request for a customer. If the fiat transfer fails after successful crypto receipt, an automatic refund will be initiated after 5 minutes. Use the refund-status endpoint to check refund status."
+      },
+      "slug": "v3/api-reference/offramp/offramp-request",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "OFFRAMP",
+      "endpoint": {
+        "path": "/api/v3/offramp/transactions",
+        "method": "GET",
+        "operationId": "OffRampController_getIntegratorOfframps_api/v3",
+        "summary": "Get Integrator Offramp Transactions",
+        "tags": [
+          "OFFRAMP"
+        ],
+        "description": "This endpoint will return all offramp transactions for the integrator."
+      },
+      "slug": "v3/api-reference/offramp/get-integrator-offramp-transactions",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "OFFRAMP",
+      "endpoint": {
+        "path": "/api/v3/offramp/{referenceId}",
+        "method": "GET",
+        "operationId": "OffRampController_getOfframpStatus_api/v3",
+        "summary": "Get Offramp MobileMoney Status",
+        "tags": [
+          "OFFRAMP"
+        ],
+        "description": "This endpoint will return the status of the withdrawal request."
+      },
+      "slug": "v3/api-reference/offramp/get-offramp-mobilemoney-status",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "OFFRAMP",
+      "endpoint": {
+        "path": "/api/v3/offramp/cancel/{referenceId}",
+        "method": "GET",
+        "operationId": "OffRampController_getCancelTransaction_api/v3",
+        "summary": "Cancel Offramp Transaction",
+        "tags": [
+          "OFFRAMP"
+        ],
+        "description": "This endpoint will cancel the offramp transaction."
+      },
+      "slug": "v3/api-reference/offramp/cancel-offramp-transaction",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "OFFRAMP",
+      "endpoint": {
+        "path": "/api/v3/offramp/refund-status/{referenceId}",
+        "method": "GET",
+        "operationId": "OffRampController_getRefundStatus_api/v3",
+        "summary": "Get Refund Status",
+        "tags": [
+          "OFFRAMP"
+        ],
+        "description": "Get the status of an onchain refund. Refunds are automatically initiated 5 minutes after a failed transaction if the crypto was successfully received but fiat transfer failed."
+      },
+      "slug": "v3/api-reference/offramp/get-refund-status",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "OFFRAMP",
+      "endpoint": {
+        "path": "/api/v3/offramp/retry-refund/{referenceId}",
+        "method": "POST",
+        "operationId": "OffRampController_retryRefund_api/v3",
+        "summary": "Retry Failed Refund",
+        "tags": [
+          "OFFRAMP"
+        ],
+        "description": "Retry a failed crypto refund for an offramp transaction. Can be retried up to 3 times."
+      },
+      "slug": "v3/api-reference/offramp/retry-failed-refund",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "ONRAMP",
+      "endpoint": {
+        "path": "/api/v3/onramp/crypto",
+        "method": "POST",
+        "operationId": "OnrampController_createOnrampCrypto_api/v3",
+        "summary": "Send Token to Crypto Wallet",
+        "tags": [
+          "ONRAMP"
+        ],
+        "description": "This endpoint will send token to any crypto wallet"
+      },
+      "slug": "v3/api-reference/onramp/send-token-to-crypto-wallet",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "ONRAMP",
+      "endpoint": {
+        "path": "/api/v3/onramp/crypto/{referenceId}",
+        "method": "GET",
+        "operationId": "OnrampController_getOnrampCrypto_api/v3",
+        "summary": "Get Status Response",
+        "tags": [
+          "ONRAMP"
+        ],
+        "description": "This endpoint will be used to get the status of the transaction"
+      },
+      "slug": "v3/api-reference/onramp/get-status-response",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "ONRAMP",
+      "endpoint": {
+        "path": "/api/v3/onramp",
+        "method": "POST",
+        "operationId": "OnrampController_onramp_api/v3",
+        "summary": "Create Onramp",
+        "tags": [
+          "ONRAMP"
+        ],
+        "description": "You can create an onramp request with either mobile money or bank checkout"
+      },
+      "slug": "v3/api-reference/onramp/create-onramp",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "ONRAMP",
+      "endpoint": {
+        "path": "/api/v3/onramp/{referenceId}",
+        "method": "GET",
+        "operationId": "OnrampController_getOnramp_api/v3",
+        "summary": "Get Status Response",
+        "tags": [
+          "ONRAMP"
+        ],
+        "description": "This endpoint will be used to get the status of the transaction"
+      },
+      "slug": "v3/api-reference/onramp/get-status-response",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "API Bulk Payments",
+      "endpoint": {
+        "path": "/api/v3/dashboard/bulk-payments/api/transactions/{transactionId}",
+        "method": "GET",
+        "operationId": "ApiBulkPaymentsController_getTransactionById_api/v3",
+        "summary": "Get transaction details with batches",
+        "tags": [
+          "API Bulk Payments"
+        ]
+      },
+      "slug": "v3/api-reference/api-bulk-payments/get-transaction-details-with-batches",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "API Bulk Payments",
+      "endpoint": {
+        "path": "/api/v3/dashboard/bulk-payments/api/transactions",
+        "method": "GET",
+        "operationId": "ApiBulkPaymentsController_getTransactions_api/v3",
+        "summary": "Get paginated transactions",
+        "tags": [
+          "API Bulk Payments"
+        ]
+      },
+      "slug": "v3/api-reference/api-bulk-payments/get-paginated-transactions",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "API Bulk Payments",
+      "endpoint": {
+        "path": "/api/v3/dashboard/bulk-payments/api/wallets",
+        "method": "GET",
+        "operationId": "ApiBulkPaymentsController_getAvailableWallets_api/v3",
+        "summary": "Get available wallets for bulk payments",
+        "tags": [
+          "API Bulk Payments"
+        ]
+      },
+      "slug": "v3/api-reference/api-bulk-payments/get-available-wallets-for-bulk-payments",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "API Bulk Payments",
+      "endpoint": {
+        "path": "/api/v3/dashboard/bulk-payments/api/validate-csv",
+        "method": "POST",
+        "operationId": "ApiBulkPaymentsController_validateCSV_api/v3",
+        "summary": "Validate CSV file for bulk payments with multi-currency support",
+        "tags": [
+          "API Bulk Payments"
+        ]
+      },
+      "slug": "v3/api-reference/api-bulk-payments/validate-csv-file-for-bulk-payments-with-multi-currency-support",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "API Bulk Payments",
+      "endpoint": {
+        "path": "/api/v3/dashboard/bulk-payments/api/batches/create",
+        "method": "POST",
+        "operationId": "ApiBulkPaymentsController_createBatches_api/v3",
+        "summary": "Create bulk payment batches",
+        "tags": [
+          "API Bulk Payments"
+        ]
+      },
+      "slug": "v3/api-reference/api-bulk-payments/create-bulk-payment-batches",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "API Bulk Payments",
+      "endpoint": {
+        "path": "/api/v3/dashboard/bulk-payments/api/preview",
+        "method": "POST",
+        "operationId": "ApiBulkPaymentsController_previewBatch_api/v3",
+        "summary": "Preview bulk payment batches",
+        "tags": [
+          "API Bulk Payments"
+        ]
+      },
+      "slug": "v3/api-reference/api-bulk-payments/preview-bulk-payment-batches",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "API Bulk Payments",
+      "endpoint": {
+        "path": "/api/v3/dashboard/bulk-payments/api/batches",
+        "method": "GET",
+        "operationId": "ApiBulkPaymentsController_getBatches_api/v3",
+        "summary": "Get bulk payment batches",
+        "tags": [
+          "API Bulk Payments"
+        ]
+      },
+      "slug": "v3/api-reference/api-bulk-payments/get-bulk-payment-batches",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "API Bulk Payments",
+      "endpoint": {
+        "path": "/api/v3/dashboard/bulk-payments/api/stats",
+        "method": "GET",
+        "operationId": "ApiBulkPaymentsController_getStats_api/v3",
+        "summary": "Get bulk payment statistics",
+        "tags": [
+          "API Bulk Payments"
+        ]
+      },
+      "slug": "v3/api-reference/api-bulk-payments/get-bulk-payment-statistics",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "API Bulk Payments",
+      "endpoint": {
+        "path": "/api/v3/dashboard/bulk-payments/api/batches/{batchId}",
+        "method": "GET",
+        "operationId": "ApiBulkPaymentsController_getBatchById_api/v3",
+        "summary": "Get bulk payment batch by ID",
+        "tags": [
+          "API Bulk Payments"
+        ]
+      },
+      "slug": "v3/api-reference/api-bulk-payments/get-bulk-payment-batch-by-id",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "API Bulk Payments",
+      "endpoint": {
+        "path": "/api/v3/dashboard/bulk-payments/api/batches/{batchId}/process",
+        "method": "POST",
+        "operationId": "ApiBulkPaymentsController_processBatch_api/v3",
+        "summary": "Process a bulk payment batch",
+        "tags": [
+          "API Bulk Payments"
+        ]
+      },
+      "slug": "v3/api-reference/api-bulk-payments/process-a-bulk-payment-batch",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "API Bulk Payments",
+      "endpoint": {
+        "path": "/api/v3/dashboard/bulk-payments/api/batches/{batchId}/payments",
+        "method": "GET",
+        "operationId": "ApiBulkPaymentsController_getBatchPayments_api/v3",
+        "summary": "Get payments for a specific batch",
+        "tags": [
+          "API Bulk Payments"
+        ]
+      },
+      "slug": "v3/api-reference/api-bulk-payments/get-payments-for-a-specific-batch",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CROSS BOARDER",
+      "endpoint": {
+        "path": "/api/v3/cross-boarder/invoice",
+        "method": "POST",
+        "operationId": "FiatToFiatController_generateInvoice_api/v3",
+        "summary": "Generate Invoice",
+        "tags": [
+          "CROSS BOARDER"
+        ],
+        "description": "Generate Invoice"
+      },
+      "slug": "v3/api-reference/cross-boarder/generate-invoice",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CROSS BOARDER",
+      "endpoint": {
+        "path": "/api/v3/cross-boarder/invoice/{referenceId}",
+        "method": "GET",
+        "operationId": "FiatToFiatController_getInvoice_api/v3",
+        "summary": "Get Invoice",
+        "tags": [
+          "CROSS BOARDER"
+        ],
+        "description": "Get Invoice"
+      },
+      "slug": "v3/api-reference/cross-boarder/get-invoice",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CROSS BOARDER",
+      "endpoint": {
+        "path": "/api/v3/cross-boarder/invoice/pay",
+        "method": "POST",
+        "operationId": "FiatToFiatController_payInvoice_api/v3",
+        "summary": "Pay Invoice",
+        "tags": [
+          "CROSS BOARDER"
+        ],
+        "description": "Pay Invoice"
+      },
+      "slug": "v3/api-reference/cross-boarder/pay-invoice",
+      "inDocsJson": false,
+      "fileExists": false
+    },
+    {
+      "tag": "CROSS BOARDER",
+      "endpoint": {
+        "path": "/api/v3/cross-boarder/invoice/pay/{referenceId}",
+        "method": "GET",
+        "operationId": "FiatToFiatController_getPaidInvoiceStatus_api/v3",
+        "summary": "Get Paid Invoice Status",
+        "tags": [
+          "CROSS BOARDER"
+        ],
+        "description": "Get Paid Invoice Status"
+      },
+      "slug": "v3/api-reference/cross-boarder/get-paid-invoice-status",
+      "inDocsJson": false,
+      "fileExists": false
+    }
+  ],
+  "existingDocs": [
+    "v3/api-reference/wallets/fiat/transfer-deposit-balance"
+  ],
+  "endpointsByTag": [
+    {
+      "tag": "RATES",
+      "count": 5,
+      "endpoints": [
+        {
+          "path": "/api/v3/rate/{from}/{to}",
+          "method": "GET",
+          "operationId": "RateController_getRates_api/v3",
+          "summary": "Get exchange rate",
+          "tags": [
+            "RATES"
+          ],
+          "description": "An integrator can use this endpoint to get the exchange rate between two currencies"
+        },
+        {
+          "path": "/api/v3/rate/onramp",
+          "method": "POST",
+          "operationId": "RateController_getOnrampRates_api/v3",
+          "summary": "Get Onramp Exchange rate",
+          "tags": [
+            "RATES"
+          ],
+          "description": "An integrator can use this endpoint to get the exchange rate between two currencies"
+        },
+        {
+          "path": "/api/v3/rate/offramp",
+          "method": "POST",
+          "operationId": "RateController_getOffRampRates_api/v3",
+          "summary": "Get Offramp Exchange rate",
+          "tags": [
+            "RATES"
+          ],
+          "description": "An integrator can use this endpoint to get the exchange rate between two currencies"
+        },
+        {
+          "path": "/api/v3/rate/fiat",
+          "method": "POST",
+          "operationId": "RateController_getFiatToFiatRate_api/v3",
+          "summary": "Get Fiat to Fiat exchange rate",
+          "tags": [
+            "RATES"
+          ],
+          "description": "An integrator can use this endpoint to get the exchange rate between two fiat currencies"
+        },
+        {
+          "path": "/api/v3/rate",
+          "method": "GET",
+          "operationId": "RateController_rates_api/v3",
+          "summary": "Get all exchange rates",
+          "tags": [
+            "RATES"
+          ],
+          "description": "An integrator can use this endpoint to get all the exchange rates available"
+        }
+      ]
+    },
+    {
+      "tag": "PUBLIC RATES",
+      "count": 2,
+      "endpoints": [
+        {
+          "path": "/api/v3/public/rate/{from}/{to}",
+          "method": "GET",
+          "operationId": "PublicRateController_getPublicRate_api/v3",
+          "summary": "Get public exchange rate (no auth required)",
+          "tags": [
+            "PUBLIC RATES"
+          ],
+          "description": "Public endpoint for getting exchange rates between two currencies. Used for payment link checkout currency conversion display."
+        },
+        {
+          "path": "/api/v3/public/rate",
+          "method": "GET",
+          "operationId": "PublicRateController_getPublicRates_api/v3",
+          "summary": "Get all public exchange rates (no auth required)",
+          "tags": [
+            "PUBLIC RATES"
+          ],
+          "description": "Public endpoint for getting all available exchange rates. Useful for dropdown displays or rate comparison."
+        }
+      ]
+    },
+    {
+      "tag": "FIAT WALLET",
+      "count": 6,
+      "endpoints": [
+        {
+          "path": "/api/v3/wallet/fiat",
+          "method": "POST",
+          "operationId": "FiatWalletController_createFiatWallet_api/v3",
+          "summary": "Create a Fiat Wallet",
+          "tags": [
+            "FIAT WALLET"
+          ],
+          "description": "This endpoint will create a fiat wallet for the integrator."
+        },
+        {
+          "path": "/api/v3/wallet/fiat",
+          "method": "GET",
+          "operationId": "FiatWalletController_getUsersFiatWallet_api/v3",
+          "summary": "Get Integrator Fiat Wallets",
+          "tags": [
+            "FIAT WALLET"
+          ],
+          "description": "This endpoint will return all the fiat wallets created by the integrator."
+        },
+        {
+          "path": "/api/v3/wallet/fiat/{id}",
+          "method": "GET",
+          "operationId": "FiatWalletController_getFiatWallet_api/v3",
+          "summary": "Get Integrator Fiat Wallet by Wallet ID",
+          "tags": [
+            "FIAT WALLET"
+          ],
+          "description": "This endpoint will return the fiat wallet created by the integrator."
+        },
+        {
+          "path": "/api/v3/wallet/fiat/{id}",
+          "method": "PATCH",
+          "operationId": "FiatWalletController_updateFiatWallet_api/v3",
+          "summary": "Update Integrator Fiat Wallet by Wallet ID",
+          "tags": [
+            "FIAT WALLET"
+          ],
+          "description": "This endpoint will update the fiat wallet created by the integrator."
+        },
+        {
+          "path": "/api/v3/wallet/fiat/currency/{currency}",
+          "method": "GET",
+          "operationId": "FiatWalletController_getFiatWalletByCurrency_api/v3",
+          "summary": "Get Integrator Fiat Wallet by Currency (optionally by Country)",
+          "tags": [
+            "FIAT WALLET"
+          ],
+          "description": "This endpoint will return the fiat wallet created by the integrator. Optionally filter by country using the \"country\" query parameter."
+        },
+        {
+          "path": "/api/v3/wallet/transfer/deposit-balance",
+          "method": "POST",
+          "operationId": "FiatWalletController_transferDepositBalance_api/v3",
+          "summary": "Transfer Deposit Balance",
+          "tags": [
+            "FIAT WALLET"
+          ],
+          "description": "This endpoint will transfer the deposit balance of the fiat wallet to the main balance."
+        }
+      ]
+    },
+    {
+      "tag": "CRYPTO WALLET",
+      "count": 3,
+      "endpoints": [
+        {
+          "path": "/api/v3/wallet/crypto",
+          "method": "POST",
+          "operationId": "CryptoWalletController_createCryptoWallet_api/v3",
+          "summary": "Create a Crypto wallet",
+          "tags": [
+            "CRYPTO WALLET"
+          ],
+          "description": "The crypto wallet will contain the specified chain and coins an integrator desires to hold and one can create as many wallets as needed."
+        },
+        {
+          "path": "/api/v3/wallet/crypto",
+          "method": "GET",
+          "operationId": "CryptoWalletController_getUsersCryptoWallets_api/v3",
+          "summary": "Get Integrator Crypto Wallets",
+          "tags": [
+            "CRYPTO WALLET"
+          ],
+          "description": "This endpoint will return all the crypto wallets created by the integrator."
+        },
+        {
+          "path": "/api/v3/wallet/crypto/{id}",
+          "method": "GET",
+          "operationId": "CryptoWalletController_getFiatWallet_api/v3",
+          "summary": "Get Integrator Crypto Wallet by Wallet ID",
+          "tags": [
+            "CRYPTO WALLET"
+          ],
+          "description": "This endpoint will return the crypto wallet created by the integrator by passing the wallet id."
+        }
+      ]
+    },
+    {
+      "tag": "INTEGRATOR",
+      "count": 3,
+      "endpoints": [
+        {
+          "path": "/api/v3/integrator",
+          "method": "POST",
+          "operationId": "IntegratorController_createIntegrator_api/v3",
+          "summary": "Create an integrator",
+          "tags": [
+            "INTEGRATOR"
+          ],
+          "description": "This endpoint will help you create an integrator"
+        },
+        {
+          "path": "/api/v3/integrator",
+          "method": "GET",
+          "operationId": "IntegratorController_getIntegrator_api/v3",
+          "summary": "Get an Integrator Details.",
+          "tags": [
+            "INTEGRATOR"
+          ],
+          "description": "This endpoint is used to retrieve an integrator details"
+        },
+        {
+          "path": "/api/v3/integrator/webhook",
+          "method": "PATCH",
+          "operationId": "IntegratorController_updateWebhookSettings_api/v3",
+          "summary": "Update webhook configuration",
+          "tags": [
+            "INTEGRATOR"
+          ],
+          "description": "Allows an integrator to update their default webhook URL, secret, and event subscriptions."
+        }
+      ]
+    },
+    {
+      "tag": "AUTHENTICATION",
+      "count": 4,
+      "endpoints": [
+        {
+          "path": "/api/v3/auth/login",
+          "method": "POST",
+          "operationId": "AuthController_authLogin_api/v3",
+          "summary": "Authentication Login",
+          "tags": [
+            "AUTHENTICATION"
+          ],
+          "description": "Login to your integrator account. This endpoint allows you to login to your account"
+        },
+        {
+          "path": "/api/v3/auth/api-key/secure",
+          "method": "GET",
+          "operationId": "AuthController_generateApiKeySecret_api/v3",
+          "summary": "Generate API Key.",
+          "tags": [
+            "AUTHENTICATION"
+          ],
+          "description": "This endpoint is used to generate an the API Key which can be used to authorize transactions and more"
+        },
+        {
+          "path": "/api/v3/auth/human-verify",
+          "method": "POST",
+          "operationId": "AuthController_humanVerify_api/v3",
+          "summary": "Human verification for suspicious requests",
+          "tags": [
+            "AUTHENTICATION"
+          ],
+          "description": "Complete human verification for magic link requests that were flagged as potentially suspicious"
+        },
+        {
+          "path": "/api/v3/auth/refresh-token",
+          "method": "GET",
+          "operationId": "AuthController_refreshToken_api/v3",
+          "summary": "Refresh access token.",
+          "tags": [
+            "AUTHENTICATION"
+          ],
+          "description": "This endpoint is used to refresh the access token using a valid refresh token"
+        }
+      ]
+    },
+    {
+      "tag": "MOBILE MONEY DEPOSIT",
+      "count": 2,
+      "endpoints": [
+        {
+          "path": "/api/v3/deposit/mobile-money",
+          "method": "POST",
+          "operationId": "DepositMobileMoneyController_mobileMoney_api/v3",
+          "summary": "Deposit via mobile money",
+          "tags": [
+            "MOBILE MONEY DEPOSIT"
+          ],
+          "description": "An integrator’s customers can initiate a deposit from their respective mobile money wallets.     An STK push will be sent to the customer and the respective amount will be deducted from their mobile money wallets and deposited into the integrator’s fiat wallet"
+        },
+        {
+          "path": "/api/v3/deposit/mobile-money/status/{reference_id}",
+          "method": "GET",
+          "operationId": "DepositMobileMoneyController_getWithdrawalStatus_api/v3",
+          "summary": "Get Deposit on Mobile Money status",
+          "tags": [
+            "MOBILE MONEY DEPOSIT"
+          ],
+          "description": "An integrator can use this endpoint to check the status of a deposit"
+        }
+      ]
+    },
+    {
+      "tag": "BANK DEPOSIT(checkout)",
+      "count": 2,
+      "endpoints": [
+        {
+          "path": "/api/v3/deposit/bank/checkout",
+          "method": "POST",
+          "operationId": "DepositBankCheckoutController_mobileMoney_api/v3",
+          "summary": "Deposit via bank checkout",
+          "tags": [
+            "BANK DEPOSIT(checkout)"
+          ],
+          "description": "Customer Completed transaction using Checkout Url"
+        },
+        {
+          "path": "/api/v3/deposit/bank/checkout/status/{reference_id}",
+          "method": "GET",
+          "operationId": "DepositBankCheckoutController_getWithdrawalStatus_api/v3",
+          "summary": "Get Deposit status",
+          "tags": [
+            "BANK DEPOSIT(checkout)"
+          ],
+          "description": "An integrator can use this endpoint to check the status of a deposit"
+        }
+      ]
+    },
+    {
+      "tag": "CARD DEPOSIT",
+      "count": 2,
+      "endpoints": [
+        {
+          "path": "/api/v3/deposit/card",
+          "method": "POST",
+          "operationId": "DepositCardController_mobileMoney_api/v3",
+          "summary": "Deposit via card",
+          "tags": [
+            "CARD DEPOSIT"
+          ],
+          "description": "Customer Completed transaction using Checkout Url"
+        },
+        {
+          "path": "/api/v3/deposit/card/{reference_id}",
+          "method": "GET",
+          "operationId": "DepositCardController_getWithdrawalStatus_api/v3",
+          "summary": "Get Deposit status",
+          "tags": [
+            "CARD DEPOSIT"
+          ],
+          "description": "An integrator can use this endpoint to check the status of a deposit"
+        }
+      ]
+    },
+    {
+      "tag": "CUSTOMER - MOBILE MONEY",
+      "count": 5,
+      "endpoints": [
+        {
+          "path": "/api/v3/customer/mobile-money",
+          "method": "POST",
+          "operationId": "MobileMoneyCustomerController_createCustomer_api/v3",
+          "summary": "Create a mobile money customer",
+          "tags": [
+            "CUSTOMER - MOBILE MONEY"
+          ],
+          "description": "An integrator can use this endpoint to create the customers who will be either receiving or sending money using mobile money."
+        },
+        {
+          "path": "/api/v3/customer/mobile-money",
+          "method": "GET",
+          "operationId": "MobileMoneyCustomerController_getUserCustomers_api/v3",
+          "summary": "Get all mobile money customers",
+          "tags": [
+            "CUSTOMER - MOBILE MONEY"
+          ],
+          "description": "An integrator can use this endpoint to get all the customers who will be either receiving or sending money using mobile money."
+        },
+        {
+          "path": "/api/v3/customer/mobile-money/{customer_key}",
+          "method": "PATCH",
+          "operationId": "MobileMoneyCustomerController_updateCustomer_api/v3",
+          "summary": "Update a mobile money customer",
+          "tags": [
+            "CUSTOMER - MOBILE MONEY"
+          ],
+          "description": "An integrator can use this endpoint to update the customers who will be either receiving or sending money using mobile money."
+        },
+        {
+          "path": "/api/v3/customer/mobile-money/{customer_key}",
+          "method": "GET",
+          "operationId": "MobileMoneyCustomerController_getCustomerDetails_api/v3",
+          "summary": "Get a mobile money customer by customer key",
+          "tags": [
+            "CUSTOMER - MOBILE MONEY"
+          ],
+          "description": "An integrator can use this endpoint to get the customer who will be either receiving or sending money using mobile money by passing customer key."
+        },
+        {
+          "path": "/api/v3/customer/mobile-money/phone/{phone_number}",
+          "method": "GET",
+          "operationId": "MobileMoneyCustomerController_getCustomerDetailsByPhone_api/v3",
+          "summary": "Get a mobile money customer by Phone",
+          "tags": [
+            "CUSTOMER - MOBILE MONEY"
+          ],
+          "description": "An integrator can use this endpoint to get the customer who will be either receiving or sending money using mobile money by passing phone number."
+        }
+      ]
+    },
+    {
+      "tag": "CUSTOMER - VALIDATION",
+      "count": 2,
+      "endpoints": [
+        {
+          "path": "/api/v3/customer/validate/mobile-money",
+          "method": "POST",
+          "operationId": "AccountValidationController_validateMobileMoneyAccount_api/v3",
+          "summary": "Validate mobile money account",
+          "tags": [
+            "CUSTOMER - VALIDATION"
+          ],
+          "description": "Validates a mobile money account by checking the phone number format and country support. Optionally verifies if the account exists and returns account holder information."
+        },
+        {
+          "path": "/api/v3/customer/validate/bank",
+          "method": "POST",
+          "operationId": "AccountValidationController_validateBankAccount_api/v3",
+          "summary": "Validate bank account",
+          "tags": [
+            "CUSTOMER - VALIDATION"
+          ],
+          "description": "Validates a bank account by checking the account number format, bank code, and country support. Returns validation status and bank information."
+        }
+      ]
+    },
+    {
+      "tag": "WITHDRAW",
+      "count": 2,
+      "endpoints": [
+        {
+          "path": "/api/v3/withdraw/mobile-money",
+          "method": "POST",
+          "operationId": "WithdrawController_mobileMoney_api/v3",
+          "summary": "Withdraw Fiat to Mobile Money",
+          "tags": [
+            "WITHDRAW"
+          ],
+          "description": "This api will withdraw fiat from the integrator’s fiat wallet to the customer’s mobile money wallet."
+        },
+        {
+          "path": "/api/v3/withdraw/status/{reference_id}",
+          "method": "GET",
+          "operationId": "WithdrawController_getWithdrawalStatus_api/v3",
+          "summary": "Get Withdrawal Mobile Money Status",
+          "tags": [
+            "WITHDRAW"
+          ],
+          "description": "This endpoint will return the status of the withdrawal request."
+        }
+      ]
+    },
+    {
+      "tag": "PAYMENT PROVIDERS",
+      "count": 1,
+      "endpoints": [
+        {
+          "path": "/api/v3/providers",
+          "method": "POST",
+          "operationId": "PaymentProviderController_providers_api/v3",
+          "summary": "Get Payment Providers",
+          "tags": [
+            "PAYMENT PROVIDERS"
+          ],
+          "description": "This Api Handles fetching of payment providers"
+        }
+      ]
+    },
+    {
+      "tag": "WITHDRAW V2",
+      "count": 3,
+      "endpoints": [
+        {
+          "path": "/api/v3/withdraw/v2/bank",
+          "method": "POST",
+          "operationId": "WithdrawTransactionController_mobileMoney_api/v3",
+          "summary": "BANK WITHDRAWAL",
+          "tags": [
+            "WITHDRAW V2"
+          ],
+          "description": "This Api Handles payout to bank, currently only supports SA Banks"
+        },
+        {
+          "path": "/api/v3/withdraw/v2/bank/status/{referenceId}",
+          "method": "GET",
+          "operationId": "WithdrawTransactionController_getWithdrawTransaction_api/v3",
+          "summary": "BANK WITHDRAWAL STATUS",
+          "tags": [
+            "WITHDRAW V2"
+          ],
+          "description": "This Api Handles payout to bank, currently only supports SA Banks"
+        },
+        {
+          "path": "/api/v3/withdraw/v2/bank/supporting-banks/{currency}",
+          "method": "GET",
+          "operationId": "WithdrawTransactionController_getSupportingBanksWithCurrency_api/v3",
+          "summary": "GET SUPPORTING BANKS",
+          "tags": [
+            "WITHDRAW V2"
+          ],
+          "description": "This Api Handles fetching of supporting banks"
+        }
+      ]
+    },
+    {
+      "tag": "GlobPay",
+      "count": 40,
+      "endpoints": [
+        {
+          "path": "/api/v3/kpglbpay/success",
+          "method": "GET",
+          "operationId": "GlobPayController_success_get",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/success",
+          "method": "POST",
+          "operationId": "GlobPayController_success_post",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/success",
+          "method": "PUT",
+          "operationId": "GlobPayController_success_put",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/success",
+          "method": "DELETE",
+          "operationId": "GlobPayController_success_delete",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/success",
+          "method": "PATCH",
+          "operationId": "GlobPayController_success_patch",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/success",
+          "method": "OPTIONS",
+          "operationId": "GlobPayController_success_options",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/success",
+          "method": "HEAD",
+          "operationId": "GlobPayController_success_head",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/success",
+          "method": "SEARCH",
+          "operationId": "GlobPayController_success_search",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/failed",
+          "method": "GET",
+          "operationId": "GlobPayController_failed_get",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/failed",
+          "method": "POST",
+          "operationId": "GlobPayController_failed_post",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/failed",
+          "method": "PUT",
+          "operationId": "GlobPayController_failed_put",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/failed",
+          "method": "DELETE",
+          "operationId": "GlobPayController_failed_delete",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/failed",
+          "method": "PATCH",
+          "operationId": "GlobPayController_failed_patch",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/failed",
+          "method": "OPTIONS",
+          "operationId": "GlobPayController_failed_options",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/failed",
+          "method": "HEAD",
+          "operationId": "GlobPayController_failed_head",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/failed",
+          "method": "SEARCH",
+          "operationId": "GlobPayController_failed_search",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+          "method": "GET",
+          "operationId": "GlobPayController_customerRedirect_get",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+          "method": "POST",
+          "operationId": "GlobPayController_customerRedirect_post",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+          "method": "PUT",
+          "operationId": "GlobPayController_customerRedirect_put",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+          "method": "DELETE",
+          "operationId": "GlobPayController_customerRedirect_delete",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+          "method": "PATCH",
+          "operationId": "GlobPayController_customerRedirect_patch",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+          "method": "OPTIONS",
+          "operationId": "GlobPayController_customerRedirect_options",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+          "method": "HEAD",
+          "operationId": "GlobPayController_customerRedirect_head",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/customer-redirect/{orderId}",
+          "method": "SEARCH",
+          "operationId": "GlobPayController_customerRedirect_search",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/callback",
+          "method": "GET",
+          "operationId": "GlobPayController_callback_get",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/callback",
+          "method": "POST",
+          "operationId": "GlobPayController_callback_post",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/callback",
+          "method": "PUT",
+          "operationId": "GlobPayController_callback_put",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/callback",
+          "method": "DELETE",
+          "operationId": "GlobPayController_callback_delete",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/callback",
+          "method": "PATCH",
+          "operationId": "GlobPayController_callback_patch",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/callback",
+          "method": "OPTIONS",
+          "operationId": "GlobPayController_callback_options",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/callback",
+          "method": "HEAD",
+          "operationId": "GlobPayController_callback_head",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/callback",
+          "method": "SEARCH",
+          "operationId": "GlobPayController_callback_search",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/{path}",
+          "method": "GET",
+          "operationId": "GlobPayController_catchAll_get",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/{path}",
+          "method": "POST",
+          "operationId": "GlobPayController_catchAll_post",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/{path}",
+          "method": "PUT",
+          "operationId": "GlobPayController_catchAll_put",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/{path}",
+          "method": "DELETE",
+          "operationId": "GlobPayController_catchAll_delete",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/{path}",
+          "method": "PATCH",
+          "operationId": "GlobPayController_catchAll_patch",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/{path}",
+          "method": "OPTIONS",
+          "operationId": "GlobPayController_catchAll_options",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/{path}",
+          "method": "HEAD",
+          "operationId": "GlobPayController_catchAll_head",
+          "tags": [
+            "GlobPay"
+          ]
+        },
+        {
+          "path": "/api/v3/kpglbpay/{path}",
+          "method": "SEARCH",
+          "operationId": "GlobPayController_catchAll_search",
+          "tags": [
+            "GlobPay"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "KYC",
+      "count": 5,
+      "endpoints": [
+        {
+          "path": "/api/v3/kyc",
+          "method": "POST",
+          "operationId": "KycController_createKyc_api/v3",
+          "summary": "Create Kyc Basic Details",
+          "tags": [
+            "KYC"
+          ],
+          "description": "This api will create a new kyc basic details"
+        },
+        {
+          "path": "/api/v3/kyc/address",
+          "method": "POST",
+          "operationId": "KycController_createAddress_api/v3",
+          "summary": "Create Kyc Address",
+          "tags": [
+            "KYC"
+          ],
+          "description": "This api will create a new kyc address"
+        },
+        {
+          "path": "/api/v3/kyc/document",
+          "method": "POST",
+          "operationId": "KycController_createDocument_api/v3",
+          "summary": "Create Kyc Document",
+          "tags": [
+            "KYC"
+          ],
+          "description": "This api will create a new kyc document"
+        },
+        {
+          "path": "/api/v3/kyc/status/{kycId}",
+          "method": "GET",
+          "operationId": "KycController_verifyKyc_api/v3",
+          "summary": "Get Kyc Status",
+          "tags": [
+            "KYC"
+          ],
+          "description": "This api will get kyc status"
+        },
+        {
+          "path": "/api/v3/kyc/integrator/users",
+          "method": "GET",
+          "operationId": "KycController_integratorKycUsers_api/v3",
+          "summary": "Get Integrator Kyc Users",
+          "tags": [
+            "KYC"
+          ],
+          "description": "This api will get all integrator kyc users"
+        }
+      ]
+    },
+    {
+      "tag": "HEALTH",
+      "count": 1,
+      "endpoints": [
+        {
+          "path": "/health",
+          "method": "GET",
+          "operationId": "HealthController_check",
+          "summary": "Check for the application health",
+          "tags": [
+            "HEALTH"
+          ],
+          "description": "This endpoint is used to check for the health of the application"
+        }
+      ]
+    },
+    {
+      "tag": "CUSTOMER - COUNTRY SUPPORT",
+      "count": 6,
+      "endpoints": [
+        {
+          "path": "/api/v3/customer/support/countries",
+          "method": "GET",
+          "operationId": "CountrySupportController_getSupportedCountries_api/v3",
+          "summary": "Get supported countries",
+          "tags": [
+            "CUSTOMER - COUNTRY SUPPORT"
+          ],
+          "description": "Returns a list of all supported countries with their configurations. Supports filtering by service type, currency, country code, and active status. Data is aggregated from the Provider Registry for real-time accuracy. The isEnabled flag indicates whether the authenticated integrator has this service enabled and providers attached."
+        },
+        {
+          "path": "/api/v3/customer/support/countries/{countryCode}",
+          "method": "GET",
+          "operationId": "CountrySupportController_getCountryDetails_api/v3",
+          "summary": "Get detailed country information",
+          "tags": [
+            "CUSTOMER - COUNTRY SUPPORT"
+          ],
+          "description": "Returns comprehensive details about a specific country including supported currencies, networks, and service availability. The isEnabled flag indicates whether the authenticated integrator has each service enabled and providers attached."
+        },
+        {
+          "path": "/api/v3/customer/support/networks/{countryCode}",
+          "method": "GET",
+          "operationId": "CountrySupportController_getNetworkAvailability_api/v3",
+          "summary": "Get available networks for a country",
+          "tags": [
+            "CUSTOMER - COUNTRY SUPPORT"
+          ],
+          "description": "Returns all active mobile money networks available in a specific country, aggregated from all providers. Indicates if network selection is required."
+        },
+        {
+          "path": "/api/v3/customer/support/banks",
+          "method": "GET",
+          "operationId": "CountrySupportController_getBanks_api/v3",
+          "summary": "Get available banks",
+          "tags": [
+            "CUSTOMER - COUNTRY SUPPORT"
+          ],
+          "description": "Returns a list of all supported banks with optional filtering by currency or search term. Banks are sourced from the centralized bank data registry."
+        },
+        {
+          "path": "/api/v3/customer/support/services/deposit",
+          "method": "GET",
+          "operationId": "CountrySupportController_getDepositConfiguration_api/v3",
+          "summary": "Get deposit service configuration",
+          "tags": [
+            "CUSTOMER - COUNTRY SUPPORT"
+          ],
+          "description": "Returns all countries that support deposit (onramp) services with their configurations."
+        },
+        {
+          "path": "/api/v3/customer/support/services/withdraw",
+          "method": "GET",
+          "operationId": "CountrySupportController_getWithdrawConfiguration_api/v3",
+          "summary": "Get withdraw service configuration",
+          "tags": [
+            "CUSTOMER - COUNTRY SUPPORT"
+          ],
+          "description": "Returns all countries that support withdraw (offramp) services with their configurations."
+        }
+      ]
+    },
+    {
+      "tag": "OFFRAMP",
+      "count": 6,
+      "endpoints": [
+        {
+          "path": "/api/v3/offramp",
+          "method": "POST",
+          "operationId": "OffRampController_createOfframp_api/v3",
+          "summary": "Offramp Request",
+          "tags": [
+            "OFFRAMP"
+          ],
+          "description": "This endpoint will create a offramp request for a customer. If the fiat transfer fails after successful crypto receipt, an automatic refund will be initiated after 5 minutes. Use the refund-status endpoint to check refund status."
+        },
+        {
+          "path": "/api/v3/offramp/transactions",
+          "method": "GET",
+          "operationId": "OffRampController_getIntegratorOfframps_api/v3",
+          "summary": "Get Integrator Offramp Transactions",
+          "tags": [
+            "OFFRAMP"
+          ],
+          "description": "This endpoint will return all offramp transactions for the integrator."
+        },
+        {
+          "path": "/api/v3/offramp/{referenceId}",
+          "method": "GET",
+          "operationId": "OffRampController_getOfframpStatus_api/v3",
+          "summary": "Get Offramp MobileMoney Status",
+          "tags": [
+            "OFFRAMP"
+          ],
+          "description": "This endpoint will return the status of the withdrawal request."
+        },
+        {
+          "path": "/api/v3/offramp/cancel/{referenceId}",
+          "method": "GET",
+          "operationId": "OffRampController_getCancelTransaction_api/v3",
+          "summary": "Cancel Offramp Transaction",
+          "tags": [
+            "OFFRAMP"
+          ],
+          "description": "This endpoint will cancel the offramp transaction."
+        },
+        {
+          "path": "/api/v3/offramp/refund-status/{referenceId}",
+          "method": "GET",
+          "operationId": "OffRampController_getRefundStatus_api/v3",
+          "summary": "Get Refund Status",
+          "tags": [
+            "OFFRAMP"
+          ],
+          "description": "Get the status of an onchain refund. Refunds are automatically initiated 5 minutes after a failed transaction if the crypto was successfully received but fiat transfer failed."
+        },
+        {
+          "path": "/api/v3/offramp/retry-refund/{referenceId}",
+          "method": "POST",
+          "operationId": "OffRampController_retryRefund_api/v3",
+          "summary": "Retry Failed Refund",
+          "tags": [
+            "OFFRAMP"
+          ],
+          "description": "Retry a failed crypto refund for an offramp transaction. Can be retried up to 3 times."
+        }
+      ]
+    },
+    {
+      "tag": "ONRAMP",
+      "count": 4,
+      "endpoints": [
+        {
+          "path": "/api/v3/onramp/crypto",
+          "method": "POST",
+          "operationId": "OnrampController_createOnrampCrypto_api/v3",
+          "summary": "Send Token to Crypto Wallet",
+          "tags": [
+            "ONRAMP"
+          ],
+          "description": "This endpoint will send token to any crypto wallet"
+        },
+        {
+          "path": "/api/v3/onramp/crypto/{referenceId}",
+          "method": "GET",
+          "operationId": "OnrampController_getOnrampCrypto_api/v3",
+          "summary": "Get Status Response",
+          "tags": [
+            "ONRAMP"
+          ],
+          "description": "This endpoint will be used to get the status of the transaction"
+        },
+        {
+          "path": "/api/v3/onramp",
+          "method": "POST",
+          "operationId": "OnrampController_onramp_api/v3",
+          "summary": "Create Onramp",
+          "tags": [
+            "ONRAMP"
+          ],
+          "description": "You can create an onramp request with either mobile money or bank checkout"
+        },
+        {
+          "path": "/api/v3/onramp/{referenceId}",
+          "method": "GET",
+          "operationId": "OnrampController_getOnramp_api/v3",
+          "summary": "Get Status Response",
+          "tags": [
+            "ONRAMP"
+          ],
+          "description": "This endpoint will be used to get the status of the transaction"
+        }
+      ]
+    },
+    {
+      "tag": "API Bulk Payments",
+      "count": 11,
+      "endpoints": [
+        {
+          "path": "/api/v3/dashboard/bulk-payments/api/transactions/{transactionId}",
+          "method": "GET",
+          "operationId": "ApiBulkPaymentsController_getTransactionById_api/v3",
+          "summary": "Get transaction details with batches",
+          "tags": [
+            "API Bulk Payments"
+          ]
+        },
+        {
+          "path": "/api/v3/dashboard/bulk-payments/api/transactions",
+          "method": "GET",
+          "operationId": "ApiBulkPaymentsController_getTransactions_api/v3",
+          "summary": "Get paginated transactions",
+          "tags": [
+            "API Bulk Payments"
+          ]
+        },
+        {
+          "path": "/api/v3/dashboard/bulk-payments/api/wallets",
+          "method": "GET",
+          "operationId": "ApiBulkPaymentsController_getAvailableWallets_api/v3",
+          "summary": "Get available wallets for bulk payments",
+          "tags": [
+            "API Bulk Payments"
+          ]
+        },
+        {
+          "path": "/api/v3/dashboard/bulk-payments/api/validate-csv",
+          "method": "POST",
+          "operationId": "ApiBulkPaymentsController_validateCSV_api/v3",
+          "summary": "Validate CSV file for bulk payments with multi-currency support",
+          "tags": [
+            "API Bulk Payments"
+          ]
+        },
+        {
+          "path": "/api/v3/dashboard/bulk-payments/api/batches/create",
+          "method": "POST",
+          "operationId": "ApiBulkPaymentsController_createBatches_api/v3",
+          "summary": "Create bulk payment batches",
+          "tags": [
+            "API Bulk Payments"
+          ]
+        },
+        {
+          "path": "/api/v3/dashboard/bulk-payments/api/preview",
+          "method": "POST",
+          "operationId": "ApiBulkPaymentsController_previewBatch_api/v3",
+          "summary": "Preview bulk payment batches",
+          "tags": [
+            "API Bulk Payments"
+          ]
+        },
+        {
+          "path": "/api/v3/dashboard/bulk-payments/api/batches",
+          "method": "GET",
+          "operationId": "ApiBulkPaymentsController_getBatches_api/v3",
+          "summary": "Get bulk payment batches",
+          "tags": [
+            "API Bulk Payments"
+          ]
+        },
+        {
+          "path": "/api/v3/dashboard/bulk-payments/api/stats",
+          "method": "GET",
+          "operationId": "ApiBulkPaymentsController_getStats_api/v3",
+          "summary": "Get bulk payment statistics",
+          "tags": [
+            "API Bulk Payments"
+          ]
+        },
+        {
+          "path": "/api/v3/dashboard/bulk-payments/api/batches/{batchId}",
+          "method": "GET",
+          "operationId": "ApiBulkPaymentsController_getBatchById_api/v3",
+          "summary": "Get bulk payment batch by ID",
+          "tags": [
+            "API Bulk Payments"
+          ]
+        },
+        {
+          "path": "/api/v3/dashboard/bulk-payments/api/batches/{batchId}/process",
+          "method": "POST",
+          "operationId": "ApiBulkPaymentsController_processBatch_api/v3",
+          "summary": "Process a bulk payment batch",
+          "tags": [
+            "API Bulk Payments"
+          ]
+        },
+        {
+          "path": "/api/v3/dashboard/bulk-payments/api/batches/{batchId}/payments",
+          "method": "GET",
+          "operationId": "ApiBulkPaymentsController_getBatchPayments_api/v3",
+          "summary": "Get payments for a specific batch",
+          "tags": [
+            "API Bulk Payments"
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "CROSS BOARDER",
+      "count": 4,
+      "endpoints": [
+        {
+          "path": "/api/v3/cross-boarder/invoice",
+          "method": "POST",
+          "operationId": "FiatToFiatController_generateInvoice_api/v3",
+          "summary": "Generate Invoice",
+          "tags": [
+            "CROSS BOARDER"
+          ],
+          "description": "Generate Invoice"
+        },
+        {
+          "path": "/api/v3/cross-boarder/invoice/{referenceId}",
+          "method": "GET",
+          "operationId": "FiatToFiatController_getInvoice_api/v3",
+          "summary": "Get Invoice",
+          "tags": [
+            "CROSS BOARDER"
+          ],
+          "description": "Get Invoice"
+        },
+        {
+          "path": "/api/v3/cross-boarder/invoice/pay",
+          "method": "POST",
+          "operationId": "FiatToFiatController_payInvoice_api/v3",
+          "summary": "Pay Invoice",
+          "tags": [
+            "CROSS BOARDER"
+          ],
+          "description": "Pay Invoice"
+        },
+        {
+          "path": "/api/v3/cross-boarder/invoice/pay/{referenceId}",
+          "method": "GET",
+          "operationId": "FiatToFiatController_getPaidInvoiceStatus_api/v3",
+          "summary": "Get Paid Invoice Status",
+          "tags": [
+            "CROSS BOARDER"
+          ],
+          "description": "Get Paid Invoice Status"
+        }
+      ]
+    }
+  ]
+}
