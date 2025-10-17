@@ -1,17 +1,5 @@
 {
   "openapi": "3.0.0",
-  "info": {
-    "title": "KOTANI PAY API PLATFORM",
-    "description": "Comprehensive API for payment processing, crypto wallets, and financial services",
-    "version": "3.0",
-    "contact": {}
-  },
-  "servers": [
-    {
-      "url": "https://sandbox-api.kotanipay.com",
-      "description": "Sandbox environment"
-    }
-  ],
   "paths": {
     "/api/v3/rate/{from}/{to}": {
       "get": {
@@ -2308,7 +2296,7 @@
     },
     "/api/v3/customer/validate/mobile-money": {
       "post": {
-        "description": "Validates a mobile money account by checking the phone number format and country support. Optionally verifies if the account exists and returns account holder information.",
+        "description": "Validates a phone number in any format (with or without country code). Returns validation status, country information, formatted number, and whether the country is supported for mobile money.",
         "operationId": "AccountValidationController_validateMobileMoneyAccount_api/v3",
         "parameters": [],
         "requestBody": {
@@ -2331,7 +2319,7 @@
                     "success": { "type": "boolean", "example": true },
                     "message": {
                       "type": "string",
-                      "example": "Mobile money account validated successfully."
+                      "example": "Phone number validated successfully."
                     },
                     "data": {
                       "type": "object",
@@ -2375,13 +2363,13 @@
           }
         },
         "security": [{ "JWT": [] }],
-        "summary": "Validate mobile money account",
+        "summary": "Validate phone number",
         "tags": ["CUSTOMER - VALIDATION"]
       }
     },
     "/api/v3/customer/validate/bank": {
       "post": {
-        "description": "Validates a bank account by checking the account number format, bank code, and country support. Returns validation status and bank information.",
+        "description": "Validates a bank account number format for a given country and bank code. Returns validation status, bank information, and whether the country is supported.",
         "operationId": "AccountValidationController_validateBankAccount_api/v3",
         "parameters": [],
         "requestBody": {
@@ -4853,6 +4841,14 @@
       }
     }
   },
+  "info": {
+    "title": "KOTANI PAY API PLATFORM",
+    "description": "",
+    "version": "3.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [{ "url": "https://sandbox-api.kotanipay.com" }],
   "components": {
     "securitySchemes": {
       "JWT": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" }
@@ -6099,7 +6095,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2025-10-17T13:00:08.270Z"
+            "example": "2025-10-17T14:25:17.498Z"
           },
           "transactionCost": {
             "type": "number",
@@ -6327,97 +6323,89 @@
         "properties": {
           "isValid": {
             "type": "boolean",
-            "description": "Validation status",
+            "description": "Whether the phone number or account is valid",
             "example": true
           },
-          "accountName": {
+          "isSupported": {
+            "type": "boolean",
+            "description": "Whether the country/service is supported",
+            "example": true
+          },
+          "requiresInternationalization": {
+            "type": "boolean",
+            "description": "Whether the phone number needs internationalization (missing country code)",
+            "example": false
+          },
+          "countryCode": {
             "type": "string",
-            "description": "Account holder name (if available)"
+            "description": "Country code (ISO2)",
+            "example": "KE"
+          },
+          "countryName": {
+            "type": "string",
+            "description": "Country name",
+            "example": "Kenya"
+          },
+          "callingCode": {
+            "type": "string",
+            "description": "Phone number calling code (e.g., +254)"
+          },
+          "internationalNumber": {
+            "type": "string",
+            "description": "Phone number in international format without spaces (e.g., +254719399210)",
+            "example": "+254719399210"
+          },
+          "nationalNumber": {
+            "type": "string",
+            "description": "Phone number in national format without spaces (e.g., 0719399210)",
+            "example": "0719399210"
           },
           "accountType": {
             "type": "string",
             "description": "Account type",
             "enum": ["mobile_money", "bank"]
           },
-          "details": {
-            "type": "object",
-            "description": "Additional validation details"
+          "bankName": {
+            "type": "string",
+            "description": "Bank name (for bank accounts)"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency for the country",
+            "example": "KES"
+          },
+          "message": {
+            "type": "string",
+            "description": "Validation error message (if invalid)"
           }
         },
-        "required": ["isValid", "accountType"]
+        "required": ["isValid", "isSupported", "accountType"]
       },
       "ValidateMobileMoneyAccountDto": {
         "type": "object",
         "properties": {
-          "phone_number": {
+          "phoneNumber": {
             "type": "string",
-            "description": "Phone number to validate",
-            "example": "+254712345678"
-          },
-          "country_code": {
-            "type": "string",
-            "enum": [
-              "GHA",
-              "NG",
-              "KE",
-              "ZA",
-              "CIV",
-              "ZM",
-              "CMR",
-              "COD",
-              "SEN",
-              "TZ",
-              "MWI",
-              "UG",
-              "EG",
-              "RW",
-              "COD",
-              "USA"
-            ],
-            "description": "Country code",
-            "example": "KE"
-          },
-          "network": {
-            "type": "string",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "VODACOM"
-            ],
-            "description": "Mobile money network (required for some countries like Ghana)",
-            "example": "MPESA"
+            "description": "Phone number to validate (with or without country code). Examples: 0719399210, +254719399210, +27123456789",
+            "example": "+254719399210"
           }
         },
-        "required": ["phone_number", "country_code"]
+        "required": ["phoneNumber"]
       },
       "ValidateBankAccountDto": {
         "type": "object",
         "properties": {
-          "account_number": {
+          "accountNumber": {
             "type": "string",
             "description": "Bank account number",
             "example": "1234567890"
           },
-          "bank_code": {
+          "bankCode": {
             "type": "string",
-            "description": "Bank code or institution ID",
+            "description": "Bank code or name",
             "example": "KCB"
           },
-          "country_code": {
+          "countryCode": {
             "type": "string",
             "enum": [
               "GHA",
@@ -6439,13 +6427,9 @@
             ],
             "description": "Country code",
             "example": "KE"
-          },
-          "account_name": {
-            "type": "string",
-            "description": "Account holder name (optional, for name matching)"
           }
         },
-        "required": ["account_number", "bank_code", "country_code"]
+        "required": ["accountNumber", "bankCode", "countryCode"]
       },
       "WithdrawResponseDto": {
         "type": "object",
