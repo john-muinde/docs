@@ -5154,7 +5154,7 @@
     "contact": {}
   },
   "tags": [],
-  "servers": [{ "url": "https://sandbox-api.kotanipay.com" }],
+  "servers": [{ "url": "https://sandbox-api.kotanipay.com/api/v3" }],
   "components": {
     "securitySchemes": {
       "JWT": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" }
@@ -6401,7 +6401,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2025-10-17T11:45:24.660Z"
+            "example": "2025-10-17T13:00:08.270Z"
           },
           "transactionCost": {
             "type": "number",
