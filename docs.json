@@ -73,7 +73,8 @@
                   "v3/api-reference/authentication/refresh-token",
                   "v3/api-reference/authentication/human-verify",
                   "v3/api-reference/integrator/create",
-                  "v3/api-reference/integrator/get"
+                  "v3/api-reference/integrator/get",
+                  "v3/api-reference/integrator/update-webhook"
                 ]
               },
               {
@@ -112,7 +113,20 @@
                   "v3/api-reference/customers/mobile-money/list",
                   "v3/api-reference/customers/mobile-money/get",
                   "v3/api-reference/customers/mobile-money/get-by-phone",
-                  "v3/api-reference/customers/mobile-money/update"
+                  "v3/api-reference/customers/mobile-money/update",
+                  "v3/api-reference/customers/validate-mobile-money",
+                  "v3/api-reference/customers/validate-bank"
+                ]
+              },
+              {
+                "group": "Country & Service Support",
+                "pages": [
+                  "v3/api-reference/country-support/countries",
+                  "v3/api-reference/country-support/country-details",
+                  "v3/api-reference/country-support/networks",
+                  "v3/api-reference/country-support/banks",
+                  "v3/api-reference/country-support/deposit-services",
+                  "v3/api-reference/country-support/withdraw-services"
                 ]
               },
               {
@@ -170,8 +184,10 @@
                 "pages": [
                   "v3/api-reference/onramp/create",
                   "v3/api-reference/onramp/status",
+                  "v3/api-reference/onramp/get-status",
                   "v3/api-reference/onramp/crypto",
-                  "v3/api-reference/onramp/crypto-status"
+                  "v3/api-reference/onramp/crypto-status",
+                  "v3/api-reference/onramp/get-crypto-status"
                 ]
               },
               {
@@ -179,7 +195,11 @@
                 "pages": [
                   "v3/api-reference/offramp/create",
                   "v3/api-reference/offramp/status",
-                  "v3/api-reference/offramp/cancel"
+                  "v3/api-reference/offramp/get-status",
+                  "v3/api-reference/offramp/cancel",
+                  "v3/api-reference/offramp/list-transactions",
+                  "v3/api-reference/offramp/refund-status",
+                  "v3/api-reference/offramp/retry-refund"
                 ]
               },
               {
@@ -198,7 +218,24 @@
                   "v3/api-reference/kyc/create-address",
                   "v3/api-reference/kyc/create-document",
                   "v3/api-reference/kyc/get-status",
-                  "v3/api-reference/kyc/get-integrator-users"
+                  "v3/api-reference/kyc/get-integrator-users",
+                  "v3/api-reference/kyc/list-integrator-users"
+                ]
+              },
+              {
+                "group": "Bulk Payments",
+                "pages": [
+                  "v3/api-reference/bulk-payments/get-wallets",
+                  "v3/api-reference/bulk-payments/validate-csv",
+                  "v3/api-reference/bulk-payments/preview-batches",
+                  "v3/api-reference/bulk-payments/create-batches",
+                  "v3/api-reference/bulk-payments/list-batches",
+                  "v3/api-reference/bulk-payments/get-batch",
+                  "v3/api-reference/bulk-payments/process-batch",
+                  "v3/api-reference/bulk-payments/get-batch-payments",
+                  "v3/api-reference/bulk-payments/list-transactions",
+                  "v3/api-reference/bulk-payments/get-transaction",
+                  "v3/api-reference/bulk-payments/get-statistics"
                 ]
               },
               {
