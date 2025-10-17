@@ -4848,7 +4848,7 @@
     "contact": {}
   },
   "tags": [],
-  "servers": [{ "url": "https://sandbox-api.kotanipay.com/api/v3" }],
+  "servers": [{ "url": "https://sandbox-api.kotanipay.com" }],
   "components": {
     "securitySchemes": {
       "JWT": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" }
