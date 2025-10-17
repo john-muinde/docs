@@ -218,7 +218,6 @@
                   "v3/api-reference/kyc/create-address",
                   "v3/api-reference/kyc/create-document",
                   "v3/api-reference/kyc/get-status",
-                  "v3/api-reference/kyc/get-integrator-users",
                   "v3/api-reference/kyc/list-integrator-users"
                 ]
               },
