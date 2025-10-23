@@ -18,25 +18,21 @@ Configure one webhook endpoint per environment from the dashboard and opt in to 
 
 The following event types are available:
 
-```typescript
-// Deprecated - kept for backward compatibility
-TRANSACTION_STATUS_UPDATED = 'transaction.status.updated',
+**Transaction Events:**
+- `transaction.deposit.status.updated` - Deposit transaction status changed
+- `transaction.withdrawal.status.updated` - Withdrawal transaction status changed
+- `transaction.onramp.status.updated` - On-ramp transaction status changed
+- `transaction.offramp.status.updated` - Off-ramp transaction status changed
+- `transaction.status.updated` - *(Deprecated)* Generic transaction status update
 
-// Specific transaction type events
-TRANSACTION_DEPOSIT_STATUS_UPDATED = 'transaction.deposit.status.updated',
-TRANSACTION_WITHDRAWAL_STATUS_UPDATED = 'transaction.withdrawal.status.updated',
-TRANSACTION_ONRAMP_STATUS_UPDATED = 'transaction.onramp.status.updated',
-TRANSACTION_OFFRAMP_STATUS_UPDATED = 'transaction.offramp.status.updated',
+**Payment Events:**
+- `payment.confirmed` - Payment has been confirmed
 
-// Payment events
-PAYMENT_CONFIRMED = 'payment.confirmed',
+**KYC Events:**
+- `kyc.status.changed` - Customer verification status changed
 
-// KYC events
-KYC_STATUS_CHANGED = 'kyc.status.changed',
-
-// System events
-SYSTEM_EVENT = 'system.event',
-```
+**System Events:**
+- `system.event` - Operational notices and maintenance alerts
 
 ## Payload Format
 
