@@ -1,87 +1,105 @@
 ---
-title: "Webhooks"
-description: "Setting up and handling webhook notifications from Kotani Pay"
+title: "Webhook Notifications"
+description: "Receive real-time notifications about transaction status updates and other events."
 ---
 
-Webhooks allow Kotani Pay to notify your application in real-time when events occur, such as when a transaction is completed or fails.
+Kotani Pay sends webhook notifications to inform your application about key lifecycle events—transaction status changes, payment confirmations, compliance updates, and scheduled system announcements. Use these callbacks to drive your automations instead of polling for status.
 
-## Setting Up Webhooks
+## Supported Events
 
-To receive webhooks, you need to:
+Configure one webhook endpoint per environment from the dashboard and opt in to any combination of events:
 
-1. **Configure a webhook endpoint** in your application
-2. **Register the endpoint** with Kotani Pay through the dashboard or API
-3. **Verify webhook signatures** to ensure authenticity
+- **Transaction Status Updates** – Deposit, withdrawal, or transfer status changes (e.g., `PENDING` → `COMPLETED`)
+- **Payment Confirmations** – Real-time acknowledgements when a payment settles on- or off-chain
+- **KYC Status Changes** – Triggers when a customer's verification outcome changes
+- **System Events** – Low-volume operational notices and maintenance alerts
 
-## Webhook Events
+### Event Types
 
-Kotani Pay sends webhooks for the following events:
+The following event types are available:
 
-| Event Type              | Description                                   |
-| ----------------------- | --------------------------------------------- |
-| `transaction.completed` | A transaction has been successfully completed |
-| `transaction.failed`    | A transaction has failed                      |
-| `transaction.pending`   | A transaction is pending confirmation         |
-| `deposit.completed`     | A deposit has been completed                  |
-| `withdrawal.completed`  | A withdrawal has been completed               |
+```typescript
+// Deprecated - kept for backward compatibility
+TRANSACTION_STATUS_UPDATED = 'transaction.status.updated',
 
-## Webhook Payload
+// Specific transaction type events
+TRANSACTION_DEPOSIT_STATUS_UPDATED = 'transaction.deposit.status.updated',
+TRANSACTION_WITHDRAWAL_STATUS_UPDATED = 'transaction.withdrawal.status.updated',
+TRANSACTION_ONRAMP_STATUS_UPDATED = 'transaction.onramp.status.updated',
+TRANSACTION_OFFRAMP_STATUS_UPDATED = 'transaction.offramp.status.updated',
 
-All webhooks include a standard payload structure:
+// Payment events
+PAYMENT_CONFIRMED = 'payment.confirmed',
+
+// KYC events
+KYC_STATUS_CHANGED = 'kyc.status.changed',
+
+// System events
+SYSTEM_EVENT = 'system.event',
+```
+
+## Payload Format
+
+Webhooks are sent as HTTP `POST` requests with a JSON payload. The request body includes the event name, data payload, and a convenience copy of the signature. The canonical signature is delivered in the `X-Kotani-Signature` header.
 
 ```json
 {
-  "event_type": "transaction.completed",
-  "timestamp": "2024-01-15T10:30:00Z",
+  "event": "transaction.deposit.status.updated",
   "data": {
-    "transaction_id": "txn_1234567890",
-    "reference_id": "ref_abc123",
-    "amount": 1000,
-    "currency": "KES",
-    "status": "completed",
-    "phone_number": "+254712345678"
+    "referenceId": "ABC123",
+    "status": "SUCCESSFUL",
+    "timestamp": "2025-01-01T00:00:00Z"
   },
   "signature": "sha256=abc123..."
 }
 ```
 
-## Verifying Webhooks
+> **Tip:** The payload's `signature` field is provided for quick sanity checks, but the header is the source of truth for verification.
 
-To verify that a webhook came from Kotani Pay, validate the signature:
+## Verifying Signatures
 
-```javascript
-const crypto = require("crypto");
+Every payload is signed with your dashboard-configured webhook secret. Validate the signature before acting on the event:
 
-function verifyWebhookSignature(payload, signature, secret) {
-  const expectedSignature = crypto
-    .createHmac("sha256", secret)
-    .update(payload)
-    .digest("hex");
+1. Read the request body as a **raw string** before parsing or mutating it.
+2. Compute an HMAC-SHA256 digest: `sha256=HMAC(secret, rawBody)`.
+3. Compare the digest with the `X-Kotani-Signature` header using a timing-safe comparison.
 
-  return `sha256=${expectedSignature}` === signature;
-}
+### Node.js helper
 
-// Express.js example
-app.post("/webhook", express.raw({ type: "application/json" }), (req, res) => {
-  const signature = req.headers["x-kotani-signature"];
-  const payload = req.body;
+```ts
+import crypto from "crypto";
 
-  if (!verifyWebhookSignature(payload, signature, process.env.WEBHOOK_SECRET)) {
-    return res.status(401).send("Invalid signature");
+export function verifyWebhook({ secret, rawBody, headerSignature }: {
+  secret: string;
+  rawBody: string | Buffer;
+  headerSignature: string;
+}) {
+  const normalizedBody = Buffer.isBuffer(rawBody)
+    ? rawBody
+    : Buffer.from(rawBody, "utf8");
+
+  const computed =
+    "sha256=" +
+    crypto.createHmac("sha256", secret).update(normalizedBody).digest("hex");
+
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(computed),
+      Buffer.from(headerSignature.trim())
+    );
+  } catch {
+    return false;
   }
-
-  // Process the webhook
-  const event = JSON.parse(payload);
-  console.log("Received webhook:", event.event_type);
-
-  res.status(200).send("OK");
-});
+}
 ```
 
-## Best Practices
+## Configuring Webhooks
 
-1. **Always verify signatures** to ensure webhook authenticity
-2. **Respond quickly** (within 10 seconds) to acknowledge receipt
-3. **Handle duplicate events** idempotently
-4. **Log webhook events** for debugging and audit purposes
-5. **Implement retry logic** for failed webhook processing
+1. Log into the Kotani Pay dashboard.
+2. Navigate to **Settings → Webhooks**.
+3. Provide a publicly reachable HTTPS URL.
+4. Select the events you want to subscribe to.
+5. Copy or generate a signing secret and store it securely (e.g., an environment variable).
+6. Save your changes.
+
+You can rotate the secret at any time; remember to update your verification logic before applying the new secret in production.

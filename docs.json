@@ -236,10 +236,6 @@
                   "v3/api-reference/bulk-payments/get-transaction",
                   "v3/api-reference/bulk-payments/get-statistics"
                 ]
-              },
-              {
-                "group": "Webhooks & Notifications",
-                "pages": ["v3/api-reference/webhooks/notifications"]
               }
             ]
           }
