@@ -1961,6 +1961,246 @@
         "tags": ["CARD DEPOSIT"]
       }
     },
+    "/api/v3/deposit/on-chain": {
+      "post": {
+        "deprecated": true,
+        "description": "Crypto deposits are where a customer’s mobile money wallet account is deducted a specific fiat amount which is then converted to a specified stablecoin amount and sent to the integrator’s crypto wallet. From there, the money/ stablecoin is transferred to the customer’s public address that matches the chain. This can also be called on-ramp",
+        "operationId": "DepositOnchainController_onchain_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDepositMobileMoneyOnChainDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Deposit has been successfully created."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/DepositResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Bad Request" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Not Found" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Deposit onChain",
+        "tags": ["DEPOSIT"]
+      }
+    },
+    "/api/v3/deposit/on-chain/status/{reference_id}": {
+      "get": {
+        "deprecated": true,
+        "description": "This endpoint will be used to get the status of the deposit onchain request",
+        "operationId": "DepositOnchainController_getWithdrawalStatus_api/v3",
+        "parameters": [
+          {
+            "name": "reference_id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Deposit status successfully retrieved."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/OnchainDepositResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Bad Request" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Not Found" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Get Deposit Onchain Status",
+        "tags": ["DEPOSIT"]
+      }
+    },
+    "/api/v3/deposit/on-chain/supported-chains": {
+      "get": {
+        "deprecated": true,
+        "description": "This endpoint will be used to get the supported chains for deposit onchain",
+        "operationId": "DepositOnchainController_getSupportedChains_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Deposit onchain supported chains retrieved successfully."
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "FUSE": {
+                          "type": "array",
+                          "example": ["USDT", "USDC"]
+                        },
+                        "CELO": { "type": "array", "example": ["CUSD"] },
+                        "ETHEREUM": {
+                          "type": "array",
+                          "example": ["USDT", "USDC"]
+                        },
+                        "POLYGON": { "type": "array", "example": ["USDC"] }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Bad Request" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": { "type": "boolean", "example": false },
+                    "message": { "type": "string", "example": "Unauthorized" },
+                    "data": { "type": "object", "example": {} }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT": [] }],
+        "summary": "Get Deposit Onchain Supported Chains",
+        "tags": ["DEPOSIT"]
+      }
+    },
     "/api/v3/customer/mobile-money": {
       "post": {
         "description": "An integrator can use this endpoint to create the customers who will be either receiving or sending money using mobile money.",
@@ -3074,7 +3314,11 @@
                 "ETB",
                 "MZN",
                 "LSL",
-                "GNF"
+                "GNF",
+                "USDT",
+                "BTC",
+                "ETH",
+                "USDC"
               ]
             }
           },
@@ -3311,7 +3555,11 @@
                 "ETB",
                 "MZN",
                 "LSL",
-                "GNF"
+                "GNF",
+                "USDT",
+                "BTC",
+                "ETH",
+                "USDC"
               ]
             }
           },
@@ -4180,7 +4428,11 @@
                 "ETB",
                 "MZN",
                 "LSL",
-                "GNF"
+                "GNF",
+                "USDT",
+                "BTC",
+                "ETH",
+                "USDC"
               ]
             }
           }
@@ -4353,7 +4605,11 @@
                 "ETB",
                 "MZN",
                 "LSL",
-                "GNF"
+                "GNF",
+                "USDT",
+                "BTC",
+                "ETH",
+                "USDC"
               ]
             }
           }
@@ -4420,7 +4676,11 @@
                 "ETB",
                 "MZN",
                 "LSL",
-                "GNF"
+                "GNF",
+                "USDT",
+                "BTC",
+                "ETH",
+                "USDC"
               ]
             }
           }
@@ -4545,7 +4805,11 @@
                 "ETB",
                 "MZN",
                 "LSL",
-                "GNF"
+                "GNF",
+                "USDT",
+                "BTC",
+                "ETH",
+                "USDC"
               ]
             }
           }
@@ -4848,12 +5112,16 @@
     "contact": {}
   },
   "tags": [],
-  "servers": [{ "url": "https://sandbox-api.kotanipay.com" }],
+  "servers": [{ "url": "https://sandbox-api.kotanipay.com/api/v3" }],
   "components": {
     "securitySchemes": {
       "JWT": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" }
     },
     "schemas": {
+      "CreatePagePermissionDto": { "type": "object", "properties": {} },
+      "UpdatePagePermissionDto": { "type": "object", "properties": {} },
+      "ResolveAlarmDto": { "type": "object", "properties": {} },
+      "AlarmConfigDto": { "type": "object", "properties": {} },
       "RateResponseDto": {
         "type": "object",
         "properties": {
@@ -4948,7 +5216,11 @@
           "ETB",
           "MZN",
           "LSL",
-          "GNF"
+          "GNF",
+          "USDT",
+          "BTC",
+          "ETH",
+          "USDC"
         ],
         "description": "From currency"
       },
@@ -5103,66 +5375,6 @@
         "enum": ["crypto", "fiat"],
         "description": "Select wallet type"
       },
-      "COUNTRY": {
-        "type": "string",
-        "enum": [
-          "GHA",
-          "NG",
-          "KE",
-          "ZA",
-          "CIV",
-          "ZM",
-          "CMR",
-          "COD",
-          "SEN",
-          "TZ",
-          "MWI",
-          "UG",
-          "EG",
-          "RW",
-          "ETH",
-          "MAR",
-          "TUN",
-          "DZA",
-          "BWA",
-          "MLI",
-          "BFA",
-          "LBY",
-          "SDN",
-          "BDI",
-          "DJI",
-          "SOM",
-          "MDG",
-          "MUS",
-          "CPV",
-          "GMB",
-          "GIN",
-          "SLE",
-          "LBR",
-          "MRT",
-          "NER",
-          "TGO",
-          "BEN",
-          "GNB",
-          "CAF",
-          "TCD",
-          "COD",
-          "GNQ",
-          "GAB",
-          "STP",
-          "COM",
-          "SYC",
-          "ERI",
-          "SSD",
-          "LSO",
-          "SWZ",
-          "NAM",
-          "AGO",
-          "MOZ",
-          "ZWE"
-        ],
-        "description": "The country where the wallet will be used"
-      },
       "WalletStatus": {
         "type": "string",
         "enum": ["active", "inactive", "suspended", "deleted"],
@@ -5187,9 +5399,9 @@
             "allOf": [{ "$ref": "#/components/schemas/Currency" }]
           },
           "country": {
-            "description": "The country where the wallet will be used",
-            "example": "GHA",
-            "allOf": [{ "$ref": "#/components/schemas/COUNTRY" }]
+            "type": "string",
+            "description": "The country where the wallet will be used (accepts both ISO-2 and ISO-3 codes)",
+            "example": "GH or GHA for Ghana"
           },
           "integrator": {
             "type": "string",
@@ -5241,9 +5453,9 @@
             "allOf": [{ "$ref": "#/components/schemas/Currency" }]
           },
           "country": {
-            "description": "The country where the wallet will be used",
-            "example": "GHA",
-            "allOf": [{ "$ref": "#/components/schemas/COUNTRY" }]
+            "type": "string",
+            "description": "The country where the wallet will be used (accepts both ISO-2 and ISO-3 codes)",
+            "example": "GH or GHA for Ghana"
           }
         },
         "required": ["name", "currency"]
@@ -5257,9 +5469,9 @@
             "example": "My Wallet"
           },
           "country": {
-            "description": "The country where the wallet will be used",
-            "example": "GHA",
-            "allOf": [{ "$ref": "#/components/schemas/COUNTRY" }]
+            "type": "string",
+            "description": "The country where the wallet will be used (accepts both ISO-2 and ISO-3 codes)",
+            "example": "GH or GHA for Ghana"
           }
         },
         "required": ["name"]
@@ -5294,7 +5506,8 @@
           "CKES",
           "CGHS",
           "MSAT",
-          "XLM"
+          "XLM",
+          "ADA"
         ],
         "description": "The currency of the wallet"
       },
@@ -5517,11 +5730,18 @@
           "webhook_events": {
             "type": "array",
             "description": "Webhook events this integrator is subscribed to",
-            "example": ["transaction.status.updated", "payment.confirmed"],
+            "example": [
+              "transaction.deposit.status.updated",
+              "payment.confirmed"
+            ],
             "items": {
               "type": "string",
               "enum": [
                 "transaction.status.updated",
+                "transaction.deposit.status.updated",
+                "transaction.withdrawal.status.updated",
+                "transaction.onramp.status.updated",
+                "transaction.offramp.status.updated",
                 "payment.confirmed",
                 "kyc.status.changed",
                 "system.event"
@@ -5572,8 +5792,8 @@
           },
           "country_code": {
             "type": "string",
-            "description": "country_code",
-            "example": "US"
+            "description": "Country code (accepts ISO-2 or ISO-3, auto-converts to ISO-2)",
+            "example": "US or USA"
           },
           "webhook_url": {
             "type": "string",
@@ -5588,11 +5808,18 @@
           "webhook_events": {
             "type": "array",
             "description": "Webhook events this integrator is subscribed to",
-            "example": ["transaction.status.updated", "payment.confirmed"],
+            "example": [
+              "transaction.deposit.status.updated",
+              "payment.confirmed"
+            ],
             "items": {
               "type": "string",
               "enum": [
                 "transaction.status.updated",
+                "transaction.deposit.status.updated",
+                "transaction.withdrawal.status.updated",
+                "transaction.onramp.status.updated",
+                "transaction.offramp.status.updated",
                 "payment.confirmed",
                 "kyc.status.changed",
                 "system.event"
@@ -5626,11 +5853,15 @@
           "webhook_events": {
             "type": "array",
             "description": "Webhook events this integrator should receive",
-            "example": ["transaction.status.updated"],
+            "example": ["transaction.deposit.status.updated"],
             "items": {
               "type": "string",
               "enum": [
                 "transaction.status.updated",
+                "transaction.deposit.status.updated",
+                "transaction.withdrawal.status.updated",
+                "transaction.onramp.status.updated",
+                "transaction.offramp.status.updated",
                 "payment.confirmed",
                 "kyc.status.changed",
                 "system.event"
@@ -5890,9 +6121,8 @@
             "allOf": [{ "$ref": "#/components/schemas/Currency" }]
           },
           "country": {
-            "description": "Country where the wallet is used (optional if derivable from currency)",
-            "example": "ZA",
-            "allOf": [{ "$ref": "#/components/schemas/COUNTRY" }]
+            "type": "string",
+            "description": "Country where the wallet is used (optional if derivable from currency) - Cards are accepted globally"
           },
           "referenceId": {
             "type": "string",
@@ -6026,9 +6256,9 @@
             "allOf": [{ "$ref": "#/components/schemas/CardDetailsDto" }]
           },
           "country": {
-            "description": "Country where the wallet is used (optional if derivable from currency)",
-            "example": "ZA",
-            "allOf": [{ "$ref": "#/components/schemas/COUNTRY" }]
+            "type": "string",
+            "description": "Country where the wallet is used (optional if derivable from currency) - Cards are accepted globally",
+            "example": "ZA"
           },
           "referenceId": {
             "type": "string",
@@ -6095,7 +6325,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2025-10-17T14:25:17.498Z"
+            "example": "2025-11-07T16:27:18.025Z"
           },
           "transactionCost": {
             "type": "number",
@@ -6135,6 +6365,96 @@
           "transactionAmount"
         ]
       },
+      "CreateDepositMobileMoneyOnChainDto": {
+        "type": "object",
+        "properties": {
+          "public_address": {
+            "type": "string",
+            "description": "The transaction public address"
+          },
+          "chain": {
+            "description": "supported chain",
+            "allOf": [{ "$ref": "#/components/schemas/Chain" }]
+          },
+          "token": {
+            "description": "supported token",
+            "allOf": [{ "$ref": "#/components/schemas/StableCoin" }]
+          },
+          "wallet_id": { "type": "string", "description": "The wallet id" },
+          "amount": {
+            "type": "number",
+            "description": "The amount to deposit"
+          },
+          "customer_key": {
+            "type": "string",
+            "description": "The customer key"
+          },
+          "callback_url": {
+            "type": "string",
+            "description": "The callback url"
+          },
+          "reference_id": {
+            "type": "string",
+            "description": "Optional reference id"
+          }
+        },
+        "required": ["chain", "token", "wallet_id", "amount", "customer_key"]
+      },
+      "DepositMobileMoneyOnchainResponse": {
+        "type": "object",
+        "properties": {
+          "public_address": {
+            "type": "string",
+            "description": "The transaction public address"
+          },
+          "chain": {
+            "description": "supported chain",
+            "allOf": [{ "$ref": "#/components/schemas/Chain" }]
+          },
+          "token": {
+            "description": "supported token",
+            "allOf": [{ "$ref": "#/components/schemas/StableCoin" }]
+          },
+          "reference_id": {
+            "type": "string",
+            "description": "Optional reference id"
+          },
+          "crypto_amount": { "type": "string", "description": "crypto amount" },
+          "transaction_hash": {
+            "type": "string",
+            "description": "transaction hash"
+          },
+          "status": {
+            "description": "transaction status",
+            "allOf": [{ "$ref": "#/components/schemas/DEPOSIT_STATUS" }]
+          },
+          "crypto_received_status": {
+            "description": "crypto received status",
+            "allOf": [{ "$ref": "#/components/schemas/DEPOSIT_STATUS" }]
+          }
+        },
+        "required": ["chain", "token"]
+      },
+      "OnchainDepositResponse": {
+        "type": "object",
+        "properties": {
+          "mobile_money": {
+            "description": "mobile money status",
+            "allOf": [
+              { "$ref": "#/components/schemas/DepositStatusResponseDto" }
+            ]
+          },
+          "onchain": {
+            "description": "onchain status",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DepositMobileMoneyOnchainResponse"
+              }
+            ]
+          }
+        },
+        "required": ["mobile_money", "onchain"]
+      },
       "MobileMoneyCustomerDto": {
         "type": "object",
         "properties": {
@@ -6142,25 +6462,8 @@
           "phone_number": { "type": "string" },
           "country_code": {
             "type": "string",
-            "enum": [
-              "GHA",
-              "NG",
-              "KE",
-              "ZA",
-              "CIV",
-              "ZM",
-              "CMR",
-              "COD",
-              "SEN",
-              "TZ",
-              "MWI",
-              "UG",
-              "EG",
-              "RW",
-              "COD",
-              "USA"
-            ],
-            "example": "GHA or KE"
+            "example": "GH, KE, NG (or ISO-3: GHA, KEN, NGA)",
+            "description": "Country code in ISO-2 format (accepts ISO-3 and auto-converts)"
           },
           "network": {
             "type": "string",
@@ -6204,25 +6507,8 @@
           "phone_number": { "type": "string" },
           "country_code": {
             "type": "string",
-            "enum": [
-              "GHA",
-              "NG",
-              "KE",
-              "ZA",
-              "CIV",
-              "ZM",
-              "CMR",
-              "COD",
-              "SEN",
-              "TZ",
-              "MWI",
-              "UG",
-              "EG",
-              "RW",
-              "COD",
-              "USA"
-            ],
-            "example": "GHA or KE"
+            "example": "GH, KE, NG (or ISO-3: GHA, KEN, NGA)",
+            "description": "Country code in ISO-2 format (accepts ISO-3 and auto-converts)"
           },
           "network": {
             "type": "string",
@@ -6264,25 +6550,8 @@
           "phone_number": { "type": "string" },
           "country_code": {
             "type": "string",
-            "enum": [
-              "GHA",
-              "NG",
-              "KE",
-              "ZA",
-              "CIV",
-              "ZM",
-              "CMR",
-              "COD",
-              "SEN",
-              "TZ",
-              "MWI",
-              "UG",
-              "EG",
-              "RW",
-              "COD",
-              "USA"
-            ],
-            "example": "GHA or KE"
+            "example": "GH, KE, NG (or ISO-3: GHA, KEN, NGA)",
+            "description": "Country code in ISO-2 format (accepts ISO-3 and auto-converts)"
           },
           "network": {
             "type": "string",
@@ -6407,24 +6676,6 @@
           },
           "countryCode": {
             "type": "string",
-            "enum": [
-              "GHA",
-              "NG",
-              "KE",
-              "ZA",
-              "CIV",
-              "ZM",
-              "CMR",
-              "COD",
-              "SEN",
-              "TZ",
-              "MWI",
-              "UG",
-              "EG",
-              "RW",
-              "COD",
-              "USA"
-            ],
             "description": "Country code",
             "example": "KE"
           }
@@ -6625,8 +6876,8 @@
           },
           "country": {
             "type": "string",
-            "description": "The country of the bank",
-            "example": "South Africa"
+            "description": "The country code (ISO-2 like KE, ZA or ISO-3 like KEN, ZAF)",
+            "example": "ZA"
           }
         },
         "required": [
@@ -6758,12 +7009,17 @@
         "properties": {
           "countryCode": {
             "type": "string",
-            "description": "Country code",
+            "description": "ISO 3166-1 alpha-2 country code",
             "example": "KE"
           },
-          "isoName": {
+          "name": {
             "type": "string",
-            "description": "ISO country name",
+            "description": "Full country name",
+            "example": "Kenya"
+          },
+          "iso3Code": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-3 country code (optional)",
             "example": "KEN"
           },
           "currency": {
@@ -6796,6 +7052,12 @@
             "description": "Requires account name for mobile money",
             "example": false
           },
+          "supportedNetworks": {
+            "description": "Supported mobile money networks",
+            "example": ["MTN", "VODAFONE", "AIRTEL"],
+            "type": "array",
+            "items": { "type": "string" }
+          },
           "availableNetworks": {
             "description": "Available networks for this country",
             "example": ["MPESA", "AIRTEL"],
@@ -6805,7 +7067,7 @@
         },
         "required": [
           "countryCode",
-          "isoName",
+          "name",
           "currency",
           "serviceType",
           "isActive",
@@ -6980,7 +7242,11 @@
             "type": "string",
             "description": "Account number"
           },
-          "country": { "type": "string", "description": "Country" }
+          "country": {
+            "type": "string",
+            "description": "Country code (ISO-2 like KE, GH, NG or ISO-3 like KEN, GHA, NGA)",
+            "example": "KE"
+          }
         },
         "required": [
           "name",
@@ -7444,7 +7710,11 @@
               "ETB",
               "MZN",
               "LSL",
-              "GNF"
+              "GNF",
+              "USDT",
+              "BTC",
+              "ETH",
+              "USDC"
             ]
           },
           "balance": { "type": "number", "description": "Available balance" }
@@ -7540,7 +7810,11 @@
               "ETB",
               "MZN",
               "LSL",
-              "GNF"
+              "GNF",
+              "USDT",
+              "BTC",
+              "ETH",
+              "USDC"
             ]
           },
           "reference": {
@@ -7583,7 +7857,11 @@
               "ETB",
               "MZN",
               "LSL",
-              "GNF"
+              "GNF",
+              "USDT",
+              "BTC",
+              "ETH",
+              "USDC"
             ]
           },
           "walletId": { "type": "string", "description": "Selected wallet ID" }
@@ -7647,7 +7925,11 @@
               "ETB",
               "MZN",
               "LSL",
-              "GNF"
+              "GNF",
+              "USDT",
+              "BTC",
+              "ETH",
+              "USDC"
             ]
           },
           "recipientCount": {
@@ -7778,7 +8060,11 @@
               "ETB",
               "MZN",
               "LSL",
-              "GNF"
+              "GNF",
+              "USDT",
+              "BTC",
+              "ETH",
+              "USDC"
             ]
           },
           "reference": { "type": "string", "description": "Payment reference" },

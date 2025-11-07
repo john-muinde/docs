@@ -1,0 +1,84 @@
+---
+title: "Get Deposit On-Chain Status"
+openapi: "GET /api/v3/deposit/on-chain/status/{reference_id}"
+---
+
+Get the status of a deposit on-chain transaction, including both mobile money collection and blockchain transfer details.
+
+## Response Structure
+
+The response contains two parts:
+
+1. **mobile_money** - Status of the mobile money collection
+2. **onchain** - Status of the blockchain transfer
+
+## Status Values
+
+### Mobile Money Status
+
+| Status | Description |
+|--------|-------------|
+| `PENDING` | STK push sent, waiting for customer |
+| `SUCCESSFUL` | Payment collected successfully |
+| `FAILED` | Payment failed or cancelled |
+
+### Crypto Received Status
+
+| Status | Description |
+|--------|-------------|
+| `PENDING` | Blockchain transaction in progress |
+| `SUCCESSFUL` | Crypto received at destination |
+| `FAILED` | Blockchain transaction failed |
+
+## Example Response
+
+```json
+{
+  "data": {
+    "mobile_money": {
+      "id": "dep_abc123",
+      "status": "SUCCESSFUL",
+      "amount": 1450,
+      "currency": "CDF",
+      "transaction_amount": 1450,
+      "transaction_cost": 50,
+      "reference_id": "order_12345",
+      "provider": "VODACOM",
+      "created_at": "2025-01-07T12:00:00Z"
+    },
+    "onchain": {
+      "status": "SUCCESSFUL",
+      "crypto_received_status": "SUCCESSFUL",
+      "chain": "POLYGON",
+      "token": "USDT",
+      "public_address": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+      "crypto_amount": 0.65,
+      "transaction_hash": "0xabc...def"
+    }
+  }
+}
+```
+
+## Webhook Notification
+
+You'll receive a webhook when the transaction completes:
+
+```json
+{
+  "event": "deposit.onchain.successful",
+  "data": {
+    "reference_id": "order_12345",
+    "status": "SUCCESSFUL",
+    "mobile_money_status": "SUCCESSFUL",
+    "crypto_received_status": "SUCCESSFUL",
+    "amount": 1450,
+    "currency": "CDF",
+    "crypto_amount": 0.65,
+    "chain": "POLYGON",
+    "token": "USDT",
+    "transaction_hash": "0xabc...def",
+    "created_at": "2025-01-07T12:00:00Z",
+    "completed_at": "2025-01-07T12:02:30Z"
+  }
+}
+```

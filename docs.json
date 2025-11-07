@@ -152,6 +152,14 @@
                 ]
               },
               {
+                "group": "Crypto Deposits (On-Chain)",
+                "pages": [
+                  "v3/api-reference/deposits/deposit-on-chain",
+                  "v3/api-reference/deposits/deposit-on-chain-status",
+                  "v3/api-reference/deposits/deposit-on-chain-supported-chains"
+                ]
+              },
+              {
                 "group": "General Deposits",
                 "pages": [
                   "v3/api-reference/deposits/initiate",

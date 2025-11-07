@@ -1,0 +1,62 @@
+---
+title: "Get Supported Chains & Tokens"
+openapi: "GET /api/v3/deposit/on-chain/supported-chains"
+---
+
+Get the list of supported blockchain networks and tokens for deposit on-chain transactions.
+
+## Use Case
+
+Use this endpoint to:
+- Display available crypto options to your users
+- Validate chain/token combinations before initiating deposits
+- Build dynamic UI for chain/token selection
+
+## Response Format
+
+```json
+{
+  "data": {
+    "POLYGON": ["USDT", "USDC"],
+    "ETHEREUM": ["USDT", "USDC"],
+    "CELO": ["CUSD"],
+    "STELLAR": ["USDC"],
+    "SOLANA": ["USDT", "USDC"],
+    "TRON": ["USDT"],
+    "BASE": ["USDC"]
+  }
+}
+```
+
+## Integration Example
+
+```javascript
+// Fetch supported chains
+const response = await fetch('https://api.kotanipay.com/api/v3/deposit/on-chain/supported-chains', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY'
+  }
+});
+
+const { data } = await response.json();
+
+// Display to user
+Object.entries(data).forEach(([chain, tokens]) => {
+  console.log(`${chain}: ${tokens.join(', ')}`);
+});
+
+// Validate user selection
+function isValidSelection(chain, token) {
+  return data[chain]?.includes(token) ?? false;
+}
+
+// Example
+console.log(isValidSelection('POLYGON', 'USDT')); // true
+console.log(isValidSelection('POLYGON', 'DAI'));  // false
+```
+
+## Notes
+
+- Supported chains/tokens may vary by country
+- Check this endpoint periodically for updates
+- Some chains may have minimum amounts (check pricing)
