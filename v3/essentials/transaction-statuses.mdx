@@ -1,0 +1,377 @@
+---
+title: 'Transaction Statuses'
+description: 'Understand all transaction status codes used across Kotani Pay API endpoints'
+---
+
+## Overview
+
+Kotani Pay uses a comprehensive set of status codes to track the lifecycle of different transaction types. Understanding these statuses is crucial for building robust integrations and handling transaction states correctly.
+
+## Status Categories
+
+### Terminal Statuses
+
+Terminal statuses indicate that a transaction has reached its final state and will not change further. **You should stop polling for updates once a transaction reaches a terminal status.**
+
+Terminal statuses include:
+- `SUCCESSFUL` / `SUCCESS`
+- `FAILED`
+- `CANCELLED`
+- `EXPIRED`
+- `DECLINED`
+- `PERMANENTLY_FAILED`
+- `REVERSED`
+
+### Intermediate Statuses
+
+Intermediate statuses indicate that a transaction is still being processed. **You should continue polling or wait for webhooks when a transaction is in an intermediate status.**
+
+Intermediate statuses include:
+- `PENDING`
+- `INITIATED`
+- `IN_PROGRESS`
+- `PROCESSING`
+- `RETRY`
+
+### Special Statuses
+
+Special statuses are used for specific scenarios:
+- `DUPLICATE` - Transaction is a duplicate of an existing one
+- `ERROR_OCCURRED` - An error occurred during processing
+- `REQUIRE_REVIEW` - Transaction requires manual review
+- `NOT_INITIATED` - Transaction has not been initiated yet
+
+---
+
+## Deposit Transaction Statuses
+
+Used for mobile money deposits, bank deposits, and card deposits.
+
+<ParamField path="PENDING" type="string">
+  Initial status. Payment request has been created but not yet sent to the provider.
+</ParamField>
+
+<ParamField path="INITIATED" type="string">
+  Payment request has been sent to the provider and is awaiting customer action.
+</ParamField>
+
+<ParamField path="IN_PROGRESS" type="string">
+  Customer has initiated payment and it's being processed by the provider.
+</ParamField>
+
+<ParamField path="SUCCESSFUL" type="string">
+  **Terminal Status** - Payment completed successfully. Funds have been credited to your fiat wallet.
+</ParamField>
+
+<ParamField path="SUCCESS" type="string">
+  **Terminal Status** - Alternative success status used by some providers.
+</ParamField>
+
+<ParamField path="FAILED" type="string">
+  **Terminal Status** - Payment failed. Common reasons include insufficient funds, network errors, or provider issues.
+</ParamField>
+
+<ParamField path="EXPIRED" type="string">
+  **Terminal Status** - Payment request expired before customer completed payment (typically 30 minutes timeout).
+</ParamField>
+
+<ParamField path="CANCELLED" type="string">
+  **Terminal Status** - Payment was cancelled by customer or system.
+</ParamField>
+
+<ParamField path="DECLINED" type="string">
+  **Terminal Status** - Payment was declined by the provider or payment network.
+</ParamField>
+
+<ParamField path="REVERSED" type="string">
+  **Terminal Status** - Payment was reversed/refunded.
+</ParamField>
+
+<ParamField path="DUPLICATE" type="string">
+  Duplicate transaction detected (same reference ID already exists).
+</ParamField>
+
+<ParamField path="ERROR_OCCURRED" type="string">
+  An unexpected error occurred during processing.
+</ParamField>
+
+<ParamField path="REQUIRE_REVIEW" type="string">
+  Transaction flagged for manual review.
+</ParamField>
+
+<ParamField path="RETRY" type="string">
+  Transaction is being retried after a temporary failure.
+</ParamField>
+
+<ParamField path="PERMANENTLY_FAILED" type="string">
+  **Terminal Status** - Transaction failed permanently after all retry attempts exhausted.
+</ParamField>
+
+---
+
+## Withdrawal Transaction Statuses
+
+Used for mobile money withdrawals and bank withdrawals.
+
+<ParamField path="NOT_INITIATED" type="string">
+  Withdrawal request created but not yet sent to provider.
+</ParamField>
+
+<ParamField path="PENDING" type="string">
+  Withdrawal request queued for processing.
+</ParamField>
+
+<ParamField path="INITIATED" type="string">
+  Withdrawal request sent to provider.
+</ParamField>
+
+<ParamField path="TRANSACTION_INITIATED" type="string">
+  Provider has initiated the withdrawal transaction.
+</ParamField>
+
+<ParamField path="IN_PROGRESS" type="string">
+  Withdrawal is being processed by the provider.
+</ParamField>
+
+<ParamField path="SUCCESSFUL" type="string">
+  **Terminal Status** - Withdrawal completed successfully. Funds have been sent to the recipient.
+</ParamField>
+
+<ParamField path="FAILED" type="string">
+  **Terminal Status** - Withdrawal failed.
+</ParamField>
+
+<ParamField path="CANCELLED" type="string">
+  **Terminal Status** - Withdrawal was cancelled.
+</ParamField>
+
+<ParamField path="DECLINED" type="string">
+  **Terminal Status** - Withdrawal was declined by provider.
+</ParamField>
+
+<ParamField path="EXPIRED" type="string">
+  **Terminal Status** - Withdrawal request expired.
+</ParamField>
+
+<ParamField path="REVERSED" type="string">
+  **Terminal Status** - Withdrawal was reversed.
+</ParamField>
+
+<ParamField path="ERROR_OCCURRED" type="string">
+  An error occurred during withdrawal processing.
+</ParamField>
+
+<ParamField path="REQUIRE_REVIEW" type="string">
+  Withdrawal requires manual review.
+</ParamField>
+
+<ParamField path="RETRY" type="string">
+  Withdrawal is being retried.
+</ParamField>
+
+<ParamField path="TRANSACTION_RETRY" type="string">
+  Provider is retrying the withdrawal transaction.
+</ParamField>
+
+<ParamField path="TRANSACTION_RETRY_SUCCESSFUL" type="string">
+  **Terminal Status** - Retry attempt was successful.
+</ParamField>
+
+<ParamField path="TRANSACTION_RETRY_FAILED" type="string">
+  **Terminal Status** - Retry attempt failed.
+</ParamField>
+
+---
+
+## Onramp Transaction Statuses
+
+Onramp transactions use two separate status fields:
+
+### `depositStatus`
+
+Tracks the fiat payment status (mobile money/bank deposit). Uses the same statuses as [Deposit Transaction Statuses](#deposit-transaction-statuses).
+
+### `onchainStatus`
+
+Tracks the crypto transfer status (sending crypto to external wallet).
+
+<ParamField path="PENDING" type="string">
+  Crypto transfer is pending. Waiting for deposit to complete first.
+</ParamField>
+
+<ParamField path="IN_PROGRESS" type="string">
+  Crypto transfer is being processed on the blockchain.
+</ParamField>
+
+<ParamField path="SUCCESSFUL" type="string">
+  **Terminal Status** - Crypto successfully sent to recipient address. Transaction hash available.
+</ParamField>
+
+<ParamField path="FAILED" type="string">
+  **Terminal Status** - Crypto transfer failed.
+</ParamField>
+
+<ParamField path="CANCELLED" type="string">
+  **Terminal Status** - Crypto transfer cancelled (usually because deposit failed).
+</ParamField>
+
+---
+
+## Payment Link Transaction Statuses
+
+Used for payment link transactions.
+
+<ParamField path="pending" type="string">
+  Payment link created but no payment attempted yet.
+</ParamField>
+
+<ParamField path="processing" type="string">
+  Customer is completing the payment.
+</ParamField>
+
+<ParamField path="successful" type="string">
+  **Terminal Status** - Payment completed successfully.
+</ParamField>
+
+<ParamField path="failed" type="string">
+  **Terminal Status** - Payment failed.
+</ParamField>
+
+<ParamField path="cancelled" type="string">
+  **Terminal Status** - Payment cancelled by customer or expired.
+</ParamField>
+
+<ParamField path="expired" type="string">
+  **Terminal Status** - Payment link expired before payment was completed.
+</ParamField>
+
+---
+
+## Callback Statuses
+
+Internal statuses tracking callback delivery to your webhook URL.
+
+<ParamField path="COMPLETED" type="number" default="0">
+  Callback delivered successfully to your webhook.
+</ParamField>
+
+<ParamField path="PENDING" type="number" default="1">
+  Callback waiting to be sent.
+</ParamField>
+
+<ParamField path="PROCESSING" type="number" default="2">
+  Callback is being sent.
+</ParamField>
+
+<ParamField path="FAILED" type="number" default="-1">
+  Callback delivery failed (will retry).
+</ParamField>
+
+<ParamField path="PERMANENTLY_FAILED" type="number" default="-2">
+  Callback delivery permanently failed after all retries.
+</ParamField>
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="When to stop polling">
+    Stop polling when a transaction reaches any **terminal status**:
+    - `SUCCESSFUL` / `SUCCESS`
+    - `FAILED`
+    - `CANCELLED`
+    - `EXPIRED`
+    - `DECLINED`
+    - `PERMANENTLY_FAILED`
+    - `REVERSED`
+  </Accordion>
+
+  <Accordion title="Handling failures">
+    Different failure statuses indicate different scenarios:
+
+    - `FAILED` - Temporary failure, user can retry creating a new transaction
+    - `DECLINED` - Provider declined the transaction (insufficient funds, limits, etc.)
+    - `EXPIRED` - Timeout, user can create a new transaction
+    - `CANCELLED` - User or system cancelled, no action needed
+    - `PERMANENTLY_FAILED` - Unrecoverable failure, investigate the error
+  </Accordion>
+
+  <Accordion title="Using webhooks vs polling">
+    **Recommended**: Use webhooks for real-time status updates instead of polling.
+
+    Configure webhook URLs in your integration to receive automatic notifications when transaction statuses change.
+
+    See [Webhooks documentation](/v3/essentials/webhooks) for setup instructions.
+  </Accordion>
+
+  <Accordion title="Onramp status tracking">
+    For onramp transactions, monitor BOTH statuses:
+
+    1. **`depositStatus`** - Tracks if customer paid (mobile money/bank)
+    2. **`onchainStatus`** - Tracks if crypto was sent
+
+    Success criteria: **BOTH** must be `SUCCESSFUL`
+
+    Common flow:
+    ```
+    depositStatus: PENDING → INITIATED → SUCCESSFUL
+    onchainStatus: PENDING → IN_PROGRESS → SUCCESSFUL
+    ```
+  </Accordion>
+
+  <Accordion title="Error handling">
+    When you receive `ERROR_OCCURRED` or `REQUIRE_REVIEW`:
+
+    1. Check the `error` or `errorMessage` field in the response for details
+    2. Log the full transaction details for support
+    3. Contact support if the issue persists
+    4. Do not retry automatically - these statuses often require manual intervention
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Common Status Flows
+
+### Successful Deposit Flow
+```
+PENDING → INITIATED → IN_PROGRESS → SUCCESSFUL
+```
+
+### Failed Deposit Flow
+```
+PENDING → INITIATED → FAILED
+```
+
+### Expired Deposit Flow
+```
+PENDING → INITIATED → EXPIRED
+```
+
+### Successful Withdrawal Flow
+```
+NOT_INITIATED → PENDING → INITIATED → IN_PROGRESS → SUCCESSFUL
+```
+
+### Successful Onramp Flow
+```
+Deposit:  PENDING → INITIATED → SUCCESSFUL
+Onchain:  PENDING → IN_PROGRESS → SUCCESSFUL
+```
+
+### Failed Onramp Flow (Deposit Fails)
+```
+Deposit:  PENDING → INITIATED → FAILED
+Onchain:  PENDING → CANCELLED
+```
+
+### Failed Onramp Flow (Crypto Transfer Fails)
+```
+Deposit:  PENDING → INITIATED → SUCCESSFUL
+Onchain:  PENDING → IN_PROGRESS → FAILED
+```
+
+<Note>
+  **Note**: If deposit succeeds but crypto transfer fails, your fiat wallet is still credited. The crypto transfer will be automatically retried or can be manually retried via support.
+</Note>
