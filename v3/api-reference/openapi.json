@@ -3158,118 +3158,6 @@
         "tags": ["KYC"]
       }
     },
-    "/health": {
-      "get": {
-        "description": "This endpoint is used to check for the health of the application",
-        "operationId": "HealthController_check",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The Health Check is successful",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": { "type": "string", "example": "ok" },
-                    "info": {
-                      "type": "object",
-                      "example": { "database": { "status": "up" } },
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": ["status"],
-                        "properties": { "status": { "type": "string" } },
-                        "additionalProperties": true
-                      },
-                      "nullable": true
-                    },
-                    "error": {
-                      "type": "object",
-                      "example": {},
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": ["status"],
-                        "properties": { "status": { "type": "string" } },
-                        "additionalProperties": true
-                      },
-                      "nullable": true
-                    },
-                    "details": {
-                      "type": "object",
-                      "example": { "database": { "status": "up" } },
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": ["status"],
-                        "properties": { "status": { "type": "string" } },
-                        "additionalProperties": true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "The Health Check is not successful",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": { "type": "string", "example": "error" },
-                    "info": {
-                      "type": "object",
-                      "example": { "database": { "status": "up" } },
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": ["status"],
-                        "properties": { "status": { "type": "string" } },
-                        "additionalProperties": true
-                      },
-                      "nullable": true
-                    },
-                    "error": {
-                      "type": "object",
-                      "example": {
-                        "redis": {
-                          "status": "down",
-                          "message": "Could not connect"
-                        }
-                      },
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": ["status"],
-                        "properties": { "status": { "type": "string" } },
-                        "additionalProperties": true
-                      },
-                      "nullable": true
-                    },
-                    "details": {
-                      "type": "object",
-                      "example": {
-                        "database": { "status": "up" },
-                        "redis": {
-                          "status": "down",
-                          "message": "Could not connect"
-                        }
-                      },
-                      "additionalProperties": {
-                        "type": "object",
-                        "required": ["status"],
-                        "properties": { "status": { "type": "string" } },
-                        "additionalProperties": true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Check for the application health",
-        "tags": ["HEALTH"]
-      }
-    },
     "/api/v3/customer/support/countries": {
       "get": {
         "description": "Returns a list of all supported countries with their configurations. Supports filtering by service type, currency, country code, and active status. Data is aggregated from the Provider Registry for real-time accuracy. The isEnabled flag indicates whether the authenticated integrator has this service enabled and providers attached.",
@@ -3721,6 +3609,118 @@
         "security": [{ "JWT": [] }],
         "summary": "Get withdraw service configuration",
         "tags": ["CUSTOMER - COUNTRY SUPPORT"]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "This endpoint is used to check for the health of the application",
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The Health Check is successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "ok" },
+                    "info": {
+                      "type": "object",
+                      "example": { "database": { "status": "up" } },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {},
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": { "database": { "status": "up" } },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The Health Check is not successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "error" },
+                    "info": {
+                      "type": "object",
+                      "example": { "database": { "status": "up" } },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": { "status": "up" },
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": ["status"],
+                        "properties": { "status": { "type": "string" } },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Check for the application health",
+        "tags": ["HEALTH"]
       }
     },
     "/api/v3/offramp": {
@@ -5118,10 +5118,6 @@
       "JWT": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" }
     },
     "schemas": {
-      "CreatePagePermissionDto": { "type": "object", "properties": {} },
-      "UpdatePagePermissionDto": { "type": "object", "properties": {} },
-      "ResolveAlarmDto": { "type": "object", "properties": {} },
-      "AlarmConfigDto": { "type": "object", "properties": {} },
       "RateResponseDto": {
         "type": "object",
         "properties": {
@@ -6325,7 +6321,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2025-11-07T16:27:18.025Z"
+            "example": "2025-11-11T18:26:11.512Z"
           },
           "transactionCost": {
             "type": "number",
