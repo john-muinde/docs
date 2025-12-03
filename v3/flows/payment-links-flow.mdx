@@ -1,0 +1,743 @@
+---
+title: "Payment Links Flow"
+description: "Complete sequence diagrams for payment link creation and transactions"
+---
+
+# Payment Links Flow
+
+Payment links allow integrators to collect payments without building a full checkout experience. Create a link once, share it anywhere, and start accepting payments via multiple methods.
+
+## Overview
+
+Payment links provide a hosted payment page that accepts:
+- Mobile money payments
+- Bank transfers
+- Card payments
+- Crypto payments
+
+**Key Features**:
+- Single link, multiple payment methods
+- Flexible pricing (fixed, variable, packages)
+- Customer info collection
+- Branded payment pages
+- Usage limits and expiration
+- Automatic wallet routing
+- Webhook notifications
+
+---
+
+## Payment Link Creation Flow
+
+Create and configure a payment link with pricing, payment methods, and branding.
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Integrator
+    participant API
+    participant LinkService
+    participant IntegratorService
+    participant FiatWallet
+    participant CryptoWallet
+    participant Database
+
+    Note over Integrator,Database: Payment Link Creation
+
+    Integrator->>API: POST /payment-links
+    API->>API: Validate API Key
+    API->>LinkService: Create Payment Link
+
+    LinkService->>LinkService: Validate Request
+    LinkService->>IntegratorService: Check Payment Method Access
+
+    alt Payment Methods Not Enabled
+        IntegratorService-->>LinkService: Service Not Active
+        LinkService-->>API: 400 Error
+        API-->>Integrator: Enable Payment Methods First
+    end
+
+    LinkService->>LinkService: Validate Pricing Config
+
+    alt Invalid Pricing
+        LinkService-->>API: 400 Error
+        API-->>Integrator: Invalid Pricing Configuration
+    end
+
+    Note over LinkService,CryptoWallet: Wallet Assignment
+
+    alt Fiat Methods Enabled (Mobile Money/Bank/Card)
+        LinkService->>FiatWallet: Get/Create Fiat Wallet
+        FiatWallet-->>LinkService: Wallet Assigned
+    end
+
+    alt Crypto Method Enabled
+        LinkService->>CryptoWallet: Get/Create Crypto Wallet
+        CryptoWallet-->>LinkService: Wallet Assigned
+    end
+
+    LinkService->>LinkService: Generate Unique Short Code
+    LinkService->>Database: Save Payment Link
+    Database-->>LinkService: Link Saved
+
+    LinkService-->>API: Payment Link Created
+    API-->>Integrator: Link Details + URL
+
+    Note over Integrator: Share Payment Link
+
+    Integrator->>Integrator: Share URL via SMS/Email/Social
+```
+
+### Details
+
+**Pricing Types**:
+- **FIXED**: Set amount (e.g., $10.00)
+- **VARIABLE**: Min/max range (e.g., $5-$100)
+- **CUSTOMER_CHOICE**: Customer enters any amount within limits
+- **PACKAGE**: Predefined packages (e.g., Basic $10, Pro $25, Enterprise $100)
+
+**Payment Methods**: Configure which methods to enable:
+- `MOBILE_MONEY`: Mobile money payments
+- `BANK`: Bank transfers
+- `CARD`: Card payments
+- `CRYPTO`: Cryptocurrency payments
+
+**Usage Types**:
+- **SINGLE_USE**: Link expires after one successful payment
+- **MULTIPLE_USE**: Can be used up to `maxUses` times
+- **UNLIMITED**: No usage limit
+
+**Customer Info Collection**: Configure what to collect:
+- `REQUIRED`: Must be provided
+- `OPTIONAL`: Can be skipped
+- `HIDDEN`: Not collected
+
+**Key Points**:
+- Short code generated automatically (e.g., `abc123`)
+- Link URL: `https://pay.kotanipay.com/l/{shortCode}`
+- Wallets assigned based on enabled payment methods
+- Multi-currency support per payment method
+- Branding customization (logo, colors)
+- Optional expiration date
+- Callback URL for webhooks
+
+---
+
+## Mobile Money Payment Flow
+
+Customer pays via mobile money through a payment link.
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Customer
+    participant PaymentPage
+    participant API
+    participant TransactionService
+    participant LinkService
+    participant DepositService
+    participant Provider as Mobile Money Provider
+    participant Webhook
+    participant Integrator
+
+    Note over Customer,Integrator: Customer Initiates Payment
+
+    Customer->>PaymentPage: Visit Payment Link
+    PaymentPage->>API: GET /payment-links/:shortCode/details
+    API->>LinkService: Get Link Details
+
+    alt Link Invalid/Expired
+        LinkService-->>API: Link Expired
+        API-->>PaymentPage: Error Message
+        PaymentPage-->>Customer: Link No Longer Valid
+    end
+
+    LinkService-->>API: Link Details
+    API-->>PaymentPage: Payment Page Data
+    PaymentPage-->>Customer: Show Payment Form
+
+    Customer->>Customer: Select Mobile Money
+    Customer->>Customer: Enter Phone & Amount
+    Customer->>PaymentPage: Submit Payment
+
+    PaymentPage->>API: POST /payment-links/:shortCode/pay
+    API->>TransactionService: Initiate Payment
+
+    TransactionService->>LinkService: Validate Link
+    TransactionService->>TransactionService: Validate Amount & Customer Info
+    TransactionService->>TransactionService: Check Usage Limits
+
+    alt Usage Limit Reached
+        TransactionService-->>API: Usage Limit Exceeded
+        API-->>PaymentPage: Error
+        PaymentPage-->>Customer: Link No Longer Available
+    end
+
+    TransactionService->>TransactionService: Create Transaction Record
+    TransactionService->>TransactionService: Status: PENDING
+
+    Note over TransactionService,Provider: Mobile Money Collection
+
+    TransactionService->>DepositService: Create Deposit
+    DepositService->>DepositService: Validate Phone & Currency
+    DepositService->>Provider: Initiate STK Push
+
+    Provider-->>DepositService: STK Sent
+    DepositService-->>TransactionService: Deposit Reference
+    TransactionService->>TransactionService: Status: INITIATED
+    TransactionService-->>API: Transaction Details
+    API-->>PaymentPage: Payment Initiated
+    PaymentPage-->>Customer: Check Phone for STK Push
+
+    Customer->>Provider: Enter PIN
+    Provider->>Provider: Process Payment
+
+    alt Payment Success
+        Provider->>DepositService: Payment Callback (Success)
+        DepositService->>DepositService: Status: SUCCESSFUL
+        DepositService->>TransactionService: Payment Confirmed
+        TransactionService->>TransactionService: Status: COMPLETED
+        TransactionService->>LinkService: Increment Usage Count
+
+        Note over Webhook,Integrator: Callback Notification
+
+        TransactionService->>Webhook: Queue Callback
+        Webhook->>Integrator: POST Callback URL (Signed)
+        Integrator-->>Webhook: 200 OK
+
+        PaymentPage-->>Customer: Payment Successful + Confirmation
+
+    else Payment Failed
+        Provider->>DepositService: Payment Callback (Failed)
+        DepositService->>DepositService: Status: FAILED
+        DepositService->>TransactionService: Payment Failed
+        TransactionService->>TransactionService: Status: FAILED
+
+        TransactionService->>Webhook: Queue Callback
+        Webhook->>Integrator: POST Callback (Failed Status)
+
+        PaymentPage-->>Customer: Payment Failed - Try Again
+    end
+
+    Customer->>PaymentPage: View Receipt
+    PaymentPage->>API: GET /payment-links/transactions/:refId
+    API->>TransactionService: Get Transaction
+    TransactionService-->>API: Transaction Details
+    API-->>PaymentPage: Receipt Data
+    PaymentPage-->>Customer: Digital Receipt
+```
+
+### Details
+
+**Supported Networks**: M-PESA, Airtel Money, MTN Mobile Money, Tigo Pesa, Vodafone
+
+**Customer Flow**:
+1. Customer visits payment link
+2. Selects mobile money payment method
+3. Enters phone number
+4. Enters amount (if variable pricing)
+5. Provides required customer info
+6. Submits payment
+7. Receives STK push on phone
+8. Enters PIN to authorize
+9. Receives confirmation on payment page
+
+**Key Points**:
+- Real-time validation of phone numbers
+- Currency auto-detected from phone number
+- Automatic network detection (M-PESA, MTN, etc.)
+- Payment typically completes in seconds
+- Digital receipt displayed after payment
+- Webhook sent to integrator callback URL
+- Usage count incremented on success
+
+---
+
+## Card Payment Flow
+
+Customer pays via debit/credit card through a payment link.
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Customer
+    participant PaymentPage
+    participant API
+    participant TransactionService
+    participant DepositService
+    participant Provider as Card Provider
+    participant ThreeDS as 3DS Authentication
+    participant Webhook
+    participant Integrator
+
+    Note over Customer,Integrator: Customer Initiates Card Payment
+
+    Customer->>PaymentPage: Visit Payment Link
+    PaymentPage->>API: GET /payment-links/:shortCode/details
+    API-->>PaymentPage: Link Details
+    PaymentPage-->>Customer: Show Payment Form
+
+    Customer->>Customer: Select Card Payment
+    Customer->>Customer: Enter Card Details
+    Customer->>PaymentPage: Submit Payment
+
+    PaymentPage->>API: POST /payment-links/:shortCode/pay
+    API->>TransactionService: Initiate Card Payment
+
+    TransactionService->>TransactionService: Validate & Create Transaction
+    TransactionService->>DepositService: Create Card Deposit
+
+    DepositService->>DepositService: Validate Card Details
+    DepositService->>Provider: Create Checkout Session
+    Provider-->>DepositService: Checkout URL
+    DepositService-->>TransactionService: Checkout URL
+    TransactionService->>TransactionService: Status: INITIATED
+    TransactionService-->>API: Checkout URL
+    API-->>PaymentPage: Redirect URL
+
+    PaymentPage->>Provider: Redirect to Card Provider
+
+    Note over Customer,ThreeDS: Secure Card Processing
+
+    Customer->>Provider: Enter Card Details
+    Provider->>Provider: Validate Card
+
+    alt 3DS Required
+        Provider->>ThreeDS: Initiate 3DS Challenge
+        ThreeDS->>Customer: SMS OTP / Biometric
+        Customer->>ThreeDS: Complete Authentication
+        ThreeDS-->>Provider: Authentication Complete
+    end
+
+    Provider->>Provider: Process Payment
+
+    alt Payment Success
+        Provider-->>Customer: Payment Successful
+        Provider->>DepositService: Webhook (Success)
+        DepositService->>DepositService: Status: SUCCESSFUL
+        DepositService->>TransactionService: Payment Confirmed
+        TransactionService->>TransactionService: Status: COMPLETED
+        TransactionService->>Webhook: Queue Callback
+        Webhook->>Integrator: POST Callback (Success)
+
+        Provider->>PaymentPage: Redirect Back
+        PaymentPage-->>Customer: Payment Successful
+
+    else Payment Failed
+        Provider-->>Customer: Payment Failed
+        Provider->>DepositService: Webhook (Failed)
+        DepositService->>TransactionService: Payment Failed
+        TransactionService->>TransactionService: Status: FAILED
+        TransactionService->>Webhook: Queue Callback
+
+        Provider->>PaymentPage: Redirect Back
+        PaymentPage-->>Customer: Payment Failed - Try Again
+    end
+```
+
+### Details
+
+**Supported Cards**: Visa, Mastercard, American Express
+
+**Card Processing**:
+- Secure 3DS authentication
+- PCI-DSS compliant
+- Card details never stored by Kotani Pay
+- Automatic currency conversion if needed
+
+**Customer Experience**:
+1. Enters card details on secure page
+2. Redirected to card provider
+3. Completes 3DS authentication (SMS OTP, biometric, etc.)
+4. Payment processed
+5. Redirected back to payment page
+6. Receives confirmation
+
+**Key Points**:
+- 3DS2 authentication for enhanced security
+- Support for international cards
+- Real-time payment validation
+- Automatic retries on network issues
+- Detailed failure reasons provided
+
+---
+
+## Crypto Payment Flow
+
+Customer pays via cryptocurrency through a payment link.
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Customer
+    participant PaymentPage
+    participant API
+    participant TransactionService
+    participant CryptoWallet
+    participant Blockchain
+    participant Webhook
+    participant Integrator
+
+    Note over Customer,Integrator: Customer Initiates Crypto Payment
+
+    Customer->>PaymentPage: Visit Payment Link
+    PaymentPage->>API: GET /payment-links/:shortCode/details
+    API-->>PaymentPage: Link Details
+    PaymentPage-->>Customer: Show Payment Options
+
+    Customer->>Customer: Select Crypto Payment
+    Customer->>Customer: Select Network (Polygon/Ethereum/etc.)
+    Customer->>Customer: Select Token (USDT/USDC/etc.)
+    Customer->>PaymentPage: Submit
+
+    PaymentPage->>API: POST /payment-links/:shortCode/pay
+    API->>TransactionService: Initiate Crypto Payment
+
+    TransactionService->>TransactionService: Validate & Create Transaction
+    TransactionService->>CryptoWallet: Generate Deposit Address
+    CryptoWallet-->>TransactionService: Deposit Address
+    TransactionService->>TransactionService: Status: PENDING
+    TransactionService-->>API: Deposit Address + Amount
+    API-->>PaymentPage: Payment Instructions
+
+    PaymentPage-->>Customer: Show QR Code + Address
+
+    Note over Customer,Blockchain: Customer Sends Crypto
+
+    Customer->>Blockchain: Transfer Crypto to Address
+    Blockchain->>CryptoWallet: Transaction Detected
+
+    loop Monitor Confirmations (3+ blocks)
+        CryptoWallet->>Blockchain: Check Confirmation Count
+        Blockchain-->>CryptoWallet: Confirmation Status
+        CryptoWallet->>TransactionService: Update Status
+        TransactionService-->>PaymentPage: Status Update (via polling)
+        PaymentPage-->>Customer: X of 3 Confirmations
+    end
+
+    alt Payment Confirmed
+        CryptoWallet->>TransactionService: Payment Confirmed
+        TransactionService->>TransactionService: Status: COMPLETED
+        TransactionService->>Webhook: Queue Callback
+        Webhook->>Integrator: POST Callback (Success)
+
+        PaymentPage-->>Customer: Payment Successful + TX Hash
+
+    else Payment Timeout
+        TransactionService->>TransactionService: Status: TIMEOUT
+        PaymentPage-->>Customer: Payment Timeout - Try Again
+
+    else Wrong Amount
+        CryptoWallet->>TransactionService: Amount Mismatch
+        TransactionService->>TransactionService: Status: FAILED
+        Note over TransactionService: Amount refunded automatically
+        PaymentPage-->>Customer: Incorrect Amount - Refunded
+    end
+
+    Customer->>PaymentPage: View Receipt
+    PaymentPage->>API: GET /payment-links/transactions/:refId
+    API->>TransactionService: Get Transaction
+    TransactionService-->>API: Transaction + Blockchain Link
+    API-->>PaymentPage: Receipt with TX Hash
+    PaymentPage-->>Customer: Receipt + Block Explorer Link
+```
+
+### Details
+
+**Supported Networks**:
+- Ethereum, Polygon, Arbitrum, Base, Optimism (EVM chains)
+- TRON
+- Stellar
+- Lightning Network
+
+**Supported Tokens**: USDT, USDC, DAI, USDK (varies by network)
+
+**Customer Experience**:
+1. Selects crypto payment
+2. Chooses network and token
+3. Sees deposit address and QR code
+4. Sends crypto from their wallet
+5. Waits for confirmations (real-time updates)
+6. Receives confirmation
+
+**Confirmations Required**:
+- EVM chains: 3 blocks
+- TRON: Instant (TronGrid verification)
+- Stellar: 1-2 seconds
+- Lightning: Instant
+
+**Key Points**:
+- QR code for easy mobile wallet scanning
+- Real-time confirmation tracking
+- Block explorer links provided
+- Automatic refund for incorrect amounts
+- Gas fees handled by customer
+- No KYC required for small amounts
+
+---
+
+## Bank Transfer Payment Flow
+
+Customer pays via bank transfer through a payment link.
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant Customer
+    participant PaymentPage
+    participant API
+    participant TransactionService
+    participant DepositService
+    participant Provider as Bank Provider
+    participant Webhook
+    participant Integrator
+
+    Customer->>PaymentPage: Visit Payment Link
+    PaymentPage->>API: GET /payment-links/:shortCode/details
+    API-->>PaymentPage: Link Details
+    PaymentPage-->>Customer: Show Payment Form
+
+    Customer->>Customer: Select Bank Payment
+    Customer->>PaymentPage: Submit
+
+    PaymentPage->>API: POST /payment-links/:shortCode/pay
+    API->>TransactionService: Initiate Bank Payment
+
+    TransactionService->>TransactionService: Validate & Create Transaction
+    TransactionService->>DepositService: Create Bank Deposit
+
+    DepositService->>Provider: Create Checkout Session
+    Provider-->>DepositService: Checkout URL
+    DepositService-->>TransactionService: Checkout URL
+    TransactionService->>TransactionService: Status: INITIATED
+    TransactionService-->>API: Checkout URL
+    API-->>PaymentPage: Redirect URL
+
+    PaymentPage->>Provider: Redirect to Bank
+
+    Note over Customer,Provider: Bank Authentication & Payment
+
+    Customer->>Provider: Select Bank
+    Customer->>Provider: Login to Online Banking
+    Provider->>Provider: Authenticate Customer
+    Customer->>Provider: Authorize Payment
+    Provider->>Provider: Process Transfer
+
+    alt Payment Success
+        Provider-->>Customer: Transfer Complete
+        Provider->>DepositService: Webhook (Success)
+        DepositService->>TransactionService: Payment Confirmed
+        TransactionService->>TransactionService: Status: COMPLETED
+        TransactionService->>Webhook: Queue Callback
+        Webhook->>Integrator: POST Callback
+
+        Provider->>PaymentPage: Redirect Back
+        PaymentPage-->>Customer: Payment Successful
+
+    else Payment Failed/Cancelled
+        Provider-->>Customer: Transfer Failed
+        Provider->>DepositService: Webhook (Failed)
+        DepositService->>TransactionService: Payment Failed
+        TransactionService->>TransactionService: Status: FAILED
+
+        Provider->>PaymentPage: Redirect Back
+        PaymentPage-->>Customer: Payment Failed
+    end
+```
+
+### Details
+
+**Supported Countries**: Kenya, South Africa, Nigeria
+
+**Processing Time**: Instant to 24 hours depending on bank
+
+**Customer Experience**:
+1. Selects bank payment
+2. Redirected to bank provider
+3. Selects their bank
+4. Logs in to online banking
+5. Authorizes payment
+6. Redirected back to payment page
+7. Receives confirmation
+
+**Key Points**:
+- Secure OAuth-based bank authentication
+- No card details required
+- Lower fees than card payments
+- May require bank account verification
+- Processing time varies by bank
+
+---
+
+## Transaction Statuses
+
+| Status | Description |
+|--------|-------------|
+| `PENDING` | Transaction created, awaiting payment |
+| `INITIATED` | Payment initiated with provider |
+| `PROCESSING` | Payment being processed |
+| `COMPLETED` | Payment successful, funds received |
+| `FAILED` | Payment failed |
+| `TIMEOUT` | Payment not completed within time limit |
+| `CANCELLED` | Customer cancelled payment |
+| `REFUNDED` | Payment refunded to customer |
+
+---
+
+## Webhook Notifications
+
+Webhooks are sent for all transaction status changes.
+
+**Webhook Payload**:
+```json
+{
+  "event": "payment_link.transaction.completed",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "data": {
+    "referenceId": "txn_abc123",
+    "paymentLinkShortCode": "abc123",
+    "status": "COMPLETED",
+    "paymentMethod": "MOBILE_MONEY",
+    "amount": 1000,
+    "currency": "KES",
+    "customer": {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "+254700000000"
+    },
+    "metadata": {
+      "orderId": "order_123"
+    },
+    "completedAt": "2024-01-15T10:30:00Z"
+  },
+  "signature": "hmac_signature_here"
+}
+```
+
+**Webhook Events**:
+- `payment_link.transaction.initiated`
+- `payment_link.transaction.processing`
+- `payment_link.transaction.completed`
+- `payment_link.transaction.failed`
+
+**Security**:
+- HMAC signature verification required
+- Retry mechanism (3x with exponential backoff)
+- Webhook logs available in dashboard
+
+---
+
+## Best Practices
+
+### Link Configuration
+- Use descriptive names for internal tracking
+- Set appropriate usage limits
+- Add expiration dates for time-sensitive payments
+- Configure only needed payment methods
+- Collect minimal customer info required
+
+### Pricing Strategy
+- Use FIXED pricing for products/services
+- Use VARIABLE for donations/tips
+- Use PACKAGE for tiered offerings
+- Set reasonable min/max amounts
+- Consider payment method fees in pricing
+
+### Security
+- Verify webhook signatures
+- Don't expose sensitive data in metadata
+- Use HTTPS for callback URLs
+- Implement idempotency in webhook handlers
+- Store transaction IDs for reconciliation
+
+### Customer Experience
+- Add clear description to payment link
+- Use branding to build trust
+- Provide multiple payment methods
+- Set appropriate "after payment" actions
+- Test all payment flows before launch
+
+### Monitoring
+- Monitor callback delivery success
+- Track payment method usage
+- Analyze failure patterns
+- Set up alerts for high failure rates
+- Reconcile transactions regularly
+
+---
+
+## Error Handling
+
+### Link Expired
+```json
+{
+  "statusCode": 400,
+  "message": "Payment link has expired",
+  "details": {
+    "shortCode": "abc123",
+    "expiresAt": "2024-01-15T00:00:00Z"
+  }
+}
+```
+
+### Usage Limit Reached
+```json
+{
+  "statusCode": 400,
+  "message": "Payment link usage limit reached",
+  "details": {
+    "maxUses": 100,
+    "currentUses": 100
+  }
+}
+```
+
+### Invalid Amount
+```json
+{
+  "statusCode": 400,
+  "message": "Amount outside allowed range",
+  "details": {
+    "minAmount": 100,
+    "maxAmount": 10000,
+    "providedAmount": 50
+  }
+}
+```
+
+### Payment Method Not Enabled
+```json
+{
+  "statusCode": 400,
+  "message": "Payment method not enabled for this link",
+  "details": {
+    "requestedMethod": "CRYPTO",
+    "enabledMethods": ["MOBILE_MONEY", "CARD"]
+  }
+}
+```
+
+---
+
+## Testing
+
+Sandbox mode test data:
+
+**Test Short Codes**: Create test links in sandbox mode
+
+**Test Payments**:
+- Mobile Money: Use test phone `+254700000000`
+- Card: Use test card `4242 4242 4242 4242`
+- Bank: Select "Test Bank" in checkout
+- Crypto: Use testnet addresses
+
+**Test Scenarios**:
+- Amounts ending in `00` trigger success
+- Amounts ending in `99` trigger failure
+- Amounts ending in `50` trigger timeout
+
+**Test Webhooks**: Use webhook.site or similar for testing callbacks

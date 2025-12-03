@@ -49,6 +49,17 @@
                   "v3/essentials/transaction-statuses",
                   "v3/essentials/webhooks"
                 ]
+              },
+              {
+                "group": "Transaction Flows",
+                "pages": [
+                  "v3/flows/deposit-flow",
+                  "v3/flows/withdrawal-flow",
+                  "v3/flows/onramp-flow",
+                  "v3/flows/offramp-flow",
+                  "v3/flows/payment-links-flow",
+                  "v3/flows/bulk-payments-flow"
+                ]
               }
             ]
           },

@@ -1,0 +1,501 @@
+---
+title: "Withdrawal Flows"
+description: "Complete sequence diagrams for all withdrawal transaction types"
+---
+
+# Withdrawal Flows
+
+Complete flows for disbursing fiat payments via different methods.
+
+---
+
+## Mobile Money Withdrawal Flow
+
+Disburse funds to mobile money wallets (M-PESA, MTN Money, Airtel Money, etc.)
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant WithdrawService
+    participant FiatWallet
+    participant Provider as Mobile Money Provider
+    participant CronJob
+    participant Integrator
+
+    User->>API: POST /withdraw/mobile-money
+    Note right of User: Can provide referenceId<br/>or system generates one
+    API->>API: Validate API Key, Customer & Wallet
+
+    WithdrawService->>FiatWallet: Check Balance
+    alt Insufficient Balance
+        WithdrawService-->>API: Error
+        API-->>User: 400 Insufficient Funds
+    else Sufficient Balance
+        WithdrawService->>WithdrawService: Generate/Use Transaction ID
+        WithdrawService->>WithdrawService: Calculate Fees
+
+        Note over WithdrawService: IMMEDIATE DEBIT
+        WithdrawService->>FiatWallet: Debit Wallet NOW
+        FiatWallet-->>WithdrawService: Balance Debited
+
+        WithdrawService->>WithdrawService: Save (Status: INITIATED)
+        WithdrawService->>WithdrawService: Create Hash (duplicate check)
+
+        WithdrawService->>Provider: Initiate Disbursement
+        Provider-->>WithdrawService: Request ID
+        WithdrawService->>WithdrawService: Status: PENDING
+        WithdrawService-->>API: Transaction Details
+        API-->>User: Withdrawal Initiated
+
+        alt Provider Has Webhooks
+            Provider->>WithdrawService: Status Callback
+        else Polling Required
+            Note over CronJob: Every 5 Minutes
+            CronJob->>WithdrawService: Check Pending
+            WithdrawService->>Provider: Query Status
+            Provider-->>WithdrawService: Current Status
+        end
+
+        alt Withdrawal Successful
+            WithdrawService->>WithdrawService: Status: SUCCESSFUL
+            Note over WithdrawService: Funds already debited
+
+            WithdrawService->>Integrator: Send Webhook
+            alt Webhook Success
+                Integrator-->>WithdrawService: 200 OK
+            else Webhook Failed
+                Note over CronJob: Retry Every 2h
+            end
+
+        else Withdrawal Failed
+            WithdrawService->>WithdrawService: Status: FAILED
+
+            Note over WithdrawService: AUTOMATIC REVERSAL
+            WithdrawService->>FiatWallet: Credit Back
+            FiatWallet-->>WithdrawService: Balance Restored
+
+            WithdrawService->>Integrator: Send Failed Webhook
+
+        else Timeout (24h)
+            WithdrawService->>WithdrawService: Status: EXPIRED
+            WithdrawService->>FiatWallet: Credit Back
+            WithdrawService->>Integrator: Send Timeout Webhook
+        end
+    end
+
+    User->>API: GET /withdraw/status/:reference_id
+    API->>WithdrawService: Get Status
+    WithdrawService-->>API: Status & Details
+    API-->>User: Response
+```
+
+### Details
+
+**Countries**: Kenya, Uganda, Tanzania, Ghana, Nigeria, Zambia, and more
+**Networks**: M-PESA, MTN Money, Airtel Money, Tigo Pesa, Vodacom
+**Speed**: Instant to few minutes
+**Limits**: Per-transaction and daily limits vary by country
+
+**Key Points**:
+- Funds debited IMMEDIATELY when withdrawal created
+- If withdrawal fails, funds automatically reversed
+- Hash-based duplicate prevention (same minute)
+- Automatic retry for failed withdrawals (up to 10 attempts)
+
+---
+
+## Bank Transfer Withdrawal Flow
+
+Disburse funds to bank accounts.
+
+**Available Countries**: Kenya, South Africa only
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant WithdrawService
+    participant FiatWallet
+    participant Provider as Bank Provider
+    participant CronJob
+    participant Integrator
+
+    User->>API: POST /withdraw/bank
+    Note right of User: Can provide referenceId<br/>or system generates one
+    API->>API: Validate API Key, Customer & Wallet
+
+    WithdrawService->>FiatWallet: Check Balance
+    alt Insufficient Balance
+        WithdrawService-->>API: Error
+        API-->>User: 400 Insufficient Funds
+    else Sufficient Balance
+        WithdrawService->>WithdrawService: Generate/Use Transaction ID
+        WithdrawService->>WithdrawService: Calculate Fees
+
+        Note over WithdrawService: IMMEDIATE DEBIT
+        WithdrawService->>FiatWallet: Debit Wallet NOW
+        FiatWallet-->>WithdrawService: Balance Debited
+
+        WithdrawService->>WithdrawService: Save (Status: INITIATED)
+
+        WithdrawService->>Provider: Initiate Bank Transfer
+        Provider-->>WithdrawService: Transfer ID
+        WithdrawService->>WithdrawService: Status: PENDING
+        WithdrawService-->>API: Transaction Details
+        API-->>User: Transfer Initiated
+
+        alt Provider Has Webhooks
+            Provider->>WithdrawService: Status Callback
+        else Polling Required
+            Note over CronJob: Every 5 Minutes
+            CronJob->>WithdrawService: Check Pending
+            WithdrawService->>Provider: Query Status
+            Provider-->>WithdrawService: Current Status
+        end
+
+        alt Transfer Successful
+            WithdrawService->>WithdrawService: Status: SUCCESSFUL
+            WithdrawService->>Integrator: Send Webhook
+
+        else Transfer Failed
+            WithdrawService->>WithdrawService: Status: FAILED
+            WithdrawService->>FiatWallet: Credit Back
+            WithdrawService->>Integrator: Send Failed Webhook
+
+        else Timeout (24h)
+            WithdrawService->>WithdrawService: Status: EXPIRED
+            WithdrawService->>FiatWallet: Credit Back
+            WithdrawService->>Integrator: Send Timeout Webhook
+        end
+    end
+
+    User->>API: GET /withdraw/status/:reference_id
+    API->>WithdrawService: Get Status
+    WithdrawService-->>API: Status & Details
+    API-->>User: Response
+```
+
+### Details
+
+**Countries**: Kenya, South Africa
+**Processing**: 1-3 business days
+**Requirements**: Bank account number, bank code
+**Settlement**: Depends on receiving bank
+
+**Key Points**:
+- Same immediate debit mechanism
+- Longer settlement time than mobile money
+- Automatic reversal on failure
+- Bank account validation recommended before withdrawal
+
+---
+
+## Lipa na M-Pesa / Buy Goods Withdrawal Flow
+
+Send payments to merchant till numbers.
+
+**Available Country**: Kenya only
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant WithdrawService
+    participant FiatWallet
+    participant Provider as Payment Provider
+    participant CronJob
+    participant Integrator
+
+    User->>API: POST /withdraw/lipa-na-mpesa
+    Note right of User: Includes tillNumber
+    API->>API: Validate API Key & Wallet
+    API->>API: Validate KES Currency
+
+    WithdrawService->>FiatWallet: Check Balance
+    alt Insufficient Balance
+        WithdrawService-->>API: Error
+        API-->>User: 400 Insufficient Funds
+    else Sufficient Balance
+        WithdrawService->>WithdrawService: Generate/Use Transaction ID
+        WithdrawService->>WithdrawService: Calculate Fees
+
+        Note over WithdrawService: IMMEDIATE DEBIT
+        WithdrawService->>FiatWallet: Debit Wallet NOW
+        FiatWallet-->>WithdrawService: Balance Debited
+
+        WithdrawService->>WithdrawService: Save (Status: INITIATED)
+        WithdrawService->>WithdrawService: Create Hash
+
+        WithdrawService->>Provider: Send to Till Number
+        Provider-->>WithdrawService: Request ID
+        WithdrawService->>WithdrawService: Status: PENDING
+        WithdrawService-->>API: Transaction Details
+        API-->>User: Payment Sent
+
+        Provider->>WithdrawService: Status Callback
+
+        alt Payment Successful
+            WithdrawService->>WithdrawService: Status: SUCCESSFUL
+            WithdrawService->>Integrator: Send Webhook
+
+        else Payment Failed
+            WithdrawService->>WithdrawService: Status: FAILED
+            WithdrawService->>FiatWallet: Credit Back
+            WithdrawService->>Integrator: Send Failed Webhook
+
+        else Timeout (24h)
+            WithdrawService->>WithdrawService: Status: EXPIRED
+            WithdrawService->>FiatWallet: Credit Back
+            WithdrawService->>Integrator: Send Timeout Webhook
+        end
+    end
+
+    User->>API: GET /withdraw/status/:reference_id
+    API->>WithdrawService: Get Status
+    WithdrawService-->>API: Status & Details
+    API-->>User: Response
+```
+
+### Details
+
+**Country**: Kenya only
+**Currency**: KES
+**Speed**: Instant
+**Use Case**: Paying merchants, businesses
+
+**Key Points**:
+- No customer record needed (just till number)
+- Same immediate debit mechanism
+- Instant settlement
+- Kenya-specific feature
+
+---
+
+## Paybill Withdrawal Flow
+
+Send payments to paybill numbers with account reference.
+
+**Available Country**: Kenya only
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant WithdrawService
+    participant FiatWallet
+    participant Provider as Payment Provider
+    participant CronJob
+    participant Integrator
+
+    User->>API: POST /withdraw/paybill
+    Note right of User: Includes paybillNumber<br/>& accountNumber
+    API->>API: Validate API Key & Wallet
+    API->>API: Validate KES Currency
+
+    WithdrawService->>FiatWallet: Check Balance
+    alt Insufficient Balance
+        WithdrawService-->>API: Error
+        API-->>User: 400 Insufficient Funds
+    else Sufficient Balance
+        WithdrawService->>WithdrawService: Generate/Use Transaction ID
+        WithdrawService->>WithdrawService: Calculate Fees
+
+        Note over WithdrawService: IMMEDIATE DEBIT
+        WithdrawService->>FiatWallet: Debit Wallet NOW
+        FiatWallet-->>WithdrawService: Balance Debited
+
+        WithdrawService->>WithdrawService: Save (Status: INITIATED)
+        WithdrawService->>WithdrawService: Create Hash
+
+        WithdrawService->>Provider: Send to Paybill
+        Provider-->>WithdrawService: Request ID
+        WithdrawService->>WithdrawService: Status: PENDING
+        WithdrawService-->>API: Transaction Details
+        API-->>User: Payment Sent
+
+        Provider->>WithdrawService: Status Callback
+
+        alt Payment Successful
+            WithdrawService->>WithdrawService: Status: SUCCESSFUL
+            WithdrawService->>Integrator: Send Webhook
+
+        else Payment Failed
+            WithdrawService->>WithdrawService: Status: FAILED
+            WithdrawService->>FiatWallet: Credit Back
+            WithdrawService->>Integrator: Send Failed Webhook
+
+        else Timeout (24h)
+            WithdrawService->>WithdrawService: Status: EXPIRED
+            WithdrawService->>FiatWallet: Credit Back
+            WithdrawService->>Integrator: Send Timeout Webhook
+        end
+    end
+
+    User->>API: GET /withdraw/status/:reference_id
+    API->>WithdrawService: Get Status
+    WithdrawService-->>API: Status & Details
+    API-->>User: Response
+```
+
+### Details
+
+**Country**: Kenya only
+**Currency**: KES
+**Speed**: Instant
+**Use Case**: Paying utilities, subscriptions, services
+
+**Key Points**:
+- Requires paybill number and account reference
+- No customer record needed
+- Instant settlement
+- Account reference shows on recipient's statement
+
+---
+
+## Transaction Statuses
+
+| Status | Description | Funds Status |
+|--------|-------------|--------------|
+| `INITIATED` | Transaction created, being processed | Debited |
+| `PENDING` | Submitted to provider | Debited |
+| `IN_PROGRESS` | Provider processing | Debited |
+| `SUCCESSFUL` | Funds disbursed successfully | Debited (final) |
+| `FAILED` | Disbursement failed | **Reversed** |
+| `EXPIRED` | No confirmation within 24h | **Reversed** |
+| `CANCELLED` | Transaction cancelled | **Reversed** |
+| `DECLINED` | Provider declined | **Reversed** |
+| `REVERSED` | Transaction reversed | **Reversed** |
+
+---
+
+## Common Features
+
+### Immediate Wallet Debit
+- Funds debited IMMEDIATELY at creation
+- NOT reserved - actual debit happens instantly
+- If withdrawal fails, funds automatically reversed
+- No balance locking - clean debit/reverse flow
+
+### Transaction ID
+- Can be **integrator-provided** via `referenceId`
+- Or **system-generated** if not provided
+- Must be unique per integrator
+
+### Automatic Reversal
+When withdrawal fails or times out:
+1. Status updated to FAILED/EXPIRED/REVERSED
+2. Amount automatically credited back to wallet
+3. Transaction recorded for audit
+4. Webhook sent to notify integrator
+
+### Duplicate Prevention
+- Hash-based detection within same minute
+- Composite: timestamp + integrator + phone
+- Prevents accidental duplicates
+- Returns error if duplicate detected
+
+### Status Monitoring
+- Webhook callbacks for instant updates
+- Polling every 5 minutes for pending
+- 24-hour timeout for stuck transactions
+- Automatic retry for failures (up to 10 attempts)
+
+### Callback Retries
+- Initial delivery via webhook
+- Failed callbacks retry every 2 hours
+- Maximum retry period: 24 hours
+
+---
+
+## Error Handling
+
+### Insufficient Balance
+```json
+{
+  "statusCode": 400,
+  "message": "Insufficient funds in fiat wallet"
+}
+```
+
+### Invalid Recipient
+```json
+{
+  "status": "FAILED",
+  "error": "Invalid mobile money number or bank account"
+}
+```
+
+### Provider Timeout
+```json
+{
+  "status": "EXPIRED",
+  "error": "Withdrawal not confirmed within 24 hours",
+  "note": "Funds reversed to wallet"
+}
+```
+
+### Duplicate Transaction
+```json
+{
+  "statusCode": 400,
+  "message": "Transaction Denied",
+  "note": "Duplicate detected within same minute"
+}
+```
+
+### Duplicate Reference
+```json
+{
+  "statusCode": 400,
+  "message": "Duplicate referenceId"
+}
+```
+
+### Wrong Currency (Lipa/Paybill)
+```json
+{
+  "statusCode": 400,
+  "message": "Lipa na M-Pesa/Paybill only available for Kenya (KES)"
+}
+```
+
+---
+
+## Best Practices
+
+### Validate Recipients
+- Use `/customers/validate-mobile-money` before withdrawals
+- Verify bank account details for transfers
+- Ensures recipient can receive funds
+
+### Unique References
+Always provide unique `referenceId` values.
+
+### Implement Webhooks
+Set up webhook endpoint for real-time updates.
+
+### Handle Reversals
+Monitor for FAILED/EXPIRED statuses - funds auto-reversed.
+
+### Idempotency
+Safe to retry with same `referenceId` if request fails.
+
+---
+
+## Testing
+
+Use sandbox mode:
+- **Test Phone (Success)**: Provided in sandbox docs
+- **Test Phone (Failure)**: Triggers failure scenarios
+- **Test Bank Account**: Use test accounts
+- **Test Amounts**: Specific amounts trigger outcomes
+- **Test Till/Paybill**: Test numbers available in sandbox

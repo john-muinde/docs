@@ -1,0 +1,358 @@
+---
+title: "Deposit Flows"
+description: "Complete sequence diagrams for all deposit transaction types"
+---
+
+# Deposit Flows
+
+Complete flows for collecting fiat payments via different methods.
+
+---
+
+## Mobile Money Deposit Flow
+
+Collect payments via mobile money wallets (M-PESA, MTN Money, Airtel Money, etc.)
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant DepositService
+    participant FiatWallet
+    participant Provider as Mobile Money Provider
+    participant CronJob
+    participant Integrator
+
+    User->>API: POST /deposit/mobile-money
+    Note right of User: Can provide reference_id<br/>or system generates one
+    API->>API: Validate API Key & Customer
+    API->>DepositService: Create Deposit
+
+    DepositService->>DepositService: Generate/Use Transaction ID
+    DepositService->>DepositService: Calculate Fees
+    DepositService->>DepositService: Save (Status: PENDING)
+
+    DepositService->>Provider: Initiate Collection
+    Provider-->>DepositService: Request Accepted
+    DepositService-->>API: Transaction Details
+    API-->>User: STK Push / USSD Instructions
+
+    Note over User,Provider: User Completes Payment
+    User->>Provider: Enter PIN / Confirm
+
+    alt Provider Has Webhooks
+        Provider->>DepositService: Payment Webhook
+        DepositService->>DepositService: Update Status
+    else Polling Required
+        Note over CronJob: Every 5 Minutes
+        CronJob->>DepositService: Check Pending
+        DepositService->>Provider: Query Status
+        Provider-->>DepositService: Current Status
+    end
+
+    alt Payment Successful
+        DepositService->>DepositService: Status: SUCCESSFUL
+        Note over CronJob: Reconciliation
+        CronJob->>FiatWallet: Credit Deposit Balance
+        FiatWallet-->>DepositService: Balance Updated
+
+        DepositService->>Integrator: Send Webhook
+        alt Webhook Success
+            Integrator-->>DepositService: 200 OK
+        else Webhook Failed
+            Note over CronJob: Retry Every 2h (Max 24h)
+        end
+
+    else Payment Failed
+        DepositService->>DepositService: Status: FAILED
+        DepositService->>Integrator: Send Failed Webhook
+
+    else Timeout (24h)
+        DepositService->>DepositService: Status: EXPIRED
+        DepositService->>Integrator: Send Timeout Webhook
+    end
+
+    User->>API: GET /deposit/mobile-money/status/:reference_id
+    API->>DepositService: Get Status
+    DepositService-->>API: Status & Details
+    API-->>User: Response
+```
+
+### Details
+
+**Countries**: Kenya, Uganda, Tanzania, Ghana, Nigeria, Zambia, and more
+**Networks**: M-PESA, MTN Money, Airtel Money, Tigo Pesa, Vodacom
+**Flow**: STK Push or USSD prompt
+**Speed**: Instant to few minutes
+
+**Key Points**:
+- Transaction ID can be integrator-provided or system-generated
+- Funds credited after reconciliation (not immediate)
+- 24-hour timeout for pending payments
+- Automatic webhook retries
+
+---
+
+## Bank Checkout Deposit Flow
+
+Collect payments via bank transfers with secure checkout portals.
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant DepositService
+    participant FiatWallet
+    participant Provider as Bank Provider
+    participant CronJob
+    participant Integrator
+
+    User->>API: POST /deposit/bank-checkout
+    Note right of User: Can provide reference_id<br/>or system generates one
+    API->>API: Validate API Key & Customer
+    API->>DepositService: Create Deposit
+
+    DepositService->>DepositService: Generate/Use Transaction ID
+    DepositService->>DepositService: Calculate Fees
+    DepositService->>DepositService: Save (Status: PENDING)
+
+    DepositService->>Provider: Create Checkout Session
+    Provider-->>DepositService: Checkout URL
+    DepositService-->>API: Checkout URL
+    API-->>User: Redirect to Bank Portal
+
+    Note over User,Provider: User Completes Bank Transfer
+    User->>Provider: Complete Payment
+
+    Provider->>DepositService: Payment Webhook
+    DepositService->>DepositService: Validate Webhook
+
+    alt Payment Successful
+        DepositService->>DepositService: Status: SUCCESSFUL
+        Note over CronJob: Reconciliation
+        CronJob->>FiatWallet: Credit Deposit Balance
+        FiatWallet-->>DepositService: Balance Updated
+
+        DepositService->>Integrator: Send Webhook
+        alt Webhook Success
+            Integrator-->>DepositService: 200 OK
+        else Webhook Failed
+            Note over CronJob: Retry Every 2h (Max 24h)
+        end
+
+    else Payment Failed
+        DepositService->>DepositService: Status: FAILED
+        DepositService->>Integrator: Send Failed Webhook
+
+    else Timeout (24h)
+        DepositService->>DepositService: Status: EXPIRED
+        DepositService->>Integrator: Send Timeout Webhook
+    end
+
+    User->>API: GET /deposit/bank-checkout/status/:reference_id
+    API->>DepositService: Get Status
+    DepositService-->>API: Status & Details
+    API-->>User: Response
+```
+
+### Details
+
+**Countries**: Kenya, South Africa
+**Flow**: Redirect to secure bank portal
+**Settlement**: Instant to 1 business day
+**Banks**: Major banks in supported countries
+
+**Key Points**:
+- User redirected to secure bank portal
+- Bank provider handles payment collection
+- Webhook notification on completion
+- Same reconciliation process as mobile money
+
+---
+
+## Card Deposit Flow
+
+Collect payments via credit/debit cards with 3DS support.
+
+### Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API
+    participant DepositService
+    participant FiatWallet
+    participant Provider as Card Provider
+    participant CronJob
+    participant Integrator
+
+    User->>API: POST /deposit/card
+    Note right of User: Can provide reference_id<br/>or system generates one
+    API->>API: Validate API Key & Customer
+    API->>DepositService: Create Deposit
+
+    DepositService->>DepositService: Generate/Use Transaction ID
+    DepositService->>DepositService: Calculate Fees
+    DepositService->>DepositService: Save (Status: PENDING)
+
+    DepositService->>Provider: Create Card Session
+    Provider-->>DepositService: Card Form URL
+    DepositService-->>API: Card Form URL
+    API-->>User: Card Payment Form
+
+    Note over User,Provider: User Enters Card Details
+    User->>Provider: Submit Card & CVV
+
+    alt 3DS Required
+        Provider->>User: Redirect to 3DS
+        User->>Provider: Complete 3DS Auth
+    end
+
+    Provider->>DepositService: Payment Webhook
+    DepositService->>DepositService: Validate Webhook
+
+    alt Payment Successful
+        DepositService->>DepositService: Status: SUCCESSFUL
+        Note over CronJob: Reconciliation
+        CronJob->>FiatWallet: Credit Deposit Balance
+        FiatWallet-->>DepositService: Balance Updated
+
+        DepositService->>Integrator: Send Webhook
+        alt Webhook Success
+            Integrator-->>DepositService: 200 OK
+        else Webhook Failed
+            Note over CronJob: Retry Every 2h (Max 24h)
+        end
+
+    else Payment Failed/Declined
+        DepositService->>DepositService: Status: FAILED/DECLINED
+        DepositService->>Integrator: Send Failed Webhook
+
+    else Timeout (24h)
+        DepositService->>DepositService: Status: EXPIRED
+        DepositService->>Integrator: Send Timeout Webhook
+    end
+
+    User->>API: GET /deposit/card/status/:reference_id
+    API->>DepositService: Get Status
+    DepositService-->>API: Status & Details
+    API-->>User: Response
+```
+
+### Details
+
+**Countries**: Multiple African countries
+**Supported Cards**: Visa, Mastercard, Verve
+**Security**: 3DS authentication supported
+**Processing**: Instant authorization
+
+**Key Points**:
+- Card details not stored by system
+- 3DS adds extra security layer
+- Instant authorization from card provider
+- Webhook confirms final status
+
+---
+
+## Transaction Statuses
+
+| Status | Description |
+|--------|-------------|
+| `PENDING` | Awaiting user payment or Payment being processed|
+| `INITIATED` | Payment request sent to provider |
+| `IN_PROGRESS` | Payment being processed |
+| `REQUIRE_REVIEW` | Payment requires manual review |
+| `SUCCESSFUL` | Payment confirmed, funds will be credited |
+| `FAILED` | Payment failed |
+| `EXPIRED` | No confirmation within 24 hours |
+| `CANCELLED` | Transaction cancelled |
+| `DECLINED` | Payment declined by provider |
+| `REVERSED` | Payment reversed |
+
+---
+
+## Common Features
+
+### Transaction ID
+- Can be **integrator-provided** via `reference_id`
+- Or **system-generated** if not provided
+- Must be unique per integrator
+
+### No Rate Locking
+Deposits collect fiat currency directly - no exchange rates involved.
+
+### Automatic Reconciliation
+- Successful deposits reconciled via cron job
+- Funds credited to fiat wallet deposit balance
+- Transaction records created for audit
+
+### Status Monitoring
+- Webhook callbacks for instant updates (when available)
+- Polling every 5 minutes for pending transactions
+- 24-hour timeout for unconfirmed payments
+
+### Callback Retries
+- Initial delivery via webhook
+- Failed callbacks retry every 2 hours
+- Maximum retry period: 24 hours
+
+---
+
+## Error Handling
+
+### Insufficient Funds
+```json
+{
+  "status": "FAILED",
+  "error": "Insufficient funds in account"
+}
+```
+
+### Invalid Customer
+```json
+{
+  "status": "FAILED",
+  "error": "Invalid phone number or account details"
+}
+```
+
+### Card Declined
+```json
+{
+  "status": "DECLINED",
+  "error": "Card declined by issuer"
+}
+```
+
+### Timeout
+```json
+{
+  "status": "EXPIRED",
+  "error": "Payment not confirmed within 24 hours"
+}
+```
+
+### Duplicate Reference
+```json
+{
+  "statusCode": 400,
+  "message": "Reference already used"
+}
+```
+
+---
+
+## Best Practices
+
+### Unique References
+Always provide unique `reference_id` values to track transactions.
+
+### Implement Webhooks
+Set up webhook endpoint for real-time status updates.
+
+### Handle All Statuses
+Integration should handle all transaction statuses gracefully.
