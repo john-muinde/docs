@@ -76,16 +76,16 @@ sequenceDiagram
 
 ### Details
 
-**Available Countries**: All supported countries
-
-**Networks**: M-PESA, MTN Money, Airtel Money, Orange Money, and more
+**Countries**: Kenya, Uganda, Tanzania, Ghana, Nigeria, Zambia, and more
+**Networks**: M-PESA, MTN Money, Airtel Money, Tigo Pesa, Vodacom
 **Flow**: STK Push or USSD prompt
 **Speed**: Instant to few minutes
 
 **Key Points**:
 - Transaction ID can be integrator-provided or system-generated
-- Funds credited after reconciliation
+- Funds credited after reconciliation (not immediate)
 - 24-hour timeout for pending payments
+- Automatic webhook retries
 
 ---
 
@@ -155,13 +155,14 @@ sequenceDiagram
 
 ### Details
 
-**Available Countries**: South Africa, Ivory Coast, Benin, Congo B, Gabon, Burkina Faso, Malawi, Mozambique, Senegal, Sierra Leone, Zambia
-
+**Countries**: Kenya, South Africa
 **Flow**: Redirect to secure bank portal
 **Settlement**: Instant to 1 business day
+**Banks**: Major banks in supported countries
 
 **Key Points**:
 - User redirected to secure bank portal
+- Bank provider handles payment collection
 - Webhook notification on completion
 - Same reconciliation process as mobile money
 
@@ -238,15 +239,16 @@ sequenceDiagram
 
 ### Details
 
-**Available Countries**: South Africa, Ivory Coast, Benin, Congo B, Gabon, Burkina Faso, Malawi, Mozambique, Senegal, Sierra Leone, Zambia
-
+**Countries**: Multiple African countries
 **Supported Cards**: Visa, Mastercard, Verve
 **Security**: 3DS authentication supported
+**Processing**: Instant authorization
 
 **Key Points**:
 - Card details not stored by system
 - 3DS adds extra security layer
-- Instant authorization
+- Instant authorization from card provider
+- Webhook confirms final status
 
 ---
 
@@ -283,9 +285,14 @@ Deposits collect fiat currency directly - no exchange rates involved.
 - Transaction records created for audit
 
 ### Status Monitoring
-- Webhook callbacks for instant updates
+- Webhook callbacks for instant updates (when available)
 - Polling every 5 minutes for pending transactions
 - 24-hour timeout for unconfirmed payments
+
+### Callback Retries
+- Initial delivery via webhook
+- Failed callbacks retry every 2 hours
+- Maximum retry period: 24 hours
 
 ---
 
@@ -335,6 +342,11 @@ Deposits collect fiat currency directly - no exchange rates involved.
 
 ## Best Practices
 
-- **Unique References**: Always provide unique `reference_id` values
-- **Implement Webhooks**: Set up webhook endpoint for real-time status updates
-- **Handle All Statuses**: Integration should handle all transaction statuses gracefully
+### Unique References
+Always provide unique `reference_id` values to track transactions.
+
+### Implement Webhooks
+Set up webhook endpoint for real-time status updates.
+
+### Handle All Statuses
+Integration should handle all transaction statuses gracefully.
