@@ -3,83 +3,76 @@ title: "Withdrawal Flows"
 description: "Disburse funds to mobile money wallets (M-PESA, MTN Money, Airtel Money, etc.)"
 ---
 
+## Mobile Money Withdrawal Flow
+
 ### Flow Diagram
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant API
-    participant WithdrawService
-    participant FiatWallet
-    participant Provider as Mobile Money Provider
+    participant Kotani Pay
+    participant MNO as Mobile Money Network
     participant CronJob
     participant Integrator
 
-    User->>API: POST /withdraw/mobile-money
+    User->>Kotani Pay: POST /withdraw/mobile-money
     Note right of User: Can provide referenceId<br/>or system generates one
-    API->>API: Validate API Key, Customer & Wallet
+    Kotani Pay->>Kotani Pay: Validate API Key, Customer & Wallet
+    Kotani Pay->>Kotani Pay: Check Balance
 
-    WithdrawService->>FiatWallet: Check Balance
     alt Insufficient Balance
-        WithdrawService-->>API: Error
-        API-->>User: 400 Insufficient Funds
+        Kotani Pay-->>User: 400 Insufficient Funds
     else Sufficient Balance
-        WithdrawService->>WithdrawService: Generate/Use Transaction ID
-        WithdrawService->>WithdrawService: Calculate Fees
+        Kotani Pay->>Kotani Pay: Generate/Use Transaction ID
+        Kotani Pay->>Kotani Pay: Calculate Fees
 
-        Note over WithdrawService: IMMEDIATE DEBIT
-        WithdrawService->>FiatWallet: Debit Wallet NOW
-        FiatWallet-->>WithdrawService: Balance Debited
+        Note over Kotani Pay: IMMEDIATE DEBIT
+        Kotani Pay->>Kotani Pay: Debit Wallet NOW
+        Kotani Pay->>Kotani Pay: Status: INITIATED
+        Kotani Pay->>Kotani Pay: Create Hash (duplicate check)
 
-        WithdrawService->>WithdrawService: Save (Status: INITIATED)
-        WithdrawService->>WithdrawService: Create Hash (duplicate check)
-
-        WithdrawService->>Provider: Initiate Disbursement
-        Provider-->>WithdrawService: Request ID
-        WithdrawService->>WithdrawService: Status: PENDING
-        WithdrawService-->>API: Transaction Details
-        API-->>User: Withdrawal Initiated
+        Kotani Pay->>MNO: Initiate Disbursement
+        MNO-->>Kotani Pay: Request ID
+        Kotani Pay->>Kotani Pay: Status: PENDING
+        Kotani Pay-->>User: Withdrawal Initiated
 
         alt Provider Has Webhooks
-            Provider->>WithdrawService: Status Callback
+            MNO->>Kotani Pay: Status Callback
         else Polling Required
             Note over CronJob: Every 5 Minutes
-            CronJob->>WithdrawService: Check Pending
-            WithdrawService->>Provider: Query Status
-            Provider-->>WithdrawService: Current Status
+            CronJob->>Kotani Pay: Check Pending
+            Kotani Pay->>MNO: Query Status
+            MNO-->>Kotani Pay: Current Status
         end
 
         alt Withdrawal Successful
-            WithdrawService->>WithdrawService: Status: SUCCESSFUL
-            Note over WithdrawService: Funds already debited
+            Kotani Pay->>Kotani Pay: Status: SUCCESSFUL
+            MNO->>User: Funds Received
 
-            WithdrawService->>Integrator: Send Webhook
+            Kotani Pay->>Integrator: Send Webhook
             alt Webhook Success
-                Integrator-->>WithdrawService: 200 OK
+                Integrator-->>Kotani Pay: 200 OK
             else Webhook Failed
                 Note over CronJob: Retry Every 2h
             end
 
         else Withdrawal Failed
-            WithdrawService->>WithdrawService: Status: FAILED
+            Kotani Pay->>Kotani Pay: Status: FAILED
 
-            Note over WithdrawService: AUTOMATIC REVERSAL
-            WithdrawService->>FiatWallet: Credit Back
-            FiatWallet-->>WithdrawService: Balance Restored
+            Note over Kotani Pay: AUTOMATIC REVERSAL
+            Kotani Pay->>Kotani Pay: Credit Back Balance
 
-            WithdrawService->>Integrator: Send Failed Webhook
+            Kotani Pay->>Integrator: Send Failed Webhook
 
         else Timeout (24h)
-            WithdrawService->>WithdrawService: Status: EXPIRED
-            WithdrawService->>FiatWallet: Credit Back
-            WithdrawService->>Integrator: Send Timeout Webhook
+            Kotani Pay->>Kotani Pay: Status: EXPIRED
+            Kotani Pay->>Kotani Pay: Credit Back Balance
+            Kotani Pay->>Integrator: Send Timeout Webhook
         end
     end
 
-    User->>API: GET /withdraw/status/:reference_id
-    API->>WithdrawService: Get Status
-    WithdrawService-->>API: Status & Details
-    API-->>User: Response
+    User->>Kotani Pay: GET /withdraw/status/:reference_id
+    Kotani Pay-->>User: Status & Details
 ```
 
 ### Details
@@ -105,66 +98,59 @@ Disburse funds to bank accounts.
 ```mermaid
 sequenceDiagram
     participant User
-    participant API
-    participant WithdrawService
-    participant FiatWallet
-    participant Provider as Bank Provider
+    participant Kotani Pay
+    participant Bank as Bank Provider
     participant CronJob
     participant Integrator
 
-    User->>API: POST /withdraw/bank
+    User->>Kotani Pay: POST /withdraw/bank
     Note right of User: Can provide referenceId<br/>or system generates one
-    API->>API: Validate API Key, Customer & Wallet
+    Kotani Pay->>Kotani Pay: Validate API Key, Customer & Wallet
+    Kotani Pay->>Kotani Pay: Check Balance
 
-    WithdrawService->>FiatWallet: Check Balance
     alt Insufficient Balance
-        WithdrawService-->>API: Error
-        API-->>User: 400 Insufficient Funds
+        Kotani Pay-->>User: 400 Insufficient Funds
     else Sufficient Balance
-        WithdrawService->>WithdrawService: Generate/Use Transaction ID
-        WithdrawService->>WithdrawService: Calculate Fees
+        Kotani Pay->>Kotani Pay: Generate/Use Transaction ID
+        Kotani Pay->>Kotani Pay: Calculate Fees
 
-        Note over WithdrawService: IMMEDIATE DEBIT
-        WithdrawService->>FiatWallet: Debit Wallet NOW
-        FiatWallet-->>WithdrawService: Balance Debited
+        Note over Kotani Pay: IMMEDIATE DEBIT
+        Kotani Pay->>Kotani Pay: Debit Wallet NOW
+        Kotani Pay->>Kotani Pay: Status: INITIATED
 
-        WithdrawService->>WithdrawService: Save (Status: INITIATED)
-
-        WithdrawService->>Provider: Initiate Bank Transfer
-        Provider-->>WithdrawService: Transfer ID
-        WithdrawService->>WithdrawService: Status: PENDING
-        WithdrawService-->>API: Transaction Details
-        API-->>User: Transfer Initiated
+        Kotani Pay->>Bank: Initiate Bank Transfer
+        Bank-->>Kotani Pay: Transfer ID
+        Kotani Pay->>Kotani Pay: Status: PENDING
+        Kotani Pay-->>User: Transfer Initiated
 
         alt Provider Has Webhooks
-            Provider->>WithdrawService: Status Callback
+            Bank->>Kotani Pay: Status Callback
         else Polling Required
             Note over CronJob: Every 5 Minutes
-            CronJob->>WithdrawService: Check Pending
-            WithdrawService->>Provider: Query Status
-            Provider-->>WithdrawService: Current Status
+            CronJob->>Kotani Pay: Check Pending
+            Kotani Pay->>Bank: Query Status
+            Bank-->>Kotani Pay: Current Status
         end
 
         alt Transfer Successful
-            WithdrawService->>WithdrawService: Status: SUCCESSFUL
-            WithdrawService->>Integrator: Send Webhook
+            Kotani Pay->>Kotani Pay: Status: SUCCESSFUL
+            Bank->>User: Funds Received
+            Kotani Pay->>Integrator: Send Webhook
 
         else Transfer Failed
-            WithdrawService->>WithdrawService: Status: FAILED
-            WithdrawService->>FiatWallet: Credit Back
-            WithdrawService->>Integrator: Send Failed Webhook
+            Kotani Pay->>Kotani Pay: Status: FAILED
+            Kotani Pay->>Kotani Pay: Credit Back Balance
+            Kotani Pay->>Integrator: Send Failed Webhook
 
         else Timeout (24h)
-            WithdrawService->>WithdrawService: Status: EXPIRED
-            WithdrawService->>FiatWallet: Credit Back
-            WithdrawService->>Integrator: Send Timeout Webhook
+            Kotani Pay->>Kotani Pay: Status: EXPIRED
+            Kotani Pay->>Kotani Pay: Credit Back Balance
+            Kotani Pay->>Integrator: Send Timeout Webhook
         end
     end
 
-    User->>API: GET /withdraw/status/:reference_id
-    API->>WithdrawService: Get Status
-    WithdrawService-->>API: Status & Details
-    API-->>User: Response
+    User->>Kotani Pay: GET /withdraw/status/:reference_id
+    Kotani Pay-->>User: Status & Details
 ```
 
 ### Details
@@ -190,61 +176,52 @@ Send payments to merchant till numbers (Kenya only).
 ```mermaid
 sequenceDiagram
     participant User
-    participant API
-    participant WithdrawService
-    participant FiatWallet
-    participant Provider as Payment Provider
-    participant CronJob
+    participant Kotani Pay
+    participant M-PESA as M-PESA Till
     participant Integrator
 
-    User->>API: POST /withdraw/lipa-na-mpesa
+    User->>Kotani Pay: POST /withdraw/lipa-na-mpesa
     Note right of User: Includes tillNumber
-    API->>API: Validate API Key & Wallet
-    API->>API: Validate KES Currency
+    Kotani Pay->>Kotani Pay: Validate API Key & Wallet
+    Kotani Pay->>Kotani Pay: Validate KES Currency
+    Kotani Pay->>Kotani Pay: Check Balance
 
-    WithdrawService->>FiatWallet: Check Balance
     alt Insufficient Balance
-        WithdrawService-->>API: Error
-        API-->>User: 400 Insufficient Funds
+        Kotani Pay-->>User: 400 Insufficient Funds
     else Sufficient Balance
-        WithdrawService->>WithdrawService: Generate/Use Transaction ID
-        WithdrawService->>WithdrawService: Calculate Fees
+        Kotani Pay->>Kotani Pay: Generate/Use Transaction ID
+        Kotani Pay->>Kotani Pay: Calculate Fees
 
-        Note over WithdrawService: IMMEDIATE DEBIT
-        WithdrawService->>FiatWallet: Debit Wallet NOW
-        FiatWallet-->>WithdrawService: Balance Debited
+        Note over Kotani Pay: IMMEDIATE DEBIT
+        Kotani Pay->>Kotani Pay: Debit Wallet NOW
+        Kotani Pay->>Kotani Pay: Status: INITIATED
+        Kotani Pay->>Kotani Pay: Create Hash
 
-        WithdrawService->>WithdrawService: Save (Status: INITIATED)
-        WithdrawService->>WithdrawService: Create Hash
+        Kotani Pay->>M-PESA: Send to Till Number
+        M-PESA-->>Kotani Pay: Request ID
+        Kotani Pay->>Kotani Pay: Status: PENDING
+        Kotani Pay-->>User: Payment Sent
 
-        WithdrawService->>Provider: Send to Till Number
-        Provider-->>WithdrawService: Request ID
-        WithdrawService->>WithdrawService: Status: PENDING
-        WithdrawService-->>API: Transaction Details
-        API-->>User: Payment Sent
-
-        Provider->>WithdrawService: Status Callback
+        M-PESA->>Kotani Pay: Status Callback
 
         alt Payment Successful
-            WithdrawService->>WithdrawService: Status: SUCCESSFUL
-            WithdrawService->>Integrator: Send Webhook
+            Kotani Pay->>Kotani Pay: Status: SUCCESSFUL
+            Kotani Pay->>Integrator: Send Webhook
 
         else Payment Failed
-            WithdrawService->>WithdrawService: Status: FAILED
-            WithdrawService->>FiatWallet: Credit Back
-            WithdrawService->>Integrator: Send Failed Webhook
+            Kotani Pay->>Kotani Pay: Status: FAILED
+            Kotani Pay->>Kotani Pay: Credit Back Balance
+            Kotani Pay->>Integrator: Send Failed Webhook
 
         else Timeout (24h)
-            WithdrawService->>WithdrawService: Status: EXPIRED
-            WithdrawService->>FiatWallet: Credit Back
-            WithdrawService->>Integrator: Send Timeout Webhook
+            Kotani Pay->>Kotani Pay: Status: EXPIRED
+            Kotani Pay->>Kotani Pay: Credit Back Balance
+            Kotani Pay->>Integrator: Send Timeout Webhook
         end
     end
 
-    User->>API: GET /withdraw/status/:reference_id
-    API->>WithdrawService: Get Status
-    WithdrawService-->>API: Status & Details
-    API-->>User: Response
+    User->>Kotani Pay: GET /withdraw/status/:reference_id
+    Kotani Pay-->>User: Status & Details
 ```
 
 ### Details
@@ -269,61 +246,52 @@ Send payments to paybill numbers with account reference (Kenya only).
 ```mermaid
 sequenceDiagram
     participant User
-    participant API
-    participant WithdrawService
-    participant FiatWallet
-    participant Provider as Payment Provider
-    participant CronJob
+    participant Kotani Pay
+    participant M-PESA as M-PESA Paybill
     participant Integrator
 
-    User->>API: POST /withdraw/paybill
+    User->>Kotani Pay: POST /withdraw/paybill
     Note right of User: Includes paybillNumber<br/>& accountNumber
-    API->>API: Validate API Key & Wallet
-    API->>API: Validate KES Currency
+    Kotani Pay->>Kotani Pay: Validate API Key & Wallet
+    Kotani Pay->>Kotani Pay: Validate KES Currency
+    Kotani Pay->>Kotani Pay: Check Balance
 
-    WithdrawService->>FiatWallet: Check Balance
     alt Insufficient Balance
-        WithdrawService-->>API: Error
-        API-->>User: 400 Insufficient Funds
+        Kotani Pay-->>User: 400 Insufficient Funds
     else Sufficient Balance
-        WithdrawService->>WithdrawService: Generate/Use Transaction ID
-        WithdrawService->>WithdrawService: Calculate Fees
+        Kotani Pay->>Kotani Pay: Generate/Use Transaction ID
+        Kotani Pay->>Kotani Pay: Calculate Fees
 
-        Note over WithdrawService: IMMEDIATE DEBIT
-        WithdrawService->>FiatWallet: Debit Wallet NOW
-        FiatWallet-->>WithdrawService: Balance Debited
+        Note over Kotani Pay: IMMEDIATE DEBIT
+        Kotani Pay->>Kotani Pay: Debit Wallet NOW
+        Kotani Pay->>Kotani Pay: Status: INITIATED
+        Kotani Pay->>Kotani Pay: Create Hash
 
-        WithdrawService->>WithdrawService: Save (Status: INITIATED)
-        WithdrawService->>WithdrawService: Create Hash
+        Kotani Pay->>M-PESA: Send to Paybill
+        M-PESA-->>Kotani Pay: Request ID
+        Kotani Pay->>Kotani Pay: Status: PENDING
+        Kotani Pay-->>User: Payment Sent
 
-        WithdrawService->>Provider: Send to Paybill
-        Provider-->>WithdrawService: Request ID
-        WithdrawService->>WithdrawService: Status: PENDING
-        WithdrawService-->>API: Transaction Details
-        API-->>User: Payment Sent
-
-        Provider->>WithdrawService: Status Callback
+        M-PESA->>Kotani Pay: Status Callback
 
         alt Payment Successful
-            WithdrawService->>WithdrawService: Status: SUCCESSFUL
-            WithdrawService->>Integrator: Send Webhook
+            Kotani Pay->>Kotani Pay: Status: SUCCESSFUL
+            Kotani Pay->>Integrator: Send Webhook
 
         else Payment Failed
-            WithdrawService->>WithdrawService: Status: FAILED
-            WithdrawService->>FiatWallet: Credit Back
-            WithdrawService->>Integrator: Send Failed Webhook
+            Kotani Pay->>Kotani Pay: Status: FAILED
+            Kotani Pay->>Kotani Pay: Credit Back Balance
+            Kotani Pay->>Integrator: Send Failed Webhook
 
         else Timeout (24h)
-            WithdrawService->>WithdrawService: Status: EXPIRED
-            WithdrawService->>FiatWallet: Credit Back
-            WithdrawService->>Integrator: Send Timeout Webhook
+            Kotani Pay->>Kotani Pay: Status: EXPIRED
+            Kotani Pay->>Kotani Pay: Credit Back Balance
+            Kotani Pay->>Integrator: Send Timeout Webhook
         end
     end
 
-    User->>API: GET /withdraw/status/:reference_id
-    API->>WithdrawService: Get Status
-    WithdrawService-->>API: Status & Details
-    API-->>User: Response
+    User->>Kotani Pay: GET /withdraw/status/:reference_id
+    Kotani Pay-->>User: Status & Details
 ```
 
 ### Details

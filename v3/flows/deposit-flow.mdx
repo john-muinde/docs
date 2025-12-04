@@ -12,66 +12,56 @@ Collect payments via mobile money wallets (M-PESA, MTN Money, Airtel Money, etc.
 ```mermaid
 sequenceDiagram
     participant User
-    participant API
-    participant DepositService
-    participant FiatWallet
-    participant Provider as Mobile Money Provider
+    participant Kotani Pay
+    participant MNO as Mobile Money Network
     participant CronJob
     participant Integrator
 
-    User->>API: POST /deposit/mobile-money
+    User->>Kotani Pay: POST /deposit/mobile-money
     Note right of User: Can provide reference_id<br/>or system generates one
-    API->>API: Validate API Key & Customer
-    API->>DepositService: Create Deposit
+    Kotani Pay->>Kotani Pay: Validate API Key & Customer
+    Kotani Pay->>Kotani Pay: Generate/Use Transaction ID
+    Kotani Pay->>Kotani Pay: Calculate Fees
+    Kotani Pay->>Kotani Pay: Status: PENDING
 
-    DepositService->>DepositService: Generate/Use Transaction ID
-    DepositService->>DepositService: Calculate Fees
-    DepositService->>DepositService: Save (Status: PENDING)
+    Kotani Pay->>MNO: Initiate Collection
+    MNO-->>User: STK Push / USSD Prompt
+    MNO-->>Kotani Pay: Request Accepted
 
-    DepositService->>Provider: Initiate Collection
-    Provider-->>DepositService: Request Accepted
-    DepositService-->>API: Transaction Details
-    API-->>User: STK Push / USSD Instructions
-
-    Note over User,Provider: User Completes Payment
-    User->>Provider: Enter PIN / Confirm
+    User->>MNO: Enter PIN / Confirm
 
     alt Provider Has Webhooks
-        Provider->>DepositService: Payment Webhook
-        DepositService->>DepositService: Update Status
+        MNO->>Kotani Pay: Payment Webhook
     else Polling Required
         Note over CronJob: Every 5 Minutes
-        CronJob->>DepositService: Check Pending
-        DepositService->>Provider: Query Status
-        Provider-->>DepositService: Current Status
+        CronJob->>Kotani Pay: Check Pending
+        Kotani Pay->>MNO: Query Status
+        MNO-->>Kotani Pay: Current Status
     end
 
     alt Payment Successful
-        DepositService->>DepositService: Status: SUCCESSFUL
+        Kotani Pay->>Kotani Pay: Status: SUCCESSFUL
         Note over CronJob: Reconciliation
-        CronJob->>FiatWallet: Credit Deposit Balance
-        FiatWallet-->>DepositService: Balance Updated
+        CronJob->>Kotani Pay: Credit Deposit Balance
 
-        DepositService->>Integrator: Send Webhook
+        Kotani Pay->>Integrator: Send Webhook
         alt Webhook Success
-            Integrator-->>DepositService: 200 OK
+            Integrator-->>Kotani Pay: 200 OK
         else Webhook Failed
             Note over CronJob: Retry Every 2h (Max 24h)
         end
 
     else Payment Failed
-        DepositService->>DepositService: Status: FAILED
-        DepositService->>Integrator: Send Failed Webhook
+        Kotani Pay->>Kotani Pay: Status: FAILED
+        Kotani Pay->>Integrator: Send Failed Webhook
 
     else Timeout (24h)
-        DepositService->>DepositService: Status: EXPIRED
-        DepositService->>Integrator: Send Timeout Webhook
+        Kotani Pay->>Kotani Pay: Status: EXPIRED
+        Kotani Pay->>Integrator: Send Timeout Webhook
     end
 
-    User->>API: GET /deposit/mobile-money/status/:reference_id
-    API->>DepositService: Get Status
-    DepositService-->>API: Status & Details
-    API-->>User: Response
+    User->>Kotani Pay: GET /deposit/mobile-money/status/:reference_id
+    Kotani Pay-->>User: Status & Details
 ```
 
 ### Details
@@ -98,59 +88,48 @@ Collect payments via bank transfers with secure checkout portals.
 ```mermaid
 sequenceDiagram
     participant User
-    participant API
-    participant DepositService
-    participant FiatWallet
-    participant Provider as Bank Provider
+    participant Kotani Pay
+    participant Bank as Bank Provider
     participant CronJob
     participant Integrator
 
-    User->>API: POST /deposit/bank-checkout
+    User->>Kotani Pay: POST /deposit/bank-checkout
     Note right of User: Can provide reference_id<br/>or system generates one
-    API->>API: Validate API Key & Customer
-    API->>DepositService: Create Deposit
+    Kotani Pay->>Kotani Pay: Validate API Key & Customer
+    Kotani Pay->>Kotani Pay: Generate/Use Transaction ID
+    Kotani Pay->>Kotani Pay: Calculate Fees
+    Kotani Pay->>Kotani Pay: Status: PENDING
 
-    DepositService->>DepositService: Generate/Use Transaction ID
-    DepositService->>DepositService: Calculate Fees
-    DepositService->>DepositService: Save (Status: PENDING)
+    Kotani Pay->>Bank: Create Checkout Session
+    Bank-->>Kotani Pay: Checkout URL
+    Kotani Pay-->>User: Redirect to Bank Portal
 
-    DepositService->>Provider: Create Checkout Session
-    Provider-->>DepositService: Checkout URL
-    DepositService-->>API: Checkout URL
-    API-->>User: Redirect to Bank Portal
-
-    Note over User,Provider: User Completes Bank Transfer
-    User->>Provider: Complete Payment
-
-    Provider->>DepositService: Payment Webhook
-    DepositService->>DepositService: Validate Webhook
+    User->>Bank: Complete Payment
+    Bank->>Kotani Pay: Payment Webhook
 
     alt Payment Successful
-        DepositService->>DepositService: Status: SUCCESSFUL
+        Kotani Pay->>Kotani Pay: Status: SUCCESSFUL
         Note over CronJob: Reconciliation
-        CronJob->>FiatWallet: Credit Deposit Balance
-        FiatWallet-->>DepositService: Balance Updated
+        CronJob->>Kotani Pay: Credit Deposit Balance
 
-        DepositService->>Integrator: Send Webhook
+        Kotani Pay->>Integrator: Send Webhook
         alt Webhook Success
-            Integrator-->>DepositService: 200 OK
+            Integrator-->>Kotani Pay: 200 OK
         else Webhook Failed
             Note over CronJob: Retry Every 2h (Max 24h)
         end
 
     else Payment Failed
-        DepositService->>DepositService: Status: FAILED
-        DepositService->>Integrator: Send Failed Webhook
+        Kotani Pay->>Kotani Pay: Status: FAILED
+        Kotani Pay->>Integrator: Send Failed Webhook
 
     else Timeout (24h)
-        DepositService->>DepositService: Status: EXPIRED
-        DepositService->>Integrator: Send Timeout Webhook
+        Kotani Pay->>Kotani Pay: Status: EXPIRED
+        Kotani Pay->>Integrator: Send Timeout Webhook
     end
 
-    User->>API: GET /deposit/bank-checkout/status/:reference_id
-    API->>DepositService: Get Status
-    DepositService-->>API: Status & Details
-    API-->>User: Response
+    User->>Kotani Pay: GET /deposit/bank-checkout/status/:reference_id
+    Kotani Pay-->>User: Status & Details
 ```
 
 ### Details
@@ -177,64 +156,54 @@ Collect payments via credit/debit cards with 3DS support.
 ```mermaid
 sequenceDiagram
     participant User
-    participant API
-    participant DepositService
-    participant FiatWallet
-    participant Provider as Card Provider
+    participant Kotani Pay
+    participant Card as Card Provider
     participant CronJob
     participant Integrator
 
-    User->>API: POST /deposit/card
+    User->>Kotani Pay: POST /deposit/card
     Note right of User: Can provide reference_id<br/>or system generates one
-    API->>API: Validate API Key & Customer
-    API->>DepositService: Create Deposit
+    Kotani Pay->>Kotani Pay: Validate API Key & Customer
+    Kotani Pay->>Kotani Pay: Generate/Use Transaction ID
+    Kotani Pay->>Kotani Pay: Calculate Fees
+    Kotani Pay->>Kotani Pay: Status: PENDING
 
-    DepositService->>DepositService: Generate/Use Transaction ID
-    DepositService->>DepositService: Calculate Fees
-    DepositService->>DepositService: Save (Status: PENDING)
+    Kotani Pay->>Card: Create Card Session
+    Card-->>Kotani Pay: Card Form URL
+    Kotani Pay-->>User: Card Payment Form
 
-    DepositService->>Provider: Create Card Session
-    Provider-->>DepositService: Card Form URL
-    DepositService-->>API: Card Form URL
-    API-->>User: Card Payment Form
-
-    Note over User,Provider: User Enters Card Details
-    User->>Provider: Submit Card & CVV
+    User->>Card: Submit Card & CVV
 
     alt 3DS Required
-        Provider->>User: Redirect to 3DS
-        User->>Provider: Complete 3DS Auth
+        Card->>User: Redirect to 3DS
+        User->>Card: Complete 3DS Auth
     end
 
-    Provider->>DepositService: Payment Webhook
-    DepositService->>DepositService: Validate Webhook
+    Card->>Kotani Pay: Payment Webhook
 
     alt Payment Successful
-        DepositService->>DepositService: Status: SUCCESSFUL
+        Kotani Pay->>Kotani Pay: Status: SUCCESSFUL
         Note over CronJob: Reconciliation
-        CronJob->>FiatWallet: Credit Deposit Balance
-        FiatWallet-->>DepositService: Balance Updated
+        CronJob->>Kotani Pay: Credit Deposit Balance
 
-        DepositService->>Integrator: Send Webhook
+        Kotani Pay->>Integrator: Send Webhook
         alt Webhook Success
-            Integrator-->>DepositService: 200 OK
+            Integrator-->>Kotani Pay: 200 OK
         else Webhook Failed
             Note over CronJob: Retry Every 2h (Max 24h)
         end
 
     else Payment Failed/Declined
-        DepositService->>DepositService: Status: FAILED/DECLINED
-        DepositService->>Integrator: Send Failed Webhook
+        Kotani Pay->>Kotani Pay: Status: FAILED/DECLINED
+        Kotani Pay->>Integrator: Send Failed Webhook
 
     else Timeout (24h)
-        DepositService->>DepositService: Status: EXPIRED
-        DepositService->>Integrator: Send Timeout Webhook
+        Kotani Pay->>Kotani Pay: Status: EXPIRED
+        Kotani Pay->>Integrator: Send Timeout Webhook
     end
 
-    User->>API: GET /deposit/card/status/:reference_id
-    API->>DepositService: Get Status
-    DepositService-->>API: Status & Details
-    API-->>User: Response
+    User->>Kotani Pay: GET /deposit/card/status/:reference_id
+    Kotani Pay-->>User: Status & Details
 ```
 
 ### Details

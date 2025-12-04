@@ -16,28 +16,22 @@ description: "This document shows the complete offramp flow for converting crypt
 ```mermaid
 sequenceDiagram
     participant User
-    participant API
-    participant OfframpService
-    participant RateService
+    participant Kotani Pay
 
-    User->>API: POST /offramp
-    API->>API: Validate API Key
-    API->>OfframpService: Create Offramp
-
-    OfframpService->>OfframpService: Validate Request
-    OfframpService->>OfframpService: Check Duplicate
+    User->>Kotani Pay: POST /offramp
+    Kotani Pay->>Kotani Pay: Validate API Key
+    Kotani Pay->>Kotani Pay: Validate Request
+    Kotani Pay->>Kotani Pay: Check Duplicate
 
     alt Has Rate ID
-        OfframpService->>RateService: Validate Rate (60s expiry)
+        Kotani Pay->>Kotani Pay: Validate Rate (60s expiry)
         alt Rate Expired
-            RateService-->>User: 400 Rate Expired
-        else Rate Valid
-            RateService-->>OfframpService: Rate Valid
+            Kotani Pay-->>User: 400 Rate Expired
         end
     end
 
-    OfframpService->>OfframpService: Lock Exchange Rate (Crypto→Fiat)
-    OfframpService->>OfframpService: Calculate Fiat Amount & Fees
+    Kotani Pay->>Kotani Pay: Lock Exchange Rate (Crypto→Fiat)
+    Kotani Pay->>Kotani Pay: Calculate Fiat Amount & Fees
 ```
 
 ---
@@ -51,24 +45,24 @@ User sends crypto from their own wallet.
 ```mermaid
 sequenceDiagram
     participant User
-    participant OfframpService
+    participant Kotani Pay
     participant Blockchain
 
-    OfframpService->>OfframpService: Generate Deposit Address
-    OfframpService->>OfframpService: Status: PENDING
-    OfframpService-->>User: Send Crypto to Address
+    Kotani Pay->>Kotani Pay: Generate Deposit Address
+    Kotani Pay->>Kotani Pay: Status: PENDING
+    Kotani Pay-->>User: Send Crypto to Address
 
     User->>Blockchain: Transfer Crypto
-    Blockchain->>OfframpService: Transaction Detected
+    Blockchain->>Kotani Pay: Transaction Detected
 
     loop Monitor Confirmations (3+ blocks)
-        OfframpService->>Blockchain: Check Confirmation Count
+        Kotani Pay->>Blockchain: Check Confirmation Count
         alt Confirmed
-            Blockchain-->>OfframpService: Confirmed
-            OfframpService->>OfframpService: Status: CRYPTO_RECEIVED
+            Blockchain-->>Kotani Pay: Confirmed
+            Kotani Pay->>Kotani Pay: Status: CRYPTO_RECEIVED
         else Failed/Timeout
-            Blockchain-->>OfframpService: Failed
-            OfframpService->>OfframpService: Status: FAILED
+            Blockchain-->>Kotani Pay: Failed
+            Kotani Pay->>Kotani Pay: Status: FAILED
         end
     end
 ```
@@ -79,13 +73,13 @@ Platform wallet holds crypto, instant processing.
 
 ```mermaid
 sequenceDiagram
-    participant OfframpService
+    participant Kotani Pay
     participant Blockchain
 
-    OfframpService->>OfframpService: Verify Wallet Ownership
-    OfframpService->>Blockchain: Deduct Crypto from Wallet
-    OfframpService->>OfframpService: Status: CRYPTO_RECEIVED
-    Note over OfframpService: Crypto already in platform custody
+    Kotani Pay->>Kotani Pay: Verify Wallet Ownership
+    Kotani Pay->>Blockchain: Deduct Crypto from Wallet
+    Kotani Pay->>Kotani Pay: Status: CRYPTO_RECEIVED
+    Note over Kotani Pay: Crypto already in platform custody
 ```
 
 ---
@@ -96,23 +90,20 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant OfframpService
-    participant WithdrawService
-    participant Provider as Mobile Money Provider
+    participant Kotani Pay
+    participant MNO as Mobile Money Network
+    participant User
 
-    OfframpService->>WithdrawService: Initiate Mobile Money Withdrawal
-    WithdrawService->>WithdrawService: Validate Phone & Network
-    WithdrawService->>Provider: Initiate Disbursement
+    Kotani Pay->>Kotani Pay: Validate Phone & Network
+    Kotani Pay->>MNO: Initiate Disbursement
 
     alt Disbursement Success
-        Provider-->>WithdrawService: Payment Sent
-        WithdrawService->>WithdrawService: Status: SUCCESS
-        WithdrawService-->>OfframpService: Fiat Delivered
-        OfframpService->>OfframpService: Status: SUCCESS
+        MNO-->>Kotani Pay: Payment Sent
+        MNO->>User: Funds Received
+        Kotani Pay->>Kotani Pay: Status: SUCCESS
     else Disbursement Failed
-        Provider-->>WithdrawService: Payment Failed
-        WithdrawService-->>OfframpService: Fiat Failed
-        OfframpService->>OfframpService: Status: REFUND_PENDING
+        MNO-->>Kotani Pay: Payment Failed
+        Kotani Pay->>Kotani Pay: Status: REFUND_PENDING
     end
 ```
 
@@ -123,24 +114,21 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant OfframpService
-    participant WithdrawService
-    participant Provider as Bank Provider
+    participant Kotani Pay
+    participant Bank as Bank Provider
+    participant User
 
-    OfframpService->>WithdrawService: Initiate Bank Transfer
-    WithdrawService->>WithdrawService: Validate Bank Details
-    WithdrawService->>WithdrawService: Verify Account Number
-    WithdrawService->>Provider: Initiate Bank Transfer
+    Kotani Pay->>Kotani Pay: Validate Bank Details
+    Kotani Pay->>Kotani Pay: Verify Account Number
+    Kotani Pay->>Bank: Initiate Bank Transfer
 
     alt Transfer Success
-        Provider-->>WithdrawService: Transfer Complete
-        WithdrawService->>WithdrawService: Status: SUCCESS
-        WithdrawService-->>OfframpService: Fiat Delivered
-        OfframpService->>OfframpService: Status: SUCCESS
+        Bank-->>Kotani Pay: Transfer Complete
+        Bank->>User: Funds Received
+        Kotani Pay->>Kotani Pay: Status: SUCCESS
     else Transfer Failed
-        Provider-->>WithdrawService: Transfer Failed
-        WithdrawService-->>OfframpService: Fiat Failed
-        OfframpService->>OfframpService: Status: REFUND_PENDING
+        Bank-->>Kotani Pay: Transfer Failed
+        Kotani Pay->>Kotani Pay: Status: REFUND_PENDING
     end
 ```
 
@@ -153,25 +141,25 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant OfframpService
+    participant Kotani Pay
     participant Blockchain
     participant User
 
-    Note over OfframpService: Fiat transfer failed
-    OfframpService->>OfframpService: Queue Refund Job (5 min delay)
-    OfframpService->>OfframpService: Status: REFUND_PENDING
+    Note over Kotani Pay: Fiat transfer failed
+    Kotani Pay->>Kotani Pay: Queue Refund Job (5 min delay)
+    Kotani Pay->>Kotani Pay: Status: REFUND_PENDING
 
     loop Refund Process (Max 3 retries)
-        OfframpService->>Blockchain: Return Crypto to Sender
+        Kotani Pay->>Blockchain: Return Crypto to Sender
         alt Refund Success
-            Blockchain-->>OfframpService: Crypto Returned
-            OfframpService->>OfframpService: Status: REFUNDED
-            OfframpService-->>User: Crypto Refunded
+            Blockchain->>User: Crypto Returned
+            Blockchain-->>Kotani Pay: Crypto Refunded
+            Kotani Pay->>Kotani Pay: Status: REFUNDED
         else Refund Failed
-            OfframpService->>OfframpService: Retry Count++
+            Kotani Pay->>Kotani Pay: Retry Count++
             alt Max Retries Reached
-                OfframpService->>OfframpService: Status: REFUND_FAILED
-                Note over OfframpService: Manual intervention required
+                Kotani Pay->>Kotani Pay: Status: REFUND_FAILED
+                Note over Kotani Pay: Manual intervention required
             end
         end
     end
@@ -183,20 +171,20 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant OfframpService
-    participant Queue
+    participant Kotani Pay
+    participant CronJob
     participant Integrator
 
-    OfframpService->>Queue: Queue Callback Job
-    Queue->>Integrator: POST Webhook (Signed)
+    Kotani Pay->>CronJob: Queue Callback Job
+    CronJob->>Integrator: POST Webhook (Signed)
 
     alt Webhook Success
-        Integrator-->>Queue: 200 OK
-        Queue->>OfframpService: CALLBACK_SENT
+        Integrator-->>CronJob: 200 OK
+        CronJob->>Kotani Pay: CALLBACK_SENT
     else Webhook Failed
-        Queue->>Queue: Retry 3x with Backoff
+        CronJob->>CronJob: Retry 3x with Backoff
         alt Retries Exhausted
-            Queue->>Queue: Cron Retry (Every 2h, Max 24h)
+            CronJob->>CronJob: Cron Retry (Every 2h, Max 24h)
         end
     end
 ```

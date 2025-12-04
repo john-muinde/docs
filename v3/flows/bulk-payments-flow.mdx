@@ -38,69 +38,53 @@ Upload and validate recipient data via CSV file.
 ```mermaid
 sequenceDiagram
     participant Integrator
-    participant API
-    participant BulkService
-    participant ValidationService
-    participant Database
+    participant Kotani Pay
 
-    Note over Integrator,Database: CSV Upload & Validation
+    Note over Integrator,Kotani Pay: CSV Upload & Validation
 
-    Integrator->>API: POST /bulk-payments/validate
-    API->>API: Validate API Key
-    API->>BulkService: Upload CSV File
-
-    BulkService->>BulkService: Calculate File Hash
-    BulkService->>Database: Check Duplicate Upload
+    Integrator->>Kotani Pay: POST /bulk-payments/validate
+    Kotani Pay->>Kotani Pay: Validate API Key
+    Kotani Pay->>Kotani Pay: Calculate File Hash
+    Kotani Pay->>Kotani Pay: Check Duplicate Upload
 
     alt File Already Uploaded
-        Database-->>BulkService: Duplicate Found
-        BulkService-->>API: Duplicate File Warning
-        API-->>Integrator: File Previously Uploaded
+        Kotani Pay-->>Integrator: File Previously Uploaded
     end
 
-    BulkService->>ValidationService: Parse CSV
+    Kotani Pay->>Kotani Pay: Parse CSV
 
     alt CSV Parse Error
-        ValidationService-->>BulkService: Parse Failed
-        BulkService-->>API: Invalid CSV Format
-        API-->>Integrator: CSV Format Error
+        Kotani Pay-->>Integrator: CSV Format Error
     end
 
-    ValidationService->>ValidationService: Validate Headers
+    Kotani Pay->>Kotani Pay: Validate Headers
 
     alt Invalid Headers
-        ValidationService-->>BulkService: Missing Required Columns
-        BulkService-->>API: Invalid Headers
-        API-->>Integrator: Required Columns Missing
+        Kotani Pay-->>Integrator: Required Columns Missing
     end
 
     loop For Each Row
-        ValidationService->>ValidationService: Validate Recipient Name
-        ValidationService->>ValidationService: Validate Email Format
-        ValidationService->>ValidationService: Validate Phone Number
-        ValidationService->>ValidationService: Validate Amount
-        ValidationService->>ValidationService: Validate Currency
-        ValidationService->>ValidationService: Validate Reference (Unique)
+        Kotani Pay->>Kotani Pay: Validate Recipient Data
+        Kotani Pay->>Kotani Pay: Validate Phone, Email, Amount
+        Kotani Pay->>Kotani Pay: Validate Currency & Reference
 
         alt Validation Error
-            ValidationService->>ValidationService: Collect Error (Row Number)
+            Kotani Pay->>Kotani Pay: Collect Error (Row Number)
         end
     end
 
-    ValidationService->>ValidationService: Check Duplicate References
-    ValidationService->>ValidationService: Group by Currency
-    ValidationService->>ValidationService: Calculate Totals per Currency
+    Kotani Pay->>Kotani Pay: Check Duplicate References
+    Kotani Pay->>Kotani Pay: Group by Currency
+    Kotani Pay->>Kotani Pay: Calculate Totals per Currency
 
-    ValidationService-->>BulkService: Validation Results
-    BulkService-->>API: Validation Report
-    API-->>Integrator: CSV Validation Response
+    Kotani Pay-->>Integrator: CSV Validation Response
 
     alt Validation Success
         Integrator->>Integrator: Review Summary
         Integrator->>Integrator: Select Wallets per Currency
     else Validation Errors
         Integrator->>Integrator: Fix CSV Errors
-        Integrator->>API: Re-upload Corrected CSV
+        Integrator->>Kotani Pay: Re-upload Corrected CSV
     end
 ```
 
@@ -175,121 +159,89 @@ Create payment batches and process disbursements.
 ```mermaid
 sequenceDiagram
     participant Integrator
-    participant API
-    participant BulkService
-    participant FiatWallet
+    participant Kotani Pay
     participant Queue
-    participant BatchProcessor
-    participant WithdrawService
-    participant Provider as Payment Provider
-    participant Webhook
-    participant Customer
+    participant MNO as Payment Provider
+    participant Recipient
 
-    Note over Integrator,Customer: Batch Creation
+    Note over Integrator,Recipient: Batch Creation
 
-    Integrator->>API: POST /bulk-payments/create
-    API->>BulkService: Create Batches
-
-    BulkService->>BulkService: Group Recipients by Currency
+    Integrator->>Kotani Pay: POST /bulk-payments/create
+    Kotani Pay->>Kotani Pay: Group Recipients by Currency
 
     loop For Each Currency
-        BulkService->>FiatWallet: Validate Wallet Selection
-        FiatWallet->>FiatWallet: Check Wallet Currency Match
-        FiatWallet->>FiatWallet: Check Sufficient Balance
+        Kotani Pay->>Kotani Pay: Validate Wallet Selection
+        Kotani Pay->>Kotani Pay: Check Wallet Currency Match
+        Kotani Pay->>Kotani Pay: Check Sufficient Balance
 
         alt Insufficient Balance
-            FiatWallet-->>BulkService: Insufficient Funds
-            BulkService-->>API: Balance Error
-            API-->>Integrator: Top Up Wallet for {Currency}
+            Kotani Pay-->>Integrator: Top Up Wallet for {Currency}
         end
-
-        FiatWallet-->>BulkService: Wallet Validated
     end
 
-    BulkService->>Database: Create Transaction Record
-    Database-->>BulkService: Transaction ID
+    Kotani Pay->>Kotani Pay: Create Transaction Record
+    Kotani Pay->>Kotani Pay: Create Batch Records
+    Kotani Pay->>Kotani Pay: Create Payment Records
+    Kotani Pay->>Queue: Queue Batch Processing
 
-    loop For Each Currency Group
-        BulkService->>Database: Create Batch Record
-        Database-->>BulkService: Batch ID
+    Kotani Pay-->>Integrator: Transaction & Batch IDs
 
-        BulkService->>Database: Create Payment Records
-        Note over BulkService,Database: One record per recipient
+    Note over Queue,Recipient: Asynchronous Processing
 
-        BulkService->>Queue: Queue Batch Processing
-    end
-
-    BulkService-->>API: Batches Created
-    API-->>Integrator: Transaction & Batch IDs
-
-    Note over Queue,Customer: Asynchronous Processing
-
-    Queue->>BatchProcessor: Process Batch
-    BatchProcessor->>Database: Get Pending Payments
+    Queue->>Kotani Pay: Process Batch
+    Kotani Pay->>Kotani Pay: Get Pending Payments
 
     loop For Each Payment in Batch
-        BatchProcessor->>BatchProcessor: Update Status: PROCESSING
-        BatchProcessor->>WithdrawService: Initiate Payment
+        Kotani Pay->>Kotani Pay: Status: PROCESSING
+        Kotani Pay->>Kotani Pay: Validate Phone & Amount
+        Kotani Pay->>Kotani Pay: Debit Wallet (Immediate)
 
-        WithdrawService->>WithdrawService: Validate Phone & Amount
-        WithdrawService->>FiatWallet: Debit Wallet (Immediate)
-        FiatWallet-->>WithdrawService: Wallet Debited
-
-        WithdrawService->>Provider: Initiate Disbursement
+        Kotani Pay->>MNO: Initiate Disbursement
 
         alt Payment Success
-            Provider-->>WithdrawService: Payment Sent
-            WithdrawService->>WithdrawService: Status: SUCCESS
-            WithdrawService-->>BatchProcessor: Payment Confirmed
-            BatchProcessor->>Database: Update Payment: SUCCESS
-            BatchProcessor->>BatchProcessor: Increment Success Count
-
-            Provider->>Customer: SMS: Payment Received
+            MNO-->>Kotani Pay: Payment Sent
+            Kotani Pay->>Kotani Pay: Status: SUCCESS
+            Kotani Pay->>Kotani Pay: Increment Success Count
+            MNO->>Recipient: SMS: Payment Received
 
         else Payment Failed
-            Provider-->>WithdrawService: Payment Failed
-            WithdrawService->>FiatWallet: Reverse Wallet Debit
-            FiatWallet-->>WithdrawService: Funds Restored
-            WithdrawService->>WithdrawService: Status: FAILED
-            WithdrawService-->>BatchProcessor: Payment Failed
-            BatchProcessor->>Database: Update Payment: FAILED
-            BatchProcessor->>BatchProcessor: Increment Fail Count
+            MNO-->>Kotani Pay: Payment Failed
+            Kotani Pay->>Kotani Pay: Reverse Wallet Debit
+            Kotani Pay->>Kotani Pay: Status: FAILED
+            Kotani Pay->>Kotani Pay: Increment Fail Count
 
             alt Auto-Retry Enabled
-                BatchProcessor->>Queue: Schedule Retry (Max 3x)
+                Queue->>Queue: Schedule Retry (Max 3x)
             end
         end
     end
 
-    Note over BatchProcessor,Webhook: Batch Completion
+    Note over Kotani Pay,Integrator: Batch Completion
 
-    BatchProcessor->>Database: Update Batch Status
-    BatchProcessor->>BatchProcessor: Calculate Statistics
+    Kotani Pay->>Kotani Pay: Update Batch Status
+    Kotani Pay->>Kotani Pay: Calculate Statistics
 
     alt All Payments Processed
-        BatchProcessor->>Database: Batch Status: COMPLETED
+        Kotani Pay->>Kotani Pay: Batch Status: COMPLETED
     else Some Failures
-        BatchProcessor->>Database: Batch Status: COMPLETED_WITH_ERRORS
+        Kotani Pay->>Kotani Pay: Batch Status: COMPLETED_WITH_ERRORS
     else All Failed
-        BatchProcessor->>Database: Batch Status: FAILED
+        Kotani Pay->>Kotani Pay: Batch Status: FAILED
     end
 
-    BatchProcessor->>Webhook: Queue Webhook
-    Webhook->>Integrator: POST Callback URL (Batch Results)
+    Kotani Pay->>Integrator: POST Webhook (Batch Results)
 
     alt Webhook Success
-        Integrator-->>Webhook: 200 OK
+        Integrator-->>Kotani Pay: 200 OK
     else Webhook Failed
-        Webhook->>Queue: Retry 3x with Backoff
+        Queue->>Queue: Retry 3x with Backoff
     end
 
     Note over Integrator: Monitor Progress
 
     loop Poll Status
-        Integrator->>API: GET /bulk-payments/batches/:batchId
-        API->>Database: Get Batch Status
-        Database-->>API: Progress & Stats
-        API-->>Integrator: Current Status
+        Integrator->>Kotani Pay: GET /bulk-payments/batches/:batchId
+        Kotani Pay-->>Integrator: Progress & Stats
     end
 ```
 
@@ -342,34 +294,24 @@ Monitor batch processing progress in real-time.
 ```mermaid
 sequenceDiagram
     participant Integrator
-    participant API
-    participant Database
-    participant Queue
+    participant Kotani Pay
 
-    Note over Integrator,Queue: Real-time Progress Monitoring
+    Note over Integrator,Kotani Pay: Real-time Progress Monitoring
 
-    Integrator->>API: GET /bulk-payments/transactions/:txnId
-    API->>Database: Get Transaction Details
-    Database-->>API: Transaction + Batches Summary
-    API-->>Integrator: Transaction Overview
+    Integrator->>Kotani Pay: GET /bulk-payments/transactions/:txnId
+    Kotani Pay-->>Integrator: Transaction Overview
 
-    Integrator->>API: GET /bulk-payments/batches/:batchId
-    API->>Database: Get Batch Details
-    Database-->>API: Batch + Payments List
-    API-->>Integrator: Batch Progress
+    Integrator->>Kotani Pay: GET /bulk-payments/batches/:batchId
+    Kotani Pay-->>Integrator: Batch Progress
 
     loop Poll Every 5s
-        Integrator->>API: GET /bulk-payments/batches/:batchId/stats
-        API->>Database: Get Current Stats
-        Database-->>API: Live Statistics
-        API-->>Integrator: Progress Update
+        Integrator->>Kotani Pay: GET /bulk-payments/batches/:batchId/stats
+        Kotani Pay-->>Integrator: Progress Update
 
         alt Batch Completed
             Integrator->>Integrator: Stop Polling
-            Integrator->>API: GET /bulk-payments/batches/:batchId/export
-            API->>Database: Get All Payments
-            Database-->>API: Payment Details
-            API-->>Integrator: CSV Export
+            Integrator->>Kotani Pay: GET /bulk-payments/batches/:batchId/export
+            Kotani Pay-->>Integrator: CSV Export
         end
     end
 ```

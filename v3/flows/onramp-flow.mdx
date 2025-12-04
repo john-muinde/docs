@@ -14,26 +14,23 @@ Creating an onramp transaction with rate locking.
 ```mermaid
 sequenceDiagram
     participant User
-    participant API
-    participant OnrampService
+    participant Kotani Pay
+    participant Integrator
 
-    User->>API: POST /onramp/crypto
-    API->>API: Validate API Key
-    API->>OnrampService: Create Onramp
-
-    OnrampService->>OnrampService: Generate Transaction ID
-    OnrampService->>OnrampService: Lock Exchange Rate (Fiat→Crypto)
-    OnrampService->>OnrampService: Calculate Crypto Amount & Fees
+    User->>Kotani Pay: POST /onramp/crypto
+    Kotani Pay->>Kotani Pay: Validate API Key
+    Kotani Pay->>Kotani Pay: Generate Transaction ID
+    Kotani Pay->>Kotani Pay: Lock Exchange Rate (Fiat→Crypto)
+    Kotani Pay->>Kotani Pay: Calculate Crypto Amount & Fees
 
     alt Has Crypto Wallet
-        OnrampService->>OnrampService: Validate Wallet Address
-        OnrampService->>OnrampService: Mode: CRYPTO_DELIVERY
+        Kotani Pay->>Kotani Pay: Validate Wallet Address
+        Note over Kotani Pay: Mode: CRYPTO_DELIVERY
     else No Crypto Wallet
-        OnrampService->>OnrampService: Mode: FIAT_WALLET_CREDIT
+        Note over Kotani Pay: Mode: FIAT_WALLET_CREDIT
     end
 
-    OnrampService-->>API: Transaction Details
-    API-->>User: Transaction ID & Payment Instructions
+    Kotani Pay-->>User: Transaction ID & Payment Instructions
 ```
 
 ---
@@ -45,20 +42,16 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant User
-    participant OnrampService
-    participant DepositService
-    participant Provider as Mobile Money Provider
+    participant Kotani Pay
+    participant MNO as Mobile Money Network
 
-    OnrampService->>DepositService: Initiate Fiat Deposit
-    DepositService->>Provider: Initiate Collection
-    Provider-->>DepositService: STK Push Sent
-    DepositService->>DepositService: Status: PENDING_PROVIDER
-    DepositService-->>User: STK Push / USSD Instructions
+    Kotani Pay->>MNO: Initiate Collection Request
+    MNO-->>User: STK Push / USSD Prompt
+    MNO->>MNO: Status: PENDING
 
-    User->>Provider: Enter PIN / Confirm Payment
-    Provider->>DepositService: Payment Callback
-    DepositService->>OnrampService: Payment Confirmed
-    OnrampService->>OnrampService: Status: CRYPTO_PENDING
+    User->>MNO: Enter PIN / Confirm Payment
+    MNO->>Kotani Pay: Payment Callback (Success/Failed)
+    Kotani Pay->>Kotani Pay: Status: CRYPTO_PENDING
 ```
 
 **Available Countries**: All supported countries
@@ -69,20 +62,16 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant User
-    participant OnrampService
-    participant DepositService
-    participant Provider as Bank Provider
+    participant Kotani Pay
+    participant Bank as Bank Provider
 
-    OnrampService->>DepositService: Initiate Bank Deposit
-    DepositService->>Provider: Create Checkout Session
-    Provider-->>DepositService: Checkout URL
-    DepositService-->>OnrampService: Checkout URL
-    OnrampService-->>User: Redirect to Bank Portal
+    Kotani Pay->>Bank: Create Checkout Session
+    Bank-->>Kotani Pay: Checkout URL
+    Kotani Pay-->>User: Redirect to Bank Portal
 
-    User->>Provider: Complete Bank Payment
-    Provider->>DepositService: Payment Webhook
-    DepositService->>OnrampService: Payment Confirmed
-    OnrampService->>OnrampService: Status: CRYPTO_PENDING
+    User->>Bank: Complete Bank Payment
+    Bank->>Kotani Pay: Payment Webhook
+    Kotani Pay->>Kotani Pay: Status: CRYPTO_PENDING
 ```
 
 ### Fiat Wallet Deduction
@@ -90,15 +79,14 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant User
-    participant OnrampService
-    participant CryptoWallet
+    participant Kotani Pay
 
-    OnrampService->>CryptoWallet: Check Fiat Balance
+    Kotani Pay->>Kotani Pay: Check Fiat Balance
     alt Insufficient Balance
-        CryptoWallet-->>User: 400 Insufficient Funds
+        Kotani Pay-->>User: 400 Insufficient Funds
     else Sufficient Balance
-        CryptoWallet->>CryptoWallet: Reserve Fiat Amount
-        OnrampService->>OnrampService: Status: CRYPTO_PENDING
+        Kotani Pay->>Kotani Pay: Reserve Fiat Amount
+        Kotani Pay->>Kotani Pay: Status: CRYPTO_PENDING
     end
 ```
 
@@ -110,20 +98,19 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant OnrampService
-    participant Blockchain as Lightning Network
-    participant CryptoWallet
+    participant Kotani Pay
+    participant Lightning as Lightning Network
 
-    OnrampService->>OnrampService: Validate Lightning Invoice
-    OnrampService->>Blockchain: Pay Lightning Invoice
-    Blockchain-->>OnrampService: Payment Preimage
+    Kotani Pay->>Kotani Pay: Validate Lightning Invoice
+    Kotani Pay->>Lightning: Pay Lightning Invoice
+    Lightning-->>Kotani Pay: Payment Preimage
 
     alt Payment Success
-        OnrampService->>OnrampService: Status: SUCCESS
-        OnrampService->>CryptoWallet: Deduct Fiat
+        Kotani Pay->>Kotani Pay: Status: SUCCESS
+        Kotani Pay->>Kotani Pay: Deduct Fiat
     else Payment Failed
-        OnrampService->>OnrampService: Status: FAILED
-        OnrampService->>CryptoWallet: Credit Fiat Wallet (Refund)
+        Kotani Pay->>Kotani Pay: Status: FAILED
+        Kotani Pay->>Kotani Pay: Refund to Fiat Wallet
     end
 ```
 
@@ -131,26 +118,25 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant OnrampService
+    participant Kotani Pay
     participant Blockchain as EVM Chain
-    participant CryptoWallet
 
-    OnrampService->>OnrampService: Validate EVM Address
-    OnrampService->>Blockchain: Initiate Token Transfer
-    Blockchain-->>OnrampService: Transaction Hash
-    OnrampService->>OnrampService: Status: PROCESSING
+    Kotani Pay->>Kotani Pay: Validate EVM Address
+    Kotani Pay->>Blockchain: Initiate Token Transfer
+    Blockchain-->>Kotani Pay: Transaction Hash
+    Kotani Pay->>Kotani Pay: Status: PROCESSING
 
     loop Monitor Confirmations (3+ blocks)
-        OnrampService->>Blockchain: Check Status
+        Kotani Pay->>Blockchain: Check Status
         alt Confirmed
-            Blockchain-->>OnrampService: Confirmed
-            OnrampService->>OnrampService: Status: SUCCESS
-            OnrampService->>CryptoWallet: Deduct Fiat
+            Blockchain-->>Kotani Pay: Confirmed
+            Kotani Pay->>Kotani Pay: Status: SUCCESS
+            Kotani Pay->>Kotani Pay: Deduct Fiat
         else Failed
-            OnrampService->>OnrampService: Retry (Max 3)
+            Kotani Pay->>Kotani Pay: Retry (Max 3)
             alt Max Retries
-                OnrampService->>OnrampService: Status: FAILED
-                OnrampService->>CryptoWallet: Refund to Fiat Wallet
+                Kotani Pay->>Kotani Pay: Status: FAILED
+                Kotani Pay->>Kotani Pay: Refund to Fiat Wallet
             end
         end
     end
@@ -163,23 +149,22 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant OnrampService
-    participant Blockchain as TRON
-    participant CryptoWallet
+    participant Kotani Pay
+    participant TRON as TRON Network
 
-    OnrampService->>OnrampService: Validate TRON Address
-    OnrampService->>Blockchain: Initiate TRC20 Transfer
-    Blockchain-->>OnrampService: Transaction Hash
-    OnrampService->>OnrampService: Status: PROCESSING
+    Kotani Pay->>Kotani Pay: Validate TRON Address
+    Kotani Pay->>TRON: Initiate TRC20 Transfer
+    TRON-->>Kotani Pay: Transaction Hash
+    Kotani Pay->>Kotani Pay: Status: PROCESSING
 
     loop Monitor TronGrid
-        OnrampService->>Blockchain: Check Confirmation
+        Kotani Pay->>TRON: Check Confirmation
         alt Confirmed
-            OnrampService->>OnrampService: Status: SUCCESS
-            OnrampService->>CryptoWallet: Deduct Fiat
+            Kotani Pay->>Kotani Pay: Status: SUCCESS
+            Kotani Pay->>Kotani Pay: Deduct Fiat
         else Failed
-            OnrampService->>OnrampService: Status: FAILED
-            OnrampService->>CryptoWallet: Refund to Fiat Wallet
+            Kotani Pay->>Kotani Pay: Status: FAILED
+            Kotani Pay->>Kotani Pay: Refund to Fiat Wallet
         end
     end
 ```
@@ -190,13 +175,12 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant OnrampService
-    participant CryptoWallet
+    participant Kotani Pay
 
-    Note over OnrampService: No crypto wallet provided
-    OnrampService->>CryptoWallet: Credit Fiat Wallet
-    OnrampService->>OnrampService: Status: SUCCESS
-    Note over OnrampService: Credited at crypto rate
+    Note over Kotani Pay: No crypto wallet provided
+    Kotani Pay->>Kotani Pay: Credit Fiat Wallet
+    Kotani Pay->>Kotani Pay: Status: SUCCESS
+    Note over Kotani Pay: Credited at crypto rate
 ```
 
 ---
@@ -205,20 +189,20 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    participant OnrampService
-    participant Queue
+    participant Kotani Pay
+    participant CronJob
     participant Integrator
 
-    OnrampService->>Queue: Queue Callback Job
-    Queue->>Integrator: POST Webhook (Signed)
+    Kotani Pay->>CronJob: Queue Callback Job
+    CronJob->>Integrator: POST Webhook (Signed)
 
     alt Webhook Success
-        Integrator-->>Queue: 200 OK
-        Queue->>OnrampService: CALLBACK_SENT
+        Integrator-->>CronJob: 200 OK
+        CronJob->>Kotani Pay: CALLBACK_SENT
     else Webhook Failed
-        Queue->>Queue: Retry 3x with Backoff
+        CronJob->>CronJob: Retry 3x with Backoff
         alt Retries Exhausted
-            Queue->>Queue: Cron Retry (Every 2h, Max 24h)
+            CronJob->>CronJob: Cron Retry (Every 2h, Max 24h)
         end
     end
 ```
