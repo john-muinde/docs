@@ -3,12 +3,6 @@ title: "Withdrawal Flows"
 description: "Complete sequence diagrams for all withdrawal transaction types"
 ---
 
-# Withdrawal Flows
-
-Complete flows for disbursing fiat payments via different methods.
-
----
-
 ## Mobile Money Withdrawal Flow
 
 Disburse funds to mobile money wallets (M-PESA, MTN Money, Airtel Money, etc.)
@@ -94,24 +88,21 @@ sequenceDiagram
 
 ### Details
 
-**Countries**: Kenya, Uganda, Tanzania, Ghana, Nigeria, Zambia, and more
-**Networks**: M-PESA, MTN Money, Airtel Money, Tigo Pesa, Vodacom
+**Available Countries**: All supported countries
+
+**Networks**: M-PESA, MTN Money, Airtel Money, Orange Money, and more
 **Speed**: Instant to few minutes
-**Limits**: Per-transaction and daily limits vary by country
 
 **Key Points**:
 - Funds debited IMMEDIATELY when withdrawal created
 - If withdrawal fails, funds automatically reversed
-- Hash-based duplicate prevention (same minute)
-- Automatic retry for failed withdrawals (up to 10 attempts)
+- Hash-based duplicate prevention
 
 ---
 
 ## Bank Transfer Withdrawal Flow
 
 Disburse funds to bank accounts.
-
-**Available Countries**: Kenya, South Africa only
 
 ### Flow Diagram
 
@@ -182,24 +173,21 @@ sequenceDiagram
 
 ### Details
 
-**Countries**: Kenya, South Africa
+**Available Countries**: All supported countries
+
 **Processing**: 1-3 business days
 **Requirements**: Bank account number, bank code
-**Settlement**: Depends on receiving bank
 
 **Key Points**:
-- Same immediate debit mechanism
+- Funds debited immediately
 - Longer settlement time than mobile money
 - Automatic reversal on failure
-- Bank account validation recommended before withdrawal
 
 ---
 
-## Lipa na M-Pesa / Buy Goods Withdrawal Flow
+## Lipa na M-Pesa Withdrawal Flow
 
-Send payments to merchant till numbers.
-
-**Available Country**: Kenya only
+Send payments to merchant till numbers (Kenya only).
 
 ### Flow Diagram
 
@@ -268,21 +256,17 @@ sequenceDiagram
 **Country**: Kenya only
 **Currency**: KES
 **Speed**: Instant
-**Use Case**: Paying merchants, businesses
 
 **Key Points**:
-- No customer record needed (just till number)
-- Same immediate debit mechanism
+- No customer record needed
+- Funds debited immediately
 - Instant settlement
-- Kenya-specific feature
 
 ---
 
 ## Paybill Withdrawal Flow
 
-Send payments to paybill numbers with account reference.
-
-**Available Country**: Kenya only
+Send payments to paybill numbers with account reference (Kenya only).
 
 ### Flow Diagram
 
@@ -351,13 +335,11 @@ sequenceDiagram
 **Country**: Kenya only
 **Currency**: KES
 **Speed**: Instant
-**Use Case**: Paying utilities, subscriptions, services
 
 **Key Points**:
 - Requires paybill number and account reference
 - No customer record needed
 - Instant settlement
-- Account reference shows on recipient's statement
 
 ---
 
@@ -405,14 +387,8 @@ When withdrawal fails or times out:
 
 ### Status Monitoring
 - Webhook callbacks for instant updates
-- Polling every 5 minutes for pending
-- 24-hour timeout for stuck transactions
-- Automatic retry for failures (up to 10 attempts)
-
-### Callback Retries
-- Initial delivery via webhook
-- Failed callbacks retry every 2 hours
-- Maximum retry period: 24 hours
+- Polling every 5 minutes for pending transactions
+- 24-hour timeout for unconfirmed transactions
 
 ---
 
@@ -472,30 +448,14 @@ When withdrawal fails or times out:
 
 ## Best Practices
 
-### Validate Recipients
-- Use `/customers/validate-mobile-money` before withdrawals
-- Verify bank account details for transfers
-- Ensures recipient can receive funds
-
-### Unique References
-Always provide unique `referenceId` values.
-
-### Implement Webhooks
-Set up webhook endpoint for real-time updates.
-
-### Handle Reversals
-Monitor for FAILED/EXPIRED statuses - funds auto-reversed.
-
-### Idempotency
-Safe to retry with same `referenceId` if request fails.
+- **Validate Recipients**: Use `/customers/validate-mobile-money` before withdrawals
+- **Unique References**: Always provide unique `referenceId` values
+- **Implement Webhooks**: Set up webhook endpoint for real-time updates
+- **Handle Reversals**: Monitor for FAILED/EXPIRED statuses - funds auto-reversed
+- **Idempotency**: Safe to retry with same `referenceId` if request fails
 
 ---
 
 ## Testing
 
-Use sandbox mode:
-- **Test Phone (Success)**: Provided in sandbox docs
-- **Test Phone (Failure)**: Triggers failure scenarios
-- **Test Bank Account**: Use test accounts
-- **Test Amounts**: Specific amounts trigger outcomes
-- **Test Till/Paybill**: Test numbers available in sandbox
+Use sandbox mode with test credentials provided in sandbox documentation.
