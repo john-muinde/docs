@@ -19,19 +19,23 @@ Configure one webhook endpoint per environment from the dashboard and opt in to 
 The following event types are available:
 
 **Transaction Events:**
+
 - `transaction.deposit.status.updated` - Deposit transaction status changed
 - `transaction.withdrawal.status.updated` - Withdrawal transaction status changed
 - `transaction.onramp.status.updated` - On-ramp transaction status changed
 - `transaction.offramp.status.updated` - Off-ramp transaction status changed
-- `transaction.status.updated` - *(Deprecated)* Generic transaction status update
+- `transaction.status.updated` - _(Deprecated)_ Generic transaction status update
 
 **Payment Events:**
+
 - `payment.confirmed` - Payment has been confirmed
 
 **KYC Events:**
+
 - `kyc.status.changed` - Customer verification status changed
 
 **System Events:**
+
 - `system.event` - Operational notices and maintenance alerts
 
 ## Payload Format
@@ -56,27 +60,35 @@ Webhooks are sent as HTTP `POST` requests with a JSON payload. The request body 
 
 Every payload is signed with your dashboard-configured webhook secret. Validate the signature before acting on the event:
 
-1. Read the request body as a **raw string** before parsing or mutating it.
-2. Compute an HMAC-SHA256 digest: `sha256=HMAC(secret, rawBody)`.
-3. Compare the digest with the `X-Kotani-Signature` header using a timing-safe comparison.
+1. Parse the JSON payload from the request body.
+2. **Remove the `signature` field** from the parsed payload.
+3. Compute an HMAC-SHA256 digest of the remaining payload: `sha256=HMAC(secret, JSON.stringify(payloadWithoutSignature))`.
+4. Compare the digest with the `X-Kotani-Signature` header using a timing-safe comparison.
+
+> **Important:** The signature is computed from only the `event` and `data` fields. You must exclude the `signature` field itself when verifying.
 
 ### Node.js helper
 
 ```ts
 import crypto from "crypto";
 
-export function verifyWebhook({ secret, rawBody, headerSignature }: {
+export function verifyWebhook({
+  secret,
+  payload,
+  headerSignature,
+}: {
   secret: string;
-  rawBody: string | Buffer;
+  payload: { event: string; data: Record<string, any>; signature?: string };
   headerSignature: string;
 }) {
-  const normalizedBody = Buffer.isBuffer(rawBody)
-    ? rawBody
-    : Buffer.from(rawBody, "utf8");
+  // Remove the signature field from the payload
+  const { signature, ...payloadWithoutSignature } = payload;
 
+  // Compute HMAC-SHA256 from the payload without signature
+  const payloadString = JSON.stringify(payloadWithoutSignature);
   const computed =
     "sha256=" +
-    crypto.createHmac("sha256", secret).update(normalizedBody).digest("hex");
+    crypto.createHmac("sha256", secret).update(payloadString).digest("hex");
 
   try {
     return crypto.timingSafeEqual(
@@ -87,6 +99,35 @@ export function verifyWebhook({ secret, rawBody, headerSignature }: {
     return false;
   }
 }
+```
+
+### Example usage
+
+```ts
+import express from "express";
+
+const app = express();
+
+app.post("/webhook", express.json(), (req, res) => {
+  const headerSignature = req.headers["x-kotani-signature"] as string;
+  const webhookSecret = process.env.KOTANI_WEBHOOK_SECRET;
+
+  const isValid = verifyWebhook({
+    secret: webhookSecret,
+    payload: req.body,
+    headerSignature,
+  });
+
+  if (!isValid) {
+    return res.status(401).send("Invalid signature");
+  }
+
+  // Process the webhook event
+  console.log("Event:", req.body.event);
+  console.log("Data:", req.body.data);
+
+  res.status(200).send("OK");
+});
 ```
 
 ## Configuring Webhooks
