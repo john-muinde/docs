@@ -185,10 +185,18 @@
                 ]
               },
               {
+                "group": "Kenya Withdrawals",
+                "pages": [
+                  "v3/api-reference/withdrawals/lipa-na-mpesa",
+                  "v3/api-reference/withdrawals/paybill"
+                ]
+              },
+              {
                 "group": "Bank Withdrawals",
                 "pages": [
                   "v3/api-reference/withdrawals/supporting-banks",
                   "v3/api-reference/withdrawals/bank-v2",
+                  "v3/api-reference/withdrawals/bank",
                   "v3/api-reference/withdrawals/bank-status"
                 ]
               },
