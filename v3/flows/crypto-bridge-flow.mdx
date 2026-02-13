@@ -15,7 +15,7 @@ The provider sends a single API request containing the recipient details and a p
 
 ```mermaid
 sequenceDiagram
-    participant Provider as Provider (e.g. Orange)
+    participant Provider as Provider
     participant Kotani Pay
     participant Customer as Customer / Payment Provider
 
@@ -106,14 +106,14 @@ sequenceDiagram
 
     alt Payout Successful
         Recipient-->>ProviderFiat: Payout Confirmed
-        ProviderFiat->>Kotani Pay: POST /webhooks/orange/status
+        ProviderFiat->>Kotani Pay: POST /webhooks/<provider>/status
         Note right of ProviderFiat: status: SETTLING → COMPLETED
         Kotani Pay->>Kotani Pay: Status: SETTLING
         Kotani Pay->>Kotani Pay: Status: COMPLETED
         Kotani Pay-->>ProviderFiat: 200 OK
 
     else Payout Failed
-        ProviderFiat->>Kotani Pay: POST /webhooks/orange/status
+        ProviderFiat->>Kotani Pay: POST /webhooks/<provider>/status
         Note right of ProviderFiat: status: FAILED<br/>failure_stage: SETTLEMENT
         Kotani Pay->>Kotani Pay: Status: FAILED
         Kotani Pay-->>ProviderFiat: 200 OK
@@ -220,8 +220,8 @@ sequenceDiagram
 Provider webhooks to Kotani Pay must be signed:
 
 ```
-X-Orange-Signature: HMAC-SHA256(secret, payload)
-X-Orange-Timestamp: Unix timestamp
+X-Kotani-Signature: HMAC-SHA256(secret, payload)
+X-Kotani-Timestamp: Unix timestamp
 ```
 
 Kotani Pay responds with `200 OK` and `kotani_reference_id` to acknowledge receipt.
@@ -234,7 +234,7 @@ Kotani Pay responds with `200 OK` and `kotani_reference_id` to acknowledge recei
 - **Implement webhook handler**: Set `callback_url` to receive real-time status updates
 - **Validate invoice expiry**: Ensure the bolt11 invoice `expires_at` allows enough time for fiat collection (~60s minimum)
 - **Handle all statuses**: Build UI states for all 8 statuses in the table above
-- **Use both IDs**: Always track `kotani_reference_id` and your own `orange_reference_id` together
+- **Use both IDs**: Always track `kotani_reference_id` and your own `<provider>_reference_id` together
 
 ---
 
