@@ -1,0 +1,254 @@
+---
+title: "Crypto Bridge Flow (Cross-Border Remittance)"
+description: "Complete sequence diagrams for crypto bridge transactions — fiat-to-crypto-to-fiat cross-border remittances via Lightning Network."
+---
+
+Crypto Bridge enables cross-border remittances using blockchain networks as the settlement rail. The provider (e.g. Orange Group) initiates a transaction with a single API request that includes a pre-generated crypto payment invoice. Kotani Pay collects source fiat, pays the invoice, and the provider settles destination fiat to the recipient.
+
+**Supported Corridors**: Kenya (KES) ↔ South Africa (ZAR) — extensible to additional countries
+
+---
+
+## 1. Transaction Initiation & Fiat Collection
+
+The provider sends a single API request containing the recipient details and a pre-generated crypto invoice (e.g. Lightning bolt11). Kotani Pay initiates fiat collection from the customer simultaneously.
+
+```mermaid
+sequenceDiagram
+    participant Provider as Provider (e.g. Orange)
+    participant Kotani Pay
+    participant Customer as Customer / Payment Provider
+
+    Provider->>Kotani Pay: POST /api/v3/deposit/crypto-bridge
+    Note right of Provider: Includes bolt11 invoice,<br/>settlement details & callback_url
+    Kotani Pay->>Kotani Pay: Validate API Key & wallet_id
+    Kotani Pay->>Kotani Pay: Status: DEPOSIT_INITIATED
+    Kotani Pay->>Kotani Pay: Generate refund_config (refund invoice)
+
+    Kotani Pay->>Customer: Initiate Fiat Collection
+    Note right of Kotani Pay: STK Push / USSD / Bank prompt
+
+    Kotani Pay-->>Provider: 200 ACCEPTED
+    Note left of Kotani Pay: Returns kotani_reference_id<br/>& refund_config (store this!)
+
+    Customer->>Kotani Pay: Customer Authorises Payment (PIN/OTP)
+    Kotani Pay->>Kotani Pay: Payment Confirmed
+    Kotani Pay->>Kotani Pay: Status: DEPOSIT_CONFIRMED
+```
+
+### Details
+
+**Chains supported**: Lightning (BTC), Solana, Base, Ethereum
+**Source currencies**: KES, ZAR — extensible
+**Response includes**: `kotani_reference_id`, `refund_config` (provider **must** store this)
+
+**Key Points**:
+- Provider generates the crypto invoice before calling the API
+- Kotani Pay generates and returns a `refund_config` in the initial response — the provider must store it for use if settlement fails
+- Status moves to `DEPOSIT_INITIATED` immediately on acceptance
+
+---
+
+## 2. Crypto Payment to Provider
+
+Once source fiat is confirmed, Kotani Pay pays the provider's crypto invoice.
+
+```mermaid
+sequenceDiagram
+    participant Kotani Pay
+    participant IbexHub as Ibex Hub (Lightning)
+    participant Provider as Provider Crypto Wallet
+
+    Kotani Pay->>Kotani Pay: Fiat confirmed — initiate crypto payment
+    Kotani Pay->>IbexHub: Pay bolt11 Invoice
+    IbexHub->>Provider: Route Lightning Payment
+
+    alt Payment Successful
+        Provider-->>IbexHub: Payment Preimage
+        IbexHub-->>Kotani Pay: Payment Confirmed
+        Kotani Pay->>Kotani Pay: Status: PAYMENT_SENT
+        Kotani Pay->>Kotani Pay: Status: PAYMENT_CONFIRMED
+    else Invoice Expired
+        IbexHub-->>Kotani Pay: INVOICE_EXPIRED
+        Kotani Pay->>Kotani Pay: Status: FAILED
+        Kotani Pay->>Kotani Pay: Refund source fiat to customer
+        Kotani Pay->>Provider: Webhook: TRANSACTION_FAILED (CRYPTO_PAYMENT stage)
+    else Routing Failure
+        IbexHub-->>Kotani Pay: ROUTING_FAILURE
+        Kotani Pay->>Kotani Pay: Status: FAILED
+        Kotani Pay->>Kotani Pay: Refund source fiat to customer
+        Kotani Pay->>Provider: Webhook: TRANSACTION_FAILED (CRYPTO_PAYMENT stage)
+    end
+```
+
+### Details
+
+**Timeline**: 30–60 seconds
+**Networks**: Lightning Network (via Ibex Hub), extensible to on-chain
+**Customer sees**: "Crypto transferred successfully, converting to destination currency..."
+
+---
+
+## 3. Provider Settlement (Crypto → Destination Fiat)
+
+The provider converts the received crypto to destination fiat and disburses to the recipient. The provider then webhooks Kotani Pay with the outcome.
+
+```mermaid
+sequenceDiagram
+    participant Provider as Provider Crypto Wallet
+    participant ProviderFiat as Provider Fiat Settlement
+    participant Recipient as Recipient (Mobile Money / Bank)
+    participant Kotani Pay
+
+    Provider->>ProviderFiat: Convert Crypto to Fiat
+    ProviderFiat->>Recipient: Initiate Payout
+    Note right of ProviderFiat: Mobile Money or Bank Transfer
+
+    alt Payout Successful
+        Recipient-->>ProviderFiat: Payout Confirmed
+        ProviderFiat->>Kotani Pay: POST /webhooks/orange/status
+        Note right of ProviderFiat: status: SETTLING → COMPLETED
+        Kotani Pay->>Kotani Pay: Status: SETTLING
+        Kotani Pay->>Kotani Pay: Status: COMPLETED
+        Kotani Pay-->>ProviderFiat: 200 OK
+
+    else Payout Failed
+        ProviderFiat->>Kotani Pay: POST /webhooks/orange/status
+        Note right of ProviderFiat: status: FAILED<br/>failure_stage: SETTLEMENT
+        Kotani Pay->>Kotani Pay: Status: FAILED
+        Kotani Pay-->>ProviderFiat: 200 OK
+    end
+```
+
+### Details
+
+**Timeline**: SETTLING in 0–120s, COMPLETED in 120–600s
+**Webhook**: Provider POSTs to Kotani Pay with `HMAC-SHA256` signature
+**Recipient payment methods**: `MOBILE_MONEY`, `BANK_TRANSFER`
+
+---
+
+## 4. Refund Flow (If Settlement Fails)
+
+When the provider cannot disburse destination fiat, they pay Kotani Pay's refund invoice (from `refund_config` in the initial response). Kotani Pay then refunds the source fiat to the integrator.
+
+```mermaid
+sequenceDiagram
+    participant Provider as Provider
+    participant ProviderWallet as Provider Crypto Wallet
+    participant IbexHub as Ibex Hub
+    participant Kotani Pay
+    participant Integrator
+
+    Provider->>Kotani Pay: Webhook: status FAILED (SETTLEMENT stage)
+    Kotani Pay->>Kotani Pay: Status: FAILED — awaiting refund
+
+    Provider->>ProviderWallet: Pay Kotani's refund_invoice
+    Note right of Provider: Invoice from refund_config<br/>received in initial response
+    ProviderWallet->>IbexHub: Pay Refund Lightning Invoice
+
+    IbexHub->>Kotani Pay: Incoming Payment Webhook
+    Kotani Pay->>Kotani Pay: Crypto received — initiate fiat refund
+    Kotani Pay->>Integrator: Refund Source Fiat to Integrator Wallet
+    Kotani Pay->>Kotani Pay: Status: REFUNDED
+    Kotani Pay->>Provider: Webhook: Refund Confirmed
+
+    alt Refund Invoice Expired
+        Note over Provider,Kotani Pay: Use fallback_address from refund_config
+        Provider->>Kotani Pay: Send crypto to fallback on-chain address
+        Kotani Pay->>Kotani Pay: Crypto received — initiate fiat refund
+        Kotani Pay->>Integrator: Refund Source Fiat to Integrator Wallet
+        Kotani Pay->>Kotani Pay: Status: REFUNDED
+    end
+```
+
+### Details
+
+**Timeline**: 60–300s after settlement failure
+**Primary refund**: Pay Kotani's Lightning refund invoice
+**Fallback**: Send crypto to `fallback_address` (on-chain) if invoice expires
+
+**Customer sees**: "Payment failed — Refund processing..." → "Refund completed"
+
+---
+
+## 5. Status Polling
+
+The provider can poll for transaction status at any point.
+
+```mermaid
+sequenceDiagram
+    participant Provider
+    participant Kotani Pay
+
+    Provider->>Kotani Pay: GET /api/v3/deposit/crypto-bridge/status/{kotani_reference_id}
+    Kotani Pay-->>Provider: Current status + stage breakdown
+    Note left of Kotani Pay: deposit, crypto_payment,<br/>settlement stages included
+```
+
+---
+
+## Transaction Statuses
+
+| Status | Customer Display | Description |
+|--------|-----------------|-------------|
+| `DEPOSIT_INITIATED` | "Processing payment..." | Awaiting fiat payment confirmation |
+| `DEPOSIT_CONFIRMED` | "Payment received, converting..." | Source fiat received |
+| `PAYMENT_SENT` | "Crypto transferred..." | Crypto invoice paid by Kotani Pay |
+| `PAYMENT_CONFIRMED` | "Converting to destination currency..." | Provider received crypto |
+| `SETTLING` | "Settling payment to recipient..." | Provider converting and disbursing fiat |
+| `COMPLETED` | "Payment completed successfully!" | Recipient received funds |
+| `FAILED` | "Payment failed — Processing refund" | Settlement failed, refund initiated |
+| `REFUNDED` | "Refund completed" | Source fiat returned to integrator |
+
+**Total journey time**: 5–10 minutes (success) | 6–15 minutes (failure + refund)
+
+---
+
+## Failure Stages & Handling
+
+| Stage | Who Detects | Failure Examples | Action |
+|-------|-------------|------------------|--------|
+| `DEPOSIT_COLLECTION` | Kotani Pay | Insufficient funds, customer cancelled | Error returned immediately to provider |
+| `CRYPTO_PAYMENT` | Kotani Pay | Invoice expired, routing failure | Fiat refunded to customer; provider notified |
+| `SETTLEMENT` | Provider | Invalid recipient, KYC failed | Provider webhooks Kotani; pays refund invoice |
+
+---
+
+## Webhook Security
+
+Provider webhooks to Kotani Pay must be signed:
+
+```
+X-Orange-Signature: HMAC-SHA256(secret, payload)
+X-Orange-Timestamp: Unix timestamp
+```
+
+Kotani Pay responds with `200 OK` and `kotani_reference_id` to acknowledge receipt.
+
+---
+
+## Best Practices
+
+- **Store `refund_config`**: Save it from the initial API response — it is required if settlement fails
+- **Implement webhook handler**: Set `callback_url` to receive real-time status updates
+- **Validate invoice expiry**: Ensure the bolt11 invoice `expires_at` allows enough time for fiat collection (~60s minimum)
+- **Handle all statuses**: Build UI states for all 8 statuses in the table above
+- **Use both IDs**: Always track `kotani_reference_id` and your own `orange_reference_id` together
+
+---
+
+## Testing
+
+Use the sandbox UI tester at `https://sandbox-api.kotanipay.com/crypto-bridge-tester` to simulate transactions in the sandbox environment.
+
+**Test Scenarios**:
+
+| # | Scenario | Expected Flow |
+|---|----------|---------------|
+| 1 | Happy path (mobile money) | `DEPOSIT_INITIATED` → `DEPOSIT_CONFIRMED` → `PAYMENT_SENT` → `PAYMENT_CONFIRMED` → `SETTLING` → `COMPLETED` |
+| 2 | Happy path (bank transfer) | Same flow with bank recipient |
+| 3 | Expired invoice | `DEPOSIT_CONFIRMED` → `FAILED` → Customer fiat refunded |
+| 4 | Invalid recipient | `PAYMENT_CONFIRMED` → `SETTLING` → `FAILED` → `REFUNDED` |
+| 5 | Delayed settlement | Extended `SETTLING` period → `COMPLETED` |
+| 6 | Refund invoice expired | `FAILED` → Provider uses `fallback_address` → `REFUNDED` |

@@ -58,7 +58,8 @@
                   "v3/flows/onramp-flow",
                   "v3/flows/offramp-flow",
                   "v3/flows/payment-links-flow",
-                  "v3/flows/bulk-payments-flow"
+                  "v3/flows/bulk-payments-flow",
+                  "v3/flows/crypto-bridge-flow"
                 ]
               }
             ]
@@ -171,8 +172,9 @@
                 ]
               },
               {
-                "group": "Crypto Bridge Deposits",
+                "group": "Crypto Bridge",
                 "pages": [
+                  "v3/api-reference/rates/crypto-bridge-rate",
                   "v3/api-reference/deposits/crypto-bridge",
                   "v3/api-reference/deposits/crypto-bridge-status",
                   "v3/api-reference/deposits/crypto-bridge-webhook-provider-settlement"
