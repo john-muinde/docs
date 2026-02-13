@@ -171,6 +171,14 @@
                 ]
               },
               {
+                "group": "Crypto Bridge Deposits",
+                "pages": [
+                  "v3/api-reference/deposits/crypto-bridge",
+                  "v3/api-reference/deposits/crypto-bridge-status",
+                  "v3/api-reference/deposits/crypto-bridge-webhook-provider-settlement"
+                ]
+              },
+              {
                 "group": "General Deposits",
                 "pages": [
                   "v3/api-reference/deposits/initiate",

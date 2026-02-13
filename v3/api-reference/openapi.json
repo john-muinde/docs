@@ -3451,22 +3451,6 @@
         ]
       }
     },
-    "/api/v3/deposit/crypto-bridge/internal/deposit-callback": {
-      "post": {
-        "description": "Internal webhook endpoint called by DepositMobileMoneyService when fiat collection completes. Updates the crypto bridge transaction status and triggers crypto payment if successful. No authentication required - internal callback only.",
-        "operationId": "DepositCryptoBridgeWebhookController_handleDepositCallback_api/v3",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "summary": "Internal callback for deposit mobile money completion",
-        "tags": [
-          "CRYPTO BRIDGE DEPOSIT WEBHOOKS"
-        ]
-      }
-    },
     "/api/v3/deposit/crypto-bridge/webhook/provider/settlement": {
       "post": {
         "description": "Receives settlement status updates from settlement provider. Requires signature validation. Statuses: SETTLING, COMPLETED, FAILED. For FAILED status, initiates refund process using configured refund method.",
