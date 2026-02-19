@@ -2159,6 +2159,663 @@
         ]
       }
     },
+    "/api/v3/customer/mobile-money": {
+      "post": {
+        "description": "An integrator can use this endpoint to create the customers who will be either receiving or sending money using mobile money.",
+        "operationId": "MobileMoneyCustomerController_createCustomer_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMobileMoneyCustomerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Customer has been successfully created."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/MobileMoneyCustomerDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bad Request"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Create a mobile money customer",
+        "tags": [
+          "CUSTOMER - MOBILE MONEY"
+        ]
+      },
+      "get": {
+        "description": "An integrator can use this endpoint to get all the customers who will be either receiving or sending money using mobile money.",
+        "operationId": "MobileMoneyCustomerController_getUserCustomers_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Customers successfully retrieved."
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MobileMoneyCustomerDto"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bad Request"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Forbidden"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Get all mobile money customers",
+        "tags": [
+          "CUSTOMER - MOBILE MONEY"
+        ]
+      }
+    },
+    "/api/v3/customer/mobile-money/{customer_key}": {
+      "patch": {
+        "description": "An integrator can use this endpoint to update the customers who will be either receiving or sending money using mobile money.",
+        "operationId": "MobileMoneyCustomerController_updateCustomer_api/v3",
+        "parameters": [
+          {
+            "name": "customer_key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMobileMoneyCustomerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bio Data has been successfully updated."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/MobileMoneyCustomerDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid Api Key"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Not Found"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Update a mobile money customer",
+        "tags": [
+          "CUSTOMER - MOBILE MONEY"
+        ]
+      },
+      "get": {
+        "description": "An integrator can use this endpoint to get the customer who will be either receiving or sending money using mobile money by passing customer key.",
+        "operationId": "MobileMoneyCustomerController_getCustomerDetails_api/v3",
+        "parameters": [
+          {
+            "name": "customer_key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Customer fetched successfully."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/MobileMoneyCustomerDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": ""
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Get a mobile money customer by customer key",
+        "tags": [
+          "CUSTOMER - MOBILE MONEY"
+        ]
+      }
+    },
+    "/api/v3/customer/mobile-money/phone/{phone_number}": {
+      "get": {
+        "description": "An integrator can use this endpoint to get the customer who will be either receiving or sending money using mobile money by passing phone number.",
+        "operationId": "MobileMoneyCustomerController_getCustomerDetailsByPhone_api/v3",
+        "parameters": [
+          {
+            "name": "phone_number",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Customer fetched successfully."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/MobileMoneyCustomerDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Customer not found."
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Get a mobile money customer by Phone",
+        "tags": [
+          "CUSTOMER - MOBILE MONEY"
+        ]
+      }
+    },
+    "/api/v3/customer/validate/mobile-money": {
+      "post": {
+        "description": "Validates a phone number in any format (with or without country code). Returns validation status, country information, formatted number, and whether the country is supported for mobile money.",
+        "operationId": "AccountValidationController_validateMobileMoneyAccount_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateMobileMoneyAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Phone number validated successfully."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ValidateAccountResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid request"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Validate phone number",
+        "tags": [
+          "CUSTOMER - VALIDATION"
+        ]
+      }
+    },
+    "/api/v3/customer/validate/bank": {
+      "post": {
+        "description": "Validates a bank account number format for a given country and bank code. Returns validation status, bank information, and whether the country is supported.",
+        "operationId": "AccountValidationController_validateBankAccount_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateBankAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bank account validated successfully."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ValidateAccountResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid request"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Validate bank account",
+        "tags": [
+          "CUSTOMER - VALIDATION"
+        ]
+      }
+    },
     "/api/v3/deposit/mobile-money": {
       "post": {
         "description": "An integrator’s customers can initiate a deposit from their respective mobile money wallets.     An STK push will be sent to the customer and the respective amount will be deducted from their mobile money wallets and deposited into the integrator’s fiat wallet",
@@ -3536,663 +4193,6 @@
         ]
       }
     },
-    "/api/v3/customer/mobile-money": {
-      "post": {
-        "description": "An integrator can use this endpoint to create the customers who will be either receiving or sending money using mobile money.",
-        "operationId": "MobileMoneyCustomerController_createCustomer_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateMobileMoneyCustomerDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Customer has been successfully created."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/MobileMoneyCustomerDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Create a mobile money customer",
-        "tags": [
-          "CUSTOMER - MOBILE MONEY"
-        ]
-      },
-      "get": {
-        "description": "An integrator can use this endpoint to get all the customers who will be either receiving or sending money using mobile money.",
-        "operationId": "MobileMoneyCustomerController_getUserCustomers_api/v3",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Customers successfully retrieved."
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/MobileMoneyCustomerDto"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Forbidden"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Get all mobile money customers",
-        "tags": [
-          "CUSTOMER - MOBILE MONEY"
-        ]
-      }
-    },
-    "/api/v3/customer/mobile-money/{customer_key}": {
-      "patch": {
-        "description": "An integrator can use this endpoint to update the customers who will be either receiving or sending money using mobile money.",
-        "operationId": "MobileMoneyCustomerController_updateCustomer_api/v3",
-        "parameters": [
-          {
-            "name": "customer_key",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateMobileMoneyCustomerDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bio Data has been successfully updated."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/MobileMoneyCustomerDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid Api Key"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Not Found"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Update a mobile money customer",
-        "tags": [
-          "CUSTOMER - MOBILE MONEY"
-        ]
-      },
-      "get": {
-        "description": "An integrator can use this endpoint to get the customer who will be either receiving or sending money using mobile money by passing customer key.",
-        "operationId": "MobileMoneyCustomerController_getCustomerDetails_api/v3",
-        "parameters": [
-          {
-            "name": "customer_key",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Customer fetched successfully."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/MobileMoneyCustomerDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": ""
-          },
-          "404": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Get a mobile money customer by customer key",
-        "tags": [
-          "CUSTOMER - MOBILE MONEY"
-        ]
-      }
-    },
-    "/api/v3/customer/mobile-money/phone/{phone_number}": {
-      "get": {
-        "description": "An integrator can use this endpoint to get the customer who will be either receiving or sending money using mobile money by passing phone number.",
-        "operationId": "MobileMoneyCustomerController_getCustomerDetailsByPhone_api/v3",
-        "parameters": [
-          {
-            "name": "phone_number",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Customer fetched successfully."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/MobileMoneyCustomerDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Customer not found."
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Get a mobile money customer by Phone",
-        "tags": [
-          "CUSTOMER - MOBILE MONEY"
-        ]
-      }
-    },
-    "/api/v3/customer/validate/mobile-money": {
-      "post": {
-        "description": "Validates a phone number in any format (with or without country code). Returns validation status, country information, formatted number, and whether the country is supported for mobile money.",
-        "operationId": "AccountValidationController_validateMobileMoneyAccount_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ValidateMobileMoneyAccountDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Phone number validated successfully."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/ValidateAccountResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Validate phone number",
-        "tags": [
-          "CUSTOMER - VALIDATION"
-        ]
-      }
-    },
-    "/api/v3/customer/validate/bank": {
-      "post": {
-        "description": "Validates a bank account number format for a given country and bank code. Returns validation status, bank information, and whether the country is supported.",
-        "operationId": "AccountValidationController_validateBankAccount_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ValidateBankAccountDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bank account validated successfully."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/ValidateAccountResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Validate bank account",
-        "tags": [
-          "CUSTOMER - VALIDATION"
-        ]
-      }
-    },
     "/api/v3/withdraw/mobile-money": {
       "post": {
         "description": "This api will withdraw fiat from the integrator’s fiat wallet to the customer’s mobile money wallet.",
@@ -4486,7 +4486,7 @@
     },
     "/api/v3/withdraw/bank": {
       "post": {
-        "description": "Send money from integrator wallet to customer bank account. Supports Kenya and SA",
+        "description": "Send money from integrator wallet to customer bank account. Supports Kenya and SA.",
         "operationId": "WithdrawController_bank_api/v3",
         "parameters": [],
         "requestBody": {
@@ -8037,7 +8037,7 @@
   "tags": [],
   "servers": [
     {
-      "url": "https://sandbox-api.kotanipay.com/api/v3"
+      "url": "https://sandbox-api.kotanipay.com"
     }
   ],
   "components": {
@@ -9227,6 +9227,345 @@
           "refresh_token"
         ]
       },
+      "MobileMoneyCustomerDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "phone_number": {
+            "type": "string"
+          },
+          "country_code": {
+            "type": "string",
+            "example": "GH, KE, NG (or ISO-3: GHA, KEN, NGA)",
+            "description": "Country code in ISO-2 format (accepts ISO-3 and auto-converts)"
+          },
+          "network": {
+            "type": "string",
+            "enum": [
+              "MTN",
+              "AIRTEL",
+              "VODAFONE",
+              "TIGO",
+              "ORANGE",
+              "NOT_SUPPORTED",
+              "ZAMTEL",
+              "MPESA",
+              "CHECKOUT",
+              "BKTRX",
+              "CRDTRX",
+              "MOOV",
+              "TMONEY",
+              "FREE",
+              "EXPRESSO",
+              "HALOPESA",
+              "VODACOM",
+              "WAVE"
+            ],
+            "example": "MPESA or MTN or AIRTEL or VODAFONE"
+          },
+          "customer_key": {
+            "type": "string"
+          },
+          "account_name": {
+            "type": "string"
+          },
+          "integrator": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "date_of_birth": {
+            "type": "string",
+            "example": "1990-01-01"
+          },
+          "id_number": {
+            "type": "string",
+            "example": "123456789"
+          },
+          "id_type": {
+            "type": "string",
+            "enum": [
+              "NATIONAL_ID",
+              "ECOWAS_ID"
+            ]
+          },
+          "image": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com"
+          }
+        },
+        "required": [
+          "phone_number",
+          "country_code"
+        ]
+      },
+      "CreateMobileMoneyCustomerDto": {
+        "type": "object",
+        "properties": {
+          "phone_number": {
+            "type": "string"
+          },
+          "country_code": {
+            "type": "string",
+            "example": "GH, KE, NG (or ISO-3: GHA, KEN, NGA)",
+            "description": "Country code in ISO-2 format (accepts ISO-3 and auto-converts)"
+          },
+          "network": {
+            "type": "string",
+            "enum": [
+              "MTN",
+              "AIRTEL",
+              "VODAFONE",
+              "TIGO",
+              "ORANGE",
+              "NOT_SUPPORTED",
+              "ZAMTEL",
+              "MPESA",
+              "CHECKOUT",
+              "BKTRX",
+              "CRDTRX",
+              "MOOV",
+              "TMONEY",
+              "FREE",
+              "EXPRESSO",
+              "HALOPESA",
+              "VODACOM",
+              "WAVE"
+            ],
+            "example": "MPESA or MTN or AIRTEL or VODAFONE"
+          },
+          "account_name": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "date_of_birth": {
+            "type": "string",
+            "example": "1990-01-01"
+          },
+          "id_number": {
+            "type": "string",
+            "example": "123456789"
+          },
+          "id_type": {
+            "type": "string",
+            "enum": [
+              "NATIONAL_ID",
+              "ECOWAS_ID"
+            ]
+          },
+          "image": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com"
+          }
+        },
+        "required": [
+          "phone_number",
+          "country_code"
+        ]
+      },
+      "UpdateMobileMoneyCustomerDto": {
+        "type": "object",
+        "properties": {
+          "phone_number": {
+            "type": "string"
+          },
+          "country_code": {
+            "type": "string",
+            "example": "GH, KE, NG (or ISO-3: GHA, KEN, NGA)",
+            "description": "Country code in ISO-2 format (accepts ISO-3 and auto-converts)"
+          },
+          "network": {
+            "type": "string",
+            "enum": [
+              "MTN",
+              "AIRTEL",
+              "VODAFONE",
+              "TIGO",
+              "ORANGE",
+              "NOT_SUPPORTED",
+              "ZAMTEL",
+              "MPESA",
+              "CHECKOUT",
+              "BKTRX",
+              "CRDTRX",
+              "MOOV",
+              "TMONEY",
+              "FREE",
+              "EXPRESSO",
+              "HALOPESA",
+              "VODACOM",
+              "WAVE"
+            ],
+            "example": "MPESA or MTN or AIRTEL or VODAFONE"
+          },
+          "account_name": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string",
+            "example": "John"
+          },
+          "last_name": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "date_of_birth": {
+            "type": "string",
+            "example": "1990-01-01"
+          },
+          "id_number": {
+            "type": "string",
+            "example": "123456789"
+          },
+          "id_type": {
+            "type": "string",
+            "enum": [
+              "NATIONAL_ID",
+              "ECOWAS_ID"
+            ]
+          },
+          "image": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com"
+          }
+        },
+        "required": [
+          "phone_number",
+          "country_code"
+        ]
+      },
+      "ValidateAccountResponseDto": {
+        "type": "object",
+        "properties": {
+          "isValid": {
+            "type": "boolean",
+            "description": "Whether the phone number or account is valid",
+            "example": true
+          },
+          "isSupported": {
+            "type": "boolean",
+            "description": "Whether the country/service is supported",
+            "example": true
+          },
+          "requiresInternationalization": {
+            "type": "boolean",
+            "description": "Whether the phone number needs internationalization (missing country code)",
+            "example": false
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Country code (ISO2)",
+            "example": "KE"
+          },
+          "countryName": {
+            "type": "string",
+            "description": "Country name",
+            "example": "Kenya"
+          },
+          "callingCode": {
+            "type": "string",
+            "description": "Phone number calling code (e.g., +254)"
+          },
+          "internationalNumber": {
+            "type": "string",
+            "description": "Phone number in international format without spaces (e.g., +254719399210)",
+            "example": "+254719399210"
+          },
+          "nationalNumber": {
+            "type": "string",
+            "description": "Phone number in national format without spaces (e.g., 0719399210)",
+            "example": "0719399210"
+          },
+          "accountType": {
+            "type": "string",
+            "description": "Account type",
+            "enum": [
+              "mobile_money",
+              "bank"
+            ]
+          },
+          "bankName": {
+            "type": "string",
+            "description": "Bank name (for bank accounts)"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency for the country",
+            "example": "KES"
+          },
+          "message": {
+            "type": "string",
+            "description": "Validation error message (if invalid)"
+          }
+        },
+        "required": [
+          "isValid",
+          "isSupported",
+          "accountType"
+        ]
+      },
+      "ValidateMobileMoneyAccountDto": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number to validate (with or without country code). Examples: 0719399210, +254719399210, +27123456789",
+            "example": "+254719399210"
+          }
+        },
+        "required": [
+          "phoneNumber"
+        ]
+      },
+      "ValidateBankAccountDto": {
+        "type": "object",
+        "properties": {
+          "accountNumber": {
+            "type": "string",
+            "description": "Bank account number",
+            "example": "1234567890"
+          },
+          "bankCode": {
+            "type": "string",
+            "description": "Bank code or name",
+            "example": "KCB"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Country code",
+            "example": "KE"
+          }
+        },
+        "required": [
+          "accountNumber",
+          "bankCode",
+          "countryCode"
+        ]
+      },
       "DepositResponseDto": {
         "type": "object",
         "properties": {
@@ -9288,6 +9627,11 @@
             "type": "string",
             "description": "reference id",
             "example": "5f9b2c7b9c9d6b0017b4e6b1"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
+            "example": "USD"
           }
         },
         "required": [
@@ -9349,6 +9693,11 @@
             "description": "reference id",
             "example": "5f9b2c7b9c9d6b0017b4e6b1"
           },
+          "currency": {
+            "type": "string",
+            "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
+            "example": "USD"
+          },
           "provider": {
             "type": "string"
           },
@@ -9377,9 +9726,6 @@
             "type": "number"
           },
           "network": {
-            "type": "string"
-          },
-          "currency": {
             "type": "string"
           },
           "environment": {
@@ -9739,7 +10085,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-01-30T15:40:18.576Z"
+            "example": "2026-02-19T15:52:33.158Z"
           },
           "transactionCost": {
             "type": "number",
@@ -10936,342 +11282,6 @@
           "crypto_payment"
         ]
       },
-      "MobileMoneyCustomerDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "phone_number": {
-            "type": "string"
-          },
-          "country_code": {
-            "type": "string",
-            "example": "GH, KE, NG (or ISO-3: GHA, KEN, NGA)",
-            "description": "Country code in ISO-2 format (accepts ISO-3 and auto-converts)"
-          },
-          "network": {
-            "type": "string",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "VODACOM"
-            ],
-            "example": "MPESA or MTN or AIRTEL or VODAFONE"
-          },
-          "customer_key": {
-            "type": "string"
-          },
-          "account_name": {
-            "type": "string"
-          },
-          "integrator": {
-            "type": "string"
-          },
-          "first_name": {
-            "type": "string",
-            "example": "John"
-          },
-          "last_name": {
-            "type": "string",
-            "example": "Doe"
-          },
-          "date_of_birth": {
-            "type": "string",
-            "example": "1990-01-01"
-          },
-          "id_number": {
-            "type": "string",
-            "example": "123456789"
-          },
-          "id_type": {
-            "type": "string",
-            "enum": [
-              "NATIONAL_ID",
-              "ECOWAS_ID"
-            ]
-          },
-          "image": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "example": "john.doe@example.com"
-          }
-        },
-        "required": [
-          "phone_number",
-          "country_code"
-        ]
-      },
-      "CreateMobileMoneyCustomerDto": {
-        "type": "object",
-        "properties": {
-          "phone_number": {
-            "type": "string"
-          },
-          "country_code": {
-            "type": "string",
-            "example": "GH, KE, NG (or ISO-3: GHA, KEN, NGA)",
-            "description": "Country code in ISO-2 format (accepts ISO-3 and auto-converts)"
-          },
-          "network": {
-            "type": "string",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "VODACOM"
-            ],
-            "example": "MPESA or MTN or AIRTEL or VODAFONE"
-          },
-          "account_name": {
-            "type": "string"
-          },
-          "first_name": {
-            "type": "string",
-            "example": "John"
-          },
-          "last_name": {
-            "type": "string",
-            "example": "Doe"
-          },
-          "date_of_birth": {
-            "type": "string",
-            "example": "1990-01-01"
-          },
-          "id_number": {
-            "type": "string",
-            "example": "123456789"
-          },
-          "id_type": {
-            "type": "string",
-            "enum": [
-              "NATIONAL_ID",
-              "ECOWAS_ID"
-            ]
-          },
-          "image": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "example": "john.doe@example.com"
-          }
-        },
-        "required": [
-          "phone_number",
-          "country_code"
-        ]
-      },
-      "UpdateMobileMoneyCustomerDto": {
-        "type": "object",
-        "properties": {
-          "phone_number": {
-            "type": "string"
-          },
-          "country_code": {
-            "type": "string",
-            "example": "GH, KE, NG (or ISO-3: GHA, KEN, NGA)",
-            "description": "Country code in ISO-2 format (accepts ISO-3 and auto-converts)"
-          },
-          "network": {
-            "type": "string",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "VODACOM"
-            ],
-            "example": "MPESA or MTN or AIRTEL or VODAFONE"
-          },
-          "account_name": {
-            "type": "string"
-          },
-          "first_name": {
-            "type": "string",
-            "example": "John"
-          },
-          "last_name": {
-            "type": "string",
-            "example": "Doe"
-          },
-          "date_of_birth": {
-            "type": "string",
-            "example": "1990-01-01"
-          },
-          "id_number": {
-            "type": "string",
-            "example": "123456789"
-          },
-          "id_type": {
-            "type": "string",
-            "enum": [
-              "NATIONAL_ID",
-              "ECOWAS_ID"
-            ]
-          },
-          "image": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "example": "john.doe@example.com"
-          }
-        },
-        "required": [
-          "phone_number",
-          "country_code"
-        ]
-      },
-      "ValidateAccountResponseDto": {
-        "type": "object",
-        "properties": {
-          "isValid": {
-            "type": "boolean",
-            "description": "Whether the phone number or account is valid",
-            "example": true
-          },
-          "isSupported": {
-            "type": "boolean",
-            "description": "Whether the country/service is supported",
-            "example": true
-          },
-          "requiresInternationalization": {
-            "type": "boolean",
-            "description": "Whether the phone number needs internationalization (missing country code)",
-            "example": false
-          },
-          "countryCode": {
-            "type": "string",
-            "description": "Country code (ISO2)",
-            "example": "KE"
-          },
-          "countryName": {
-            "type": "string",
-            "description": "Country name",
-            "example": "Kenya"
-          },
-          "callingCode": {
-            "type": "string",
-            "description": "Phone number calling code (e.g., +254)"
-          },
-          "internationalNumber": {
-            "type": "string",
-            "description": "Phone number in international format without spaces (e.g., +254719399210)",
-            "example": "+254719399210"
-          },
-          "nationalNumber": {
-            "type": "string",
-            "description": "Phone number in national format without spaces (e.g., 0719399210)",
-            "example": "0719399210"
-          },
-          "accountType": {
-            "type": "string",
-            "description": "Account type",
-            "enum": [
-              "mobile_money",
-              "bank"
-            ]
-          },
-          "bankName": {
-            "type": "string",
-            "description": "Bank name (for bank accounts)"
-          },
-          "currency": {
-            "type": "string",
-            "description": "Currency for the country",
-            "example": "KES"
-          },
-          "message": {
-            "type": "string",
-            "description": "Validation error message (if invalid)"
-          }
-        },
-        "required": [
-          "isValid",
-          "isSupported",
-          "accountType"
-        ]
-      },
-      "ValidateMobileMoneyAccountDto": {
-        "type": "object",
-        "properties": {
-          "phoneNumber": {
-            "type": "string",
-            "description": "Phone number to validate (with or without country code). Examples: 0719399210, +254719399210, +27123456789",
-            "example": "+254719399210"
-          }
-        },
-        "required": [
-          "phoneNumber"
-        ]
-      },
-      "ValidateBankAccountDto": {
-        "type": "object",
-        "properties": {
-          "accountNumber": {
-            "type": "string",
-            "description": "Bank account number",
-            "example": "1234567890"
-          },
-          "bankCode": {
-            "type": "string",
-            "description": "Bank code or name",
-            "example": "KCB"
-          },
-          "countryCode": {
-            "type": "string",
-            "description": "Country code",
-            "example": "KE"
-          }
-        },
-        "required": [
-          "accountNumber",
-          "bankCode",
-          "countryCode"
-        ]
-      },
       "WithdrawResponseDto": {
         "type": "object",
         "properties": {
@@ -11322,6 +11332,11 @@
             "type": "string",
             "description": "reference id",
             "example": "5f9b2c7b9c9d6b0017b4e6b1"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
+            "example": "USD"
           }
         },
         "required": [
@@ -11585,6 +11600,11 @@
             "description": "reference id",
             "example": "5f9b2c7b9c9d6b0017b4e6b1"
           },
+          "currency": {
+            "type": "string",
+            "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
+            "example": "USD"
+          },
           "bankDetails": {
             "$ref": "#/components/schemas/WithdrawBankDto"
           }
@@ -11654,6 +11674,11 @@
             "description": "reference id",
             "example": "5f9b2c7b9c9d6b0017b4e6b1"
           },
+          "currency": {
+            "type": "string",
+            "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
+            "example": "USD"
+          },
           "status": {
             "allOf": [
               {
@@ -11699,6 +11724,10 @@
           "transactionError": {
             "type": "string",
             "description": "Transaction error message from provider or system"
+          },
+          "telcoId": {
+            "type": "string",
+            "description": "Telco/MNO transaction ID from the mobile money provider"
           }
         },
         "required": [
@@ -12250,6 +12279,14 @@
             "format": "date-time",
             "type": "string",
             "description": "Last update timestamp"
+          },
+          "onchainError": {
+            "type": "object",
+            "description": "Onchain error details if the transaction failed"
+          },
+          "transactionError": {
+            "type": "object",
+            "description": "Transaction error details if the transaction failed"
           }
         },
         "required": [
