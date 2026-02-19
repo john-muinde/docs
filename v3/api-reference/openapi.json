@@ -4108,22 +4108,6 @@
         ]
       }
     },
-    "/api/v3/deposit/crypto-bridge/internal/deposit-callback": {
-      "post": {
-        "description": "Internal webhook endpoint called by DepositMobileMoneyService when fiat collection completes. Updates the crypto bridge transaction status and triggers crypto payment if successful. No authentication required - internal callback only.",
-        "operationId": "DepositCryptoBridgeWebhookController_handleDepositCallback_api/v3",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "summary": "Internal callback for deposit mobile money completion",
-        "tags": [
-          "CRYPTO BRIDGE DEPOSIT WEBHOOKS"
-        ]
-      }
-    },
     "/api/v3/deposit/crypto-bridge/webhook/provider/settlement": {
       "post": {
         "description": "Receives settlement status updates from settlement provider. Requires signature validation. Statuses: SETTLING, COMPLETED, FAILED. For FAILED status, initiates refund process using configured refund method.",
@@ -10268,7 +10252,7 @@
               "CRYPTO_INVOICE",
               "CRYPTO_ADDRESS"
             ],
-            "description": "Primary refund method - How Orange should return crypto to Kotani",
+            "description": "Primary refund method - How should the provider return crypto to Kotani",
             "example": "CRYPTO_INVOICE"
           },
           "chain": {
@@ -10315,7 +10299,7 @@
           },
           "refund_invoice": {
             "type": "string",
-            "description": "Kotani refund invoice (for Lightning) - Orange pays this if settlement fails",
+            "description": "Kotani refund invoice (for Lightning) - the provider pays this if settlement fails",
             "example": "lnbc1500n1p0xyz..."
           },
           "refund_payment_hash": {
@@ -10335,7 +10319,7 @@
           },
           "fallback_address": {
             "type": "string",
-            "description": "Kotani crypto address for refund (if invoice not applicable) - Orange sends to this address if settlement fails",
+            "description": "Kotani crypto address for refund (if invoice not applicable) - the provider sends to this address if settlement fails",
             "example": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
           },
           "fallback_method": {
@@ -10435,7 +10419,7 @@
             "example": "a1b2c3d4e5f6..."
           },
           "refund_config": {
-            "description": "Refund configuration - Orange must pay this invoice/address if settlement fails to return crypto to Kotani",
+            "description": "Refund configuration - the provider must pay this invoice/address if settlement fails to return crypto to Kotani",
             "allOf": [
               {
                 "$ref": "#/components/schemas/RefundConfigDto"
