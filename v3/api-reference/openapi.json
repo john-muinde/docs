@@ -8037,7 +8037,7 @@
   "tags": [],
   "servers": [
     {
-      "url": "https://sandbox-api.kotanipay.com"
+      "url": "https://preview.kotanipay.com"
     }
   ],
   "components": {
@@ -9792,6 +9792,10 @@
           },
           "error_description": {
             "type": "string"
+          },
+          "telco_id": {
+            "type": "string",
+            "description": "Telco/MNO transaction ID from the mobile money provider (e.g. Mpesa transaction code)"
           }
         },
         "required": [
@@ -10085,7 +10089,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-02-19T15:52:33.158Z"
+            "example": "2026-03-02T06:22:24.024Z"
           },
           "transactionCost": {
             "type": "number",
