@@ -1,6 +1,326 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/api/v3/admin/traffic-types": {
+      "get": {
+        "operationId": "AdminTrafficTypeController_getAll_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns all traffic types",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrafficTypeResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all traffic types",
+        "tags": [
+          "Admin - Traffic Types"
+        ]
+      },
+      "post": {
+        "operationId": "AdminTrafficTypeController_create_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTrafficTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Traffic type created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrafficTypeResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new traffic type",
+        "tags": [
+          "Admin - Traffic Types"
+        ]
+      }
+    },
+    "/api/v3/admin/traffic-types/active": {
+      "get": {
+        "operationId": "AdminTrafficTypeController_getActive_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns all active traffic types",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrafficTypeResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all active traffic types",
+        "tags": [
+          "Admin - Traffic Types"
+        ]
+      }
+    },
+    "/api/v3/admin/traffic-types/default": {
+      "get": {
+        "operationId": "AdminTrafficTypeController_getDefault_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns the default traffic type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrafficTypeResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get the default traffic type",
+        "tags": [
+          "Admin - Traffic Types"
+        ]
+      }
+    },
+    "/api/v3/admin/traffic-types/code/{code}": {
+      "get": {
+        "operationId": "AdminTrafficTypeController_getByCode_api/v3",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns traffic type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrafficTypeResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Traffic type not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get traffic type by code",
+        "tags": [
+          "Admin - Traffic Types"
+        ]
+      }
+    },
+    "/api/v3/admin/traffic-types/seed": {
+      "post": {
+        "operationId": "AdminTrafficTypeController_seedDefaults_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Default traffic types seeded successfully"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Seed default traffic types",
+        "tags": [
+          "Admin - Traffic Types"
+        ]
+      }
+    },
+    "/api/v3/admin/traffic-types/validate": {
+      "post": {
+        "operationId": "AdminTrafficTypeController_validate_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Validation result"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Validate traffic type codes",
+        "tags": [
+          "Admin - Traffic Types"
+        ]
+      }
+    },
+    "/api/v3/admin/traffic-types/{id}": {
+      "get": {
+        "operationId": "AdminTrafficTypeController_getById_api/v3",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns traffic type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrafficTypeResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Traffic type not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get traffic type by ID",
+        "tags": [
+          "Admin - Traffic Types"
+        ]
+      },
+      "put": {
+        "operationId": "AdminTrafficTypeController_update_api/v3",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTrafficTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Traffic type updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrafficTypeResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Traffic type not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update a traffic type",
+        "tags": [
+          "Admin - Traffic Types"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminTrafficTypeController_delete_api/v3",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Traffic type deactivated successfully"
+          },
+          "404": {
+            "description": "Traffic type not found"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Deactivate a traffic type",
+        "tags": [
+          "Admin - Traffic Types"
+        ]
+      }
+    },
     "/api/v3/rate/{from}/{to}": {
       "get": {
         "description": "An integrator can use this endpoint to get the exchange rate between two currencies",
@@ -8049,6 +8369,178 @@
       }
     },
     "schemas": {
+      "TrafficTypeResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "riskLevel": {
+            "type": "string"
+          },
+          "complianceNotes": {
+            "type": "string"
+          },
+          "requiresEnhancedKyc": {
+            "type": "boolean"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "colorCode": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "isActive",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "CreateTrafficTypeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Unique code identifier (uppercase, e.g., ECOMMERCE, LICENSED_GAMING)",
+            "example": "ECOMMERCE"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for UI",
+            "example": "E-Commerce"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description",
+            "example": "General e-commerce transactions"
+          },
+          "riskLevel": {
+            "type": "string",
+            "description": "Risk level for internal monitoring",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH"
+            ],
+            "default": "MEDIUM"
+          },
+          "complianceNotes": {
+            "type": "string",
+            "description": "Compliance/regulatory notes"
+          },
+          "requiresEnhancedKyc": {
+            "type": "boolean",
+            "description": "Whether this requires enhanced KYC",
+            "default": false
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Whether this is the default traffic type",
+            "default": false
+          },
+          "colorCode": {
+            "type": "string",
+            "description": "Color code for UI display (hex color)",
+            "example": "#10B981"
+          },
+          "icon": {
+            "type": "string",
+            "description": "Icon name/class for UI display",
+            "example": "shopping-cart"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Is this traffic type active",
+            "default": true
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ]
+      },
+      "UpdateTrafficTypeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Unique code identifier (uppercase)",
+            "example": "ECOMMERCE"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for UI",
+            "example": "E-Commerce"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description"
+          },
+          "riskLevel": {
+            "type": "string",
+            "description": "Risk level for internal monitoring",
+            "enum": [
+              "LOW",
+              "MEDIUM",
+              "HIGH"
+            ]
+          },
+          "complianceNotes": {
+            "type": "string",
+            "description": "Compliance/regulatory notes"
+          },
+          "requiresEnhancedKyc": {
+            "type": "boolean",
+            "description": "Whether this requires enhanced KYC"
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Whether this is the default traffic type"
+          },
+          "colorCode": {
+            "type": "string",
+            "description": "Color code for UI display (hex color)",
+            "example": "#10B981"
+          },
+          "icon": {
+            "type": "string",
+            "description": "Icon name/class for UI display"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Is this traffic type active"
+          }
+        }
+      },
       "RateResponseDto": {
         "type": "object",
         "properties": {
@@ -9248,6 +9740,7 @@
               "AIRTEL",
               "VODAFONE",
               "TIGO",
+              "YAS",
               "ORANGE",
               "NOT_SUPPORTED",
               "ZAMTEL",
@@ -9328,6 +9821,7 @@
               "AIRTEL",
               "VODAFONE",
               "TIGO",
+              "YAS",
               "ORANGE",
               "NOT_SUPPORTED",
               "ZAMTEL",
@@ -9402,6 +9896,7 @@
               "AIRTEL",
               "VODAFONE",
               "TIGO",
+              "YAS",
               "ORANGE",
               "NOT_SUPPORTED",
               "ZAMTEL",
@@ -9623,6 +10118,11 @@
             "description": "customer redirect url",
             "example": "https://example.com/success"
           },
+          "customer_id_number": {
+            "type": "string",
+            "description": "Customer national ID number (required for Capitec Pay in South Africa - 13 digit SA ID)",
+            "example": "9001010000084"
+          },
           "reference_id": {
             "type": "string",
             "description": "reference id",
@@ -9687,6 +10187,11 @@
             "type": "string",
             "description": "customer redirect url",
             "example": "https://example.com/success"
+          },
+          "customer_id_number": {
+            "type": "string",
+            "description": "Customer national ID number (required for Capitec Pay in South Africa - 13 digit SA ID)",
+            "example": "9001010000084"
           },
           "reference_id": {
             "type": "string",
@@ -9792,6 +10297,10 @@
           },
           "error_description": {
             "type": "string"
+          },
+          "telco_id": {
+            "type": "string",
+            "description": "Telco/MNO transaction ID from the mobile money provider (e.g. Mpesa transaction code)"
           }
         },
         "required": [
@@ -9868,6 +10377,11 @@
             "type": "string",
             "description": "customer redirect url",
             "example": "https://example.com/success"
+          },
+          "idNumber": {
+            "type": "string",
+            "description": "Customer national ID number (required for Capitec Pay in South Africa - 13 digit SA ID)",
+            "example": "9001010000084"
           }
         },
         "required": [
@@ -10085,7 +10599,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-02-19T15:52:33.158Z"
+            "example": "2026-03-05T14:58:52.163Z"
           },
           "transactionCost": {
             "type": "number",
