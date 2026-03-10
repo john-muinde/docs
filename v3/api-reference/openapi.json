@@ -10599,7 +10599,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-03-05T14:58:52.163Z"
+            "example": "2026-03-10T13:43:15.910Z"
           },
           "transactionCost": {
             "type": "number",
@@ -12337,6 +12337,11 @@
             "description": "The code of the bank gotten from the bank list api",
             "example": "2500"
           },
+          "bankName": {
+            "type": "string",
+            "description": "Bank name — required for South Africa (e.g. \"FNB\", \"ABSA\"). Not needed for Kenya.",
+            "example": "FNB"
+          },
           "accountNumber": {
             "type": "string",
             "description": "The account number of the bank",
@@ -12860,7 +12865,12 @@
           },
           "bankCode": {
             "type": "number",
-            "description": "Bank code"
+            "description": "Bank code (required for Kenya; use 0 for South Africa)"
+          },
+          "bankName": {
+            "type": "string",
+            "description": "Bank name — required for South Africa (e.g. \"FNB\", \"ABSA\", \"NEDBANK\"). Not needed for Kenya.",
+            "example": "FNB"
           },
           "accountNumber": {
             "type": "string",
@@ -12881,6 +12891,50 @@
           "country"
         ]
       },
+      "LipaNaMpesaReceiverDto": {
+        "type": "object",
+        "properties": {
+          "businessShortcode": {
+            "type": "string",
+            "description": "Till number (Business shortcode) to pay to",
+            "example": "174379"
+          },
+          "accountReference": {
+            "type": "string",
+            "description": "Account reference (optional)"
+          },
+          "transactionDesc": {
+            "type": "string",
+            "description": "Transaction description (optional)"
+          }
+        },
+        "required": [
+          "businessShortcode"
+        ]
+      },
+      "PaybillReceiverDto": {
+        "type": "object",
+        "properties": {
+          "paybillNumber": {
+            "type": "string",
+            "description": "Paybill number to send payment to",
+            "example": "400200"
+          },
+          "accountNumber": {
+            "type": "string",
+            "description": "Account number / reference the Paybill uses to identify the sender",
+            "example": "ACC123456"
+          },
+          "remarks": {
+            "type": "string",
+            "description": "Transaction remarks (optional)"
+          }
+        },
+        "required": [
+          "paybillNumber",
+          "accountNumber"
+        ]
+      },
       "OfframpDto": {
         "type": "object",
         "properties": {
@@ -12897,6 +12951,22 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/BankDto"
+              }
+            ]
+          },
+          "lipaNaMpesaReceiver": {
+            "description": "Lipa na M-Pesa (Till/Buy Goods) receiver — Kenya only",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LipaNaMpesaReceiverDto"
+              }
+            ]
+          },
+          "paybillReceiver": {
+            "description": "Paybill receiver — Kenya only",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaybillReceiverDto"
               }
             ]
           },
