@@ -1,326 +1,6 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/api/v3/admin/traffic-types": {
-      "get": {
-        "operationId": "AdminTrafficTypeController_getAll_api/v3",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Returns all traffic types",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TrafficTypeResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all traffic types",
-        "tags": [
-          "Admin - Traffic Types"
-        ]
-      },
-      "post": {
-        "operationId": "AdminTrafficTypeController_create_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTrafficTypeDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Traffic type created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TrafficTypeResponseDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Create a new traffic type",
-        "tags": [
-          "Admin - Traffic Types"
-        ]
-      }
-    },
-    "/api/v3/admin/traffic-types/active": {
-      "get": {
-        "operationId": "AdminTrafficTypeController_getActive_api/v3",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Returns all active traffic types",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TrafficTypeResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get all active traffic types",
-        "tags": [
-          "Admin - Traffic Types"
-        ]
-      }
-    },
-    "/api/v3/admin/traffic-types/default": {
-      "get": {
-        "operationId": "AdminTrafficTypeController_getDefault_api/v3",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Returns the default traffic type",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TrafficTypeResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get the default traffic type",
-        "tags": [
-          "Admin - Traffic Types"
-        ]
-      }
-    },
-    "/api/v3/admin/traffic-types/code/{code}": {
-      "get": {
-        "operationId": "AdminTrafficTypeController_getByCode_api/v3",
-        "parameters": [
-          {
-            "name": "code",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Returns traffic type",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TrafficTypeResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Traffic type not found"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get traffic type by code",
-        "tags": [
-          "Admin - Traffic Types"
-        ]
-      }
-    },
-    "/api/v3/admin/traffic-types/seed": {
-      "post": {
-        "operationId": "AdminTrafficTypeController_seedDefaults_api/v3",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Default traffic types seeded successfully"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Seed default traffic types",
-        "tags": [
-          "Admin - Traffic Types"
-        ]
-      }
-    },
-    "/api/v3/admin/traffic-types/validate": {
-      "post": {
-        "operationId": "AdminTrafficTypeController_validate_api/v3",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Validation result"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Validate traffic type codes",
-        "tags": [
-          "Admin - Traffic Types"
-        ]
-      }
-    },
-    "/api/v3/admin/traffic-types/{id}": {
-      "get": {
-        "operationId": "AdminTrafficTypeController_getById_api/v3",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Returns traffic type",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TrafficTypeResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Traffic type not found"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Get traffic type by ID",
-        "tags": [
-          "Admin - Traffic Types"
-        ]
-      },
-      "put": {
-        "operationId": "AdminTrafficTypeController_update_api/v3",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateTrafficTypeDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Traffic type updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TrafficTypeResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Traffic type not found"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Update a traffic type",
-        "tags": [
-          "Admin - Traffic Types"
-        ]
-      },
-      "delete": {
-        "operationId": "AdminTrafficTypeController_delete_api/v3",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Traffic type deactivated successfully"
-          },
-          "404": {
-            "description": "Traffic type not found"
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "Deactivate a traffic type",
-        "tags": [
-          "Admin - Traffic Types"
-        ]
-      }
-    },
     "/api/v3/rate/{from}/{to}": {
       "get": {
         "description": "An integrator can use this endpoint to get the exchange rate between two currencies",
@@ -3136,6 +2816,20 @@
         ]
       }
     },
+    "/api/v3/webhook/blockfrost/cardano": {
+      "post": {
+        "operationId": "BlockfrostWebhookController_handleCardanoWebhook_api/v3",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "BlockfrostWebhook"
+        ]
+      }
+    },
     "/api/v3/deposit/mobile-money": {
       "post": {
         "description": "An integrator’s customers can initiate a deposit from their respective mobile money wallets.     An STK push will be sent to the customer and the respective amount will be deducted from their mobile money wallets and deposited into the integrator’s fiat wallet",
@@ -4302,6 +3996,129 @@
           }
         ],
         "summary": "Create crypto bridge deposit (Cross-border remittances)",
+        "tags": [
+          "CRYPTO BRIDGE DEPOSIT"
+        ]
+      }
+    },
+    "/api/v3/deposit/crypto-bridge/{kotani_reference_id}/refund-config": {
+      "get": {
+        "description": "Returns the current refund configuration for a transaction — the bolt11 invoice (or fallback address) that the provider pays to return crypto to Kotani if settlement fails. Also returns how many regenerations have been used. If the bolt11 is expired, call POST /:id/refund-config to regenerate.",
+        "operationId": "DepositCryptoBridgeController_getRefundConfig_api/v3",
+        "parameters": [
+          {
+            "name": "kotani_reference_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Transaction not found"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Get current refund config",
+        "tags": [
+          "CRYPTO BRIDGE DEPOSIT"
+        ]
+      },
+      "post": {
+        "description": "Regenerates the bolt11 refund invoice for a Lightning transaction whose current invoice has expired. The provider uses this invoice to return crypto to Kotani if settlement fails. Only applicable to Lightning transactions. Allowed only after the existing invoice expires. Maximum 3 regenerations per transaction. Minimum 30 seconds between requests.",
+        "operationId": "DepositCryptoBridgeController_regenerateRefundConfig_api/v3",
+        "parameters": [
+          {
+            "name": "kotani_reference_id",
+            "required": true,
+            "in": "path",
+            "description": "Kotani reference ID of the transaction",
+            "schema": {
+              "example": "KOTANI-BR-1732454321-ABC123",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invoice not yet expired or max regenerations reached"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Transaction not found"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Regenerate expired refund config invoice",
         "tags": [
           "CRYPTO BRIDGE DEPOSIT"
         ]
@@ -8399,6 +8216,9 @@
           "isDefault": {
             "type": "boolean"
           },
+          "requiresLocalLicense": {
+            "type": "boolean"
+          },
           "colorCode": {
             "type": "string"
           },
@@ -8467,6 +8287,11 @@
             "description": "Whether this is the default traffic type",
             "default": false
           },
+          "requiresLocalLicense": {
+            "type": "boolean",
+            "description": "Whether this traffic type requires a local license (e.g., gaming license, forex license)",
+            "default": false
+          },
           "colorCode": {
             "type": "string",
             "description": "Color code for UI display (hex color)",
@@ -8525,6 +8350,10 @@
           "isDefault": {
             "type": "boolean",
             "description": "Whether this is the default traffic type"
+          },
+          "requiresLocalLicense": {
+            "type": "boolean",
+            "description": "Whether this traffic type requires a local license"
           },
           "colorCode": {
             "type": "string",
@@ -8939,7 +8768,8 @@
           "LISK",
           "VICTION",
           "SCROLL",
-          "LIGHTNING"
+          "LIGHTNING",
+          "CARDANO"
         ],
         "description": "Blockchain/network to use"
       },
@@ -8955,7 +8785,8 @@
           "USDGLO",
           "CKES",
           "CGHS",
-          "MSAT"
+          "MSAT",
+          "ADA"
         ],
         "description": "Crypto token to use"
       },
@@ -10424,6 +10255,10 @@
             "type": "string",
             "description": "customer key",
             "example": ""
+          },
+          "bankPaymentDetails": {
+            "type": "object",
+            "description": "Bank payment details for manual bank transfer (e.g. KES PesaLink)"
           }
         },
         "required": [
@@ -10599,7 +10434,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-03-10T13:43:15.910Z"
+            "example": "2026-03-25T21:59:33.306Z"
           },
           "transactionCost": {
             "type": "number",
@@ -10805,7 +10640,8 @@
               "LISK",
               "VICTION",
               "SCROLL",
-              "LIGHTNING"
+              "LIGHTNING",
+              "CARDANO"
             ],
             "description": "Blockchain/network for refund (same as transaction chain)",
             "example": "LIGHTNING"
@@ -10822,7 +10658,8 @@
               "USDGLO",
               "CKES",
               "CGHS",
-              "MSAT"
+              "MSAT",
+              "ADA"
             ],
             "description": "Token for refund (same as transaction token)",
             "example": "MSAT"
@@ -10896,6 +10733,7 @@
               "SETTLING",
               "COMPLETED",
               "FAILED",
+              "SETTLEMENT_UNCONFIRMED",
               "REFUNDED"
             ],
             "description": "Current transaction status",
@@ -10921,7 +10759,8 @@
               "LISK",
               "VICTION",
               "SCROLL",
-              "LIGHTNING"
+              "LIGHTNING",
+              "CARDANO"
             ],
             "description": "Chain being used",
             "example": "LIGHTNING"
@@ -10938,7 +10777,8 @@
               "USDGLO",
               "CKES",
               "CGHS",
-              "MSAT"
+              "MSAT",
+              "ADA"
             ],
             "description": "Token being used",
             "example": "MSAT"
@@ -10965,6 +10805,10 @@
             "type": "string",
             "description": "Transaction creation timestamp (ISO 8601)",
             "example": "2024-11-22T12:00:00Z"
+          },
+          "collection_instructions": {
+            "type": "object",
+            "description": "Where the sender should pay to complete the fiat collection. Present only when source.payment_method is BANK_TRANSFER and the deposit record has been created (poll /status after a few seconds). Contains Kotani bank account details + the unique reference the sender must quote as the payment narrative."
           }
         },
         "required": [
@@ -11121,6 +10965,23 @@
           }
         }
       },
+      "CryptoBridgeSourceDto": {
+        "type": "object",
+        "properties": {
+          "payment_method": {
+            "type": "string",
+            "enum": [
+              "MOBILE_MONEY",
+              "BANK_TRANSFER"
+            ],
+            "description": "How to collect fiat from the sender. MOBILE_MONEY triggers STK push; BANK_TRANSFER creates a bank checkout deposit (provider must poll status for payment details).",
+            "example": "MOBILE_MONEY"
+          }
+        },
+        "required": [
+          "payment_method"
+        ]
+      },
       "CreateCryptoBridgeDepositDto": {
         "type": "object",
         "properties": {
@@ -11184,7 +11045,8 @@
               "LISK",
               "VICTION",
               "SCROLL",
-              "LIGHTNING"
+              "LIGHTNING",
+              "CARDANO"
             ],
             "description": "Blockchain/network to use",
             "example": "LIGHTNING"
@@ -11201,7 +11063,8 @@
               "USDGLO",
               "CKES",
               "CGHS",
-              "MSAT"
+              "MSAT",
+              "ADA"
             ],
             "description": "Token/asset to use",
             "example": "MSAT"
@@ -11234,6 +11097,14 @@
                 "$ref": "#/components/schemas/TransactionMetadataDto"
               }
             ]
+          },
+          "source": {
+            "description": "Source payment configuration. Controls how Kotani collects fiat from the sender. Defaults to mobile money (STK push). Use BANK_TRANSFER for KES PesaLink collection — poll GET /status/:id after creation to retrieve the bank payment reference.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CryptoBridgeSourceDto"
+              }
+            ]
           }
         },
         "required": [
@@ -11263,6 +11134,7 @@
               "SETTLING",
               "COMPLETED",
               "FAILED",
+              "SETTLEMENT_UNCONFIRMED",
               "REFUNDED"
             ],
             "description": "Stage status",
@@ -11365,6 +11237,7 @@
               "SETTLING",
               "COMPLETED",
               "FAILED",
+              "SETTLEMENT_UNCONFIRMED",
               "REFUNDED"
             ],
             "description": "Overall transaction status",
@@ -11400,7 +11273,8 @@
               "LISK",
               "VICTION",
               "SCROLL",
-              "LIGHTNING"
+              "LIGHTNING",
+              "CARDANO"
             ],
             "description": "Chain being used",
             "example": "LIGHTNING"
@@ -11417,7 +11291,8 @@
               "USDGLO",
               "CKES",
               "CGHS",
-              "MSAT"
+              "MSAT",
+              "ADA"
             ],
             "description": "Token being used",
             "example": "MSAT"
@@ -11437,6 +11312,18 @@
                 "$ref": "#/components/schemas/TransactionMetadataDto"
               }
             ]
+          },
+          "refund_config": {
+            "description": "Refund configuration. Present when status is FAILED or PAYMENT_SENT. Orange pays this invoice/address to return crypto to Kotani. If bolt11 is expired, call POST /:id/refund-config to regenerate.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RefundConfigDto"
+              }
+            ]
+          },
+          "collection_instructions": {
+            "type": "object",
+            "description": "Where the sender should pay to complete fiat collection. Present when source.payment_method is BANK_TRANSFER. Contains Kotani bank account details + the unique reference the sender must quote as the payment narrative."
           }
         },
         "required": [
@@ -11472,7 +11359,8 @@
               "LISK",
               "VICTION",
               "SCROLL",
-              "LIGHTNING"
+              "LIGHTNING",
+              "CARDANO"
             ],
             "description": "Chain used",
             "example": "LIGHTNING"
@@ -11489,7 +11377,8 @@
               "USDGLO",
               "CKES",
               "CGHS",
-              "MSAT"
+              "MSAT",
+              "ADA"
             ],
             "description": "Token used",
             "example": "MSAT"
@@ -11647,7 +11536,8 @@
               "LISK",
               "VICTION",
               "SCROLL",
-              "LIGHTNING"
+              "LIGHTNING",
+              "CARDANO"
             ],
             "description": "Chain used for refund",
             "example": "LIGHTNING"
@@ -11664,7 +11554,8 @@
               "USDGLO",
               "CKES",
               "CGHS",
-              "MSAT"
+              "MSAT",
+              "ADA"
             ],
             "description": "Token used for refund",
             "example": "MSAT"
@@ -11736,6 +11627,7 @@
               "SETTLING",
               "COMPLETED",
               "FAILED",
+              "SETTLEMENT_UNCONFIRMED",
               "REFUNDED"
             ],
             "description": "Updated settlement status",
@@ -12861,7 +12753,7 @@
           },
           "phoneNumber": {
             "type": "string",
-            "description": "Phone number"
+            "description": "Phone number of the bank account holder (optional — not used for the bank transfer itself)"
           },
           "bankCode": {
             "type": "number",
@@ -12885,7 +12777,6 @@
         "required": [
           "name",
           "address",
-          "phoneNumber",
           "bankCode",
           "accountNumber",
           "country"
