@@ -34,6 +34,12 @@ The following event types are available:
 
 - `kyc.status.changed` - Customer verification status changed
 
+**Refund Events:**
+
+- `refund.completed` - Crypto refund successfully sent back to integrator (transaction status → `REVERSED`)
+- `refund.failed` - Refund exhausted all retry attempts — manual intervention required
+- `refund.lightning.invoice_needed` - Lightning offramp needs a bolt11 refund invoice submitted
+
 **System Events:**
 
 - `system.event` - Operational notices and maintenance alerts

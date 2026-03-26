@@ -1,0 +1,197 @@
+---
+title: "Offramp Refunds"
+description: "How Kotani Pay returns crypto to integrators when a fiat disbursement fails after on-chain receipt."
+---
+
+When an offramp transaction's fiat disbursement fails after Kotani has already received the on-chain crypto, Kotani initiates an automatic refund back to the sender's address (or to a Lightning invoice for Lightning offramps).
+
+## How Refunds Work
+
+1. **On-chain settlement confirmed** — Kotani receives the crypto from the sender.
+2. **Fiat disbursement fails** — Mobile money, bank, or paybill transfer fails or is cancelled.
+3. **Refund triggered automatically** — Kotani attempts to return the crypto to the integrator.
+4. **Webhook fired** — `refund.completed` or `refund.failed` is sent to your webhook endpoint.
+
+For non-Lightning chains (EVM, Solana, Stellar, Cardano, Tron), Kotani sends the crypto directly back to `senderAddress`. No action is needed from you.
+
+For **Lightning**, Kotani cannot push funds unprompted — it needs a bolt11 invoice to pay. See below.
+
+---
+
+## Lightning Refunds
+
+### Option A — Provide a refund invoice at create time (recommended)
+
+Include `refund_config` when creating the offramp. If fiat fails, Kotani pays the invoice immediately — no manual intervention needed.
+
+```json
+{
+  "cryptoAmount": 0.015,
+  "currency": "KES",
+  "chain": "LIGHTNING",
+  "token": "MSAT",
+  "referenceId": "TXN-001",
+  "mobileMoneyReceiver": { ... },
+  "refund_config": {
+    "bolt11": "lnbc1500n1p0xyz...",
+    "payment_hash": "a1b2c3d4e5f6...",
+    "amount_msat": 1500000,
+    "expires_at": "2024-11-22T13:00:00Z",
+    "generate_invoice_url": "https://api.yourapp.com/lightning/generate-refund-invoice"
+  }
+}
+```
+
+| Field | Required | Notes |
+|---|---|---|
+| `bolt11` | Yes | Valid, unpaid Lightning invoice |
+| `payment_hash` | Recommended | Used to detect if invoice was already paid |
+| `amount_msat` | Yes | Must match the expected refund amount exactly |
+| `expires_at` | Yes | ISO 8601 — Kotani uses this to decide whether to call `generate_invoice_url` |
+| `generate_invoice_url` | Recommended | Called when `bolt11` is expired; see contract below |
+
+> **Important:** Lightning invoices expire. Always provide `generate_invoice_url` so Kotani can fetch a fresh one if the refund is triggered after the invoice expires. Without it, and with an expired invoice, Kotani falls back to Option B.
+
+### Option B — Submit invoice manually when notified
+
+If no `refund_config` was provided (or `bolt11` is expired and no `generate_invoice_url` exists), Kotani sends a `refund.lightning.invoice_needed` webhook and an email asking you to submit an invoice via:
+
+```
+POST /api/v3/offramp/submit-refund-invoice/{referenceId}
+Body: { "invoice": "lnbc..." }
+```
+
+The invoice must be for exactly the refund amount in sats, must not be expired, and must not already be paid.
+
+---
+
+## `generate_invoice_url` Contract
+
+Kotani calls your URL with a `POST` request when it needs a fresh Lightning invoice:
+
+### Request from Kotani
+
+```json
+{
+  "amount_msat": 1500000,
+  "reference_id": "TXN-001"
+}
+```
+
+### Your expected response
+
+```json
+{
+  "bolt11": "lnbc1500n1p0abc...",
+  "payment_hash": "f6e5d4c3b2a1...",
+  "amount_msat": 1500000,
+  "expires_at": "2024-11-22T14:30:00Z"
+}
+```
+
+| Field | Required | Notes |
+|---|---|---|
+| `bolt11` | Yes | Fresh, unpaid bolt11 invoice |
+| `payment_hash` | Recommended | For Kotani to track payment |
+| `amount_msat` | Yes | Must match the requested `amount_msat` |
+| `expires_at` | Recommended | ISO 8601 — so Kotani knows when this one expires |
+
+> **Your endpoint must respond within 10 seconds.** If it times out or returns an error, Kotani falls back to the manual notification flow.
+
+---
+
+## Refund Webhooks
+
+### `refund.completed`
+
+Fired when Kotani successfully refunds crypto to the integrator.
+
+```json
+{
+  "event": "refund.completed",
+  "data": {
+    "referenceId": "TXN-001",
+    "status": "REVERSED",
+    "refundStatus": "SUCCESSFUL",
+    "refundTransactionHash": "0xabc123...",
+    "refundAmount": 0.015,
+    "chain": "LIGHTNING",
+    "token": "MSAT",
+    "currency": "KES",
+    "timestamp": "2024-11-22T13:05:00Z"
+  },
+  "signature": "sha256=..."
+}
+```
+
+The parent transaction's `status` is set to `REVERSED` once refunded.
+
+### `refund.failed`
+
+Fired when refund attempts are exhausted (after up to 5 retries for general errors, 10 for gas/fund errors).
+
+```json
+{
+  "event": "refund.failed",
+  "data": {
+    "referenceId": "TXN-001",
+    "refundStatus": "FAILED",
+    "refundAmount": 0.015,
+    "chain": "LIGHTNING",
+    "token": "MSAT",
+    "currency": "KES",
+    "error": "Invoice has expired. Please provide a new valid invoice.",
+    "totalRetries": 5,
+    "timestamp": "2024-11-22T13:10:00Z"
+  },
+  "signature": "sha256=..."
+}
+```
+
+Contact [support@kotanipay.com](mailto:support@kotanipay.com) with the `referenceId` if you receive this — manual intervention will be required.
+
+### `refund.lightning.invoice_needed`
+
+Fired when Kotani needs you to submit a Lightning invoice manually (Option B). Includes the exact amount and the submit URL.
+
+```json
+{
+  "event": "refund.lightning.invoice_needed",
+  "data": {
+    "referenceId": "TXN-001",
+    "refundAmount": 1500000,
+    "refundAmountSats": 1500,
+    "chain": "LIGHTNING",
+    "requiresAction": true,
+    "action": {
+      "type": "SUBMIT_LIGHTNING_INVOICE",
+      "submitUrl": "https://api.kotanipay.com/api/v3/offramp/submit-refund-invoice/TXN-001",
+      "method": "POST",
+      "body": { "invoice": "lnbc..." },
+      "invoiceRequirements": {
+        "amount": 1500,
+        "currency": "SATS",
+        "format": "bolt11",
+        "mustNotExpire": true,
+        "mustNotBePaid": true,
+        "mustMatchExactAmount": true
+      }
+    },
+    "timestamp": "2024-11-22T13:00:00Z"
+  },
+  "signature": "sha256=..."
+}
+```
+
+---
+
+## Retry Logic
+
+| Scenario | Max Retries | Behaviour |
+|---|---|---|
+| Gas / insufficient funds | 10 | Auto-retried on next cron cycle |
+| Timeout | 5 | Auto-retried on next cron cycle |
+| All other errors | 5 | Auto-retried; `refund.failed` fired when exhausted |
+| Lightning — no invoice | ∞ | Waits until invoice submitted; `refund.lightning.invoice_needed` sent once |
+
+Use `POST /api/v3/offramp/retry-refund/{referenceId}` to manually trigger a retry on a `FAILED` refund.

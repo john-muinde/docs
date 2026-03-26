@@ -47,7 +47,8 @@
                   "v3/essentials/error-handling",
                   "v3/essentials/rate-limits",
                   "v3/essentials/transaction-statuses",
-                  "v3/essentials/webhooks"
+                  "v3/essentials/webhooks",
+                  "v3/essentials/offramp-refunds"
                 ]
               },
               {
