@@ -1,0 +1,34 @@
+---
+title: "Regenerate Crypto Bridge Refund Config"
+openapi: "POST /api/v3/deposit/crypto-bridge/{kotani_reference_id}/refund-config"
+---
+
+Regenerate the bolt11 Lightning refund invoice for a crypto bridge deposit whose current invoice has expired. The crypto provider requires a valid, unexpired invoice to execute a refund — call this endpoint when `expires_at` in the [Get Refund Config](/v3/api-reference/deposits/crypto-bridge-get-refund-config) response is in the past.
+
+## When to Use
+
+A Lightning refund invoice is valid for **15 minutes** from deposit creation. If the deposit is still pending and the invoice has expired, call this endpoint to issue a fresh one before the provider attempts to settle.
+
+**Typical flow:**
+
+1. Call [Get Refund Config](/v3/api-reference/deposits/crypto-bridge-get-refund-config) — check `expires_at`
+2. If `expires_at` is in the past, call this endpoint to regenerate
+3. The provider receives the updated invoice automatically via Kotani's settlement pipeline
+
+## Limits & Rules
+
+| Rule | Detail |
+|---|---|
+| **Chain** | Lightning (`CHAIN: LIGHTNING`) only — on-chain deposits use a static address and never expire |
+| **Maximum regenerations** | 3 per transaction |
+| **Minimum interval** | 30 seconds between consecutive regeneration requests |
+| **Terminal states** | Cannot regenerate once the transaction is `COMPLETED` or `REFUNDED` |
+| **Invoice must be expired** | Returns `400` if the current invoice has not yet expired |
+
+## Error Responses
+
+| Status | Reason |
+|---|---|
+| `400` | Non-Lightning transaction, maximum regenerations (3) reached, invoice not yet expired, or called too soon (< 30 s since last regeneration) |
+| `400` | Transaction is in a terminal state (`COMPLETED` or `REFUNDED`) |
+| `404` | Transaction not found for the given `kotani_reference_id` |

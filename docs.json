@@ -177,7 +177,9 @@
                   "v3/api-reference/rates/crypto-bridge-rate",
                   "v3/api-reference/deposits/crypto-bridge",
                   "v3/api-reference/deposits/crypto-bridge-status",
-                  "v3/api-reference/deposits/crypto-bridge-webhook-provider-settlement"
+                  "v3/api-reference/deposits/crypto-bridge-webhook-provider-settlement",
+                  "v3/api-reference/deposits/crypto-bridge-get-refund-config",
+                  "v3/api-reference/deposits/crypto-bridge-regenerate-refund-config"
                 ]
               },
               {

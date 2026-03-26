@@ -8174,7 +8174,7 @@
   "tags": [],
   "servers": [
     {
-      "url": "https://sandbox-api.kotanipay.com"
+      "url": "https://sandbox-api.kotanipay.com/api/v3"
     }
   ],
   "components": {
@@ -8186,190 +8186,6 @@
       }
     },
     "schemas": {
-      "TrafficTypeResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "riskLevel": {
-            "type": "string"
-          },
-          "complianceNotes": {
-            "type": "string"
-          },
-          "requiresEnhancedKyc": {
-            "type": "boolean"
-          },
-          "isDefault": {
-            "type": "boolean"
-          },
-          "requiresLocalLicense": {
-            "type": "boolean"
-          },
-          "colorCode": {
-            "type": "string"
-          },
-          "icon": {
-            "type": "string"
-          },
-          "created_at": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2024-01-01T00:00:00.000Z"
-          },
-          "updated_at": {
-            "format": "date-time",
-            "type": "string",
-            "example": "2024-01-01T00:00:00.000Z"
-          }
-        },
-        "required": [
-          "id",
-          "code",
-          "name",
-          "isActive",
-          "created_at",
-          "updated_at"
-        ]
-      },
-      "CreateTrafficTypeDto": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "description": "Unique code identifier (uppercase, e.g., ECOMMERCE, LICENSED_GAMING)",
-            "example": "ECOMMERCE"
-          },
-          "name": {
-            "type": "string",
-            "description": "Display name for UI",
-            "example": "E-Commerce"
-          },
-          "description": {
-            "type": "string",
-            "description": "Detailed description",
-            "example": "General e-commerce transactions"
-          },
-          "riskLevel": {
-            "type": "string",
-            "description": "Risk level for internal monitoring",
-            "enum": [
-              "LOW",
-              "MEDIUM",
-              "HIGH"
-            ],
-            "default": "MEDIUM"
-          },
-          "complianceNotes": {
-            "type": "string",
-            "description": "Compliance/regulatory notes"
-          },
-          "requiresEnhancedKyc": {
-            "type": "boolean",
-            "description": "Whether this requires enhanced KYC",
-            "default": false
-          },
-          "isDefault": {
-            "type": "boolean",
-            "description": "Whether this is the default traffic type",
-            "default": false
-          },
-          "requiresLocalLicense": {
-            "type": "boolean",
-            "description": "Whether this traffic type requires a local license (e.g., gaming license, forex license)",
-            "default": false
-          },
-          "colorCode": {
-            "type": "string",
-            "description": "Color code for UI display (hex color)",
-            "example": "#10B981"
-          },
-          "icon": {
-            "type": "string",
-            "description": "Icon name/class for UI display",
-            "example": "shopping-cart"
-          },
-          "isActive": {
-            "type": "boolean",
-            "description": "Is this traffic type active",
-            "default": true
-          }
-        },
-        "required": [
-          "code",
-          "name"
-        ]
-      },
-      "UpdateTrafficTypeDto": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string",
-            "description": "Unique code identifier (uppercase)",
-            "example": "ECOMMERCE"
-          },
-          "name": {
-            "type": "string",
-            "description": "Display name for UI",
-            "example": "E-Commerce"
-          },
-          "description": {
-            "type": "string",
-            "description": "Detailed description"
-          },
-          "riskLevel": {
-            "type": "string",
-            "description": "Risk level for internal monitoring",
-            "enum": [
-              "LOW",
-              "MEDIUM",
-              "HIGH"
-            ]
-          },
-          "complianceNotes": {
-            "type": "string",
-            "description": "Compliance/regulatory notes"
-          },
-          "requiresEnhancedKyc": {
-            "type": "boolean",
-            "description": "Whether this requires enhanced KYC"
-          },
-          "isDefault": {
-            "type": "boolean",
-            "description": "Whether this is the default traffic type"
-          },
-          "requiresLocalLicense": {
-            "type": "boolean",
-            "description": "Whether this traffic type requires a local license"
-          },
-          "colorCode": {
-            "type": "string",
-            "description": "Color code for UI display (hex color)",
-            "example": "#10B981"
-          },
-          "icon": {
-            "type": "string",
-            "description": "Icon name/class for UI display"
-          },
-          "isActive": {
-            "type": "boolean",
-            "description": "Is this traffic type active"
-          }
-        }
-      },
       "RateResponseDto": {
         "type": "object",
         "properties": {
@@ -10434,7 +10250,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-03-25T21:59:33.306Z"
+            "example": "2026-03-26T00:19:00.997Z"
           },
           "transactionCost": {
             "type": "number",
@@ -10710,6 +10526,55 @@
           "token"
         ]
       },
+      "CollectionInstructionsDto": {
+        "type": "object",
+        "properties": {
+          "bank_name": {
+            "type": "string",
+            "description": "Name of the bank holding Kotani's receiving account",
+            "example": "Equity Bank Kenya"
+          },
+          "account_name": {
+            "type": "string",
+            "description": "Account name for Kotani's receiving account",
+            "example": "Kotani Pay Ltd"
+          },
+          "account_number": {
+            "type": "string",
+            "description": "Account number the sender must transfer to",
+            "example": "0123456789"
+          },
+          "reference": {
+            "type": "string",
+            "description": "Unique payment reference the sender MUST quote as the transfer narrative. Kotani uses this to match the incoming bank payment to the transaction.",
+            "example": "KCB-TXN-20241122-ABC"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Exact amount the sender must transfer",
+            "example": 1000
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency of the transfer",
+            "example": "KES"
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Human-readable transfer instructions to display to the sender",
+            "example": "Transfer KES 1,000 to the account above. Use the reference exactly as shown as your payment narrative."
+          }
+        },
+        "required": [
+          "bank_name",
+          "account_name",
+          "account_number",
+          "reference",
+          "amount",
+          "currency",
+          "instructions"
+        ]
+      },
       "CryptoBridgeDepositResponseDto": {
         "type": "object",
         "properties": {
@@ -10807,8 +10672,12 @@
             "example": "2024-11-22T12:00:00Z"
           },
           "collection_instructions": {
-            "type": "object",
-            "description": "Where the sender should pay to complete the fiat collection. Present only when source.payment_method is BANK_TRANSFER and the deposit record has been created (poll /status after a few seconds). Contains Kotani bank account details + the unique reference the sender must quote as the payment narrative."
+            "description": "Where the sender should pay to complete the fiat collection. Present only when source.payment_method is BANK_TRANSFER. Contains Kotani's bank account details and the unique reference the sender must quote as the payment narrative. May not be populated immediately — poll GET /status if absent.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CollectionInstructionsDto"
+              }
+            ]
           }
         },
         "required": [
@@ -11322,8 +11191,12 @@
             ]
           },
           "collection_instructions": {
-            "type": "object",
-            "description": "Where the sender should pay to complete fiat collection. Present when source.payment_method is BANK_TRANSFER. Contains Kotani bank account details + the unique reference the sender must quote as the payment narrative."
+            "description": "Where the sender should pay to complete fiat collection. Present when source.payment_method is BANK_TRANSFER. Contains Kotani bank account details + the unique reference the sender must quote as the payment narrative.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CollectionInstructionsDto"
+              }
+            ]
           }
         },
         "required": [

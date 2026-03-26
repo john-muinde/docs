@@ -1,0 +1,29 @@
+---
+title: "Get Crypto Bridge Refund Config"
+openapi: "GET /api/v3/deposit/crypto-bridge/{kotani_reference_id}/refund-config"
+---
+
+Retrieve the current refund configuration for a crypto bridge deposit. The refund config holds the bolt11 Lightning invoice (or fallback on-chain address) that the crypto provider uses to return funds to Kotani Pay if the transaction's fiat settlement fails.
+
+## When to Use
+
+Check the refund config when:
+
+- Displaying refund readiness to the user
+- Verifying the refund invoice is still valid (not expired)
+- Deciding whether to call [Regenerate Refund Config](/v3/api-reference/deposits/crypto-bridge-regenerate-refund-config) because the current invoice has expired
+
+## Response Fields
+
+| Field | Description |
+|---|---|
+| `primary_method` | `CRYPTO_INVOICE` (Lightning bolt11) or `CRYPTO_ADDRESS` (on-chain fallback) |
+| `refund_invoice` | The bolt11 invoice the provider pays if settlement fails (Lightning only) |
+| `refund_payment_hash` | Payment hash for the Lightning invoice — use this to track refund execution |
+| `refund_amount_msat` | Refund amount in millisatoshis |
+| `fallback_address` | Kotani on-chain address used if the invoice cannot be paid |
+| `expires_at` | ISO 8601 timestamp when the bolt11 invoice expires |
+| `regeneration_count` | How many times the invoice has been regenerated (max 3) |
+| `regenerations_remaining` | Regenerations still available |
+
+> **Note:** Only Lightning (`CHAIN: LIGHTNING`) transactions carry a bolt11 refund invoice. On-chain crypto bridge transactions always use `CRYPTO_ADDRESS` as the primary refund method and the `expires_at` field will be absent.
