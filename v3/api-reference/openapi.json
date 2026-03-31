@@ -8174,7 +8174,7 @@
   "tags": [],
   "servers": [
     {
-      "url": "https://sandbox-api.kotanipay.com/api/v3"
+      "url": "https://sandbox-api.kotanipay.com"
     }
   ],
   "components": {
