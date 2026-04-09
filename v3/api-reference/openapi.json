@@ -9972,7 +9972,8 @@
         "type": "string",
         "enum": [
           "PAYBYBANK",
-          "CARD"
+          "CARD",
+          "CAPITECPAY"
         ],
         "description": "Payment Method"
       },
@@ -10035,11 +10036,15 @@
             "type": "string",
             "description": "Customer national ID number (required for Capitec Pay in South Africa - 13 digit SA ID)",
             "example": "9001010000084"
+          },
+          "forceDefaultMethod": {
+            "type": "boolean",
+            "description": "When true, force the payment method specified in paymentMethod to be the only option presented to the customer (no switching allowed). Passed to the provider as forceDefaultMethod where supported.",
+            "example": false
           }
         },
         "required": [
           "fullName",
-          "phoneNumber",
           "paymentMethod",
           "currency",
           "amount"
@@ -10256,7 +10261,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-03-26T00:35:45.734Z"
+            "example": "2026-04-09T16:20:23.773Z"
           },
           "transactionCost": {
             "type": "number",
