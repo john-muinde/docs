@@ -10644,11 +10644,6 @@
           "savedBeneficiaryId": {
             "type": "string",
             "description": "ID of a saved beneficiary on the integrator config — used when beneficiaryDetails is not explicitly provided"
-          },
-          "overrideUsdRate": {
-            "type": "number",
-            "description": "Admin-supplied exchange rate as \"1 USD = X local currency\". Overrides the auto-fetched rate for USD snapshot computation. Only meaningful for non-USD wallets.",
-            "example": 129.5
           }
         },
         "required": [
