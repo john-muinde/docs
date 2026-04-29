@@ -236,13 +236,14 @@
               {
                 "group": "Settlement Requests",
                 "pages": [
-                  "v3/api-reference/settlements/settlement-config",
                   "v3/api-reference/settlements/request-settlement",
+                  "v3/api-reference/settlements/settlement-config",
                   "v3/api-reference/settlements/list-settlements",
                   "v3/api-reference/settlements/fee-preview",
                   "v3/api-reference/settlements/schedule",
                   "v3/api-reference/settlements/get-settlement",
                   "v3/api-reference/settlements/settlement-config/beneficiaries",
+                  "v3/api-reference/settlements/settlement-config/create-beneficiary",
                   "v3/api-reference/settlements/settlement-config/get-beneficiary"
                 ]
               },
