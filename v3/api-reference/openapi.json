@@ -1699,6 +1699,162 @@
         ]
       }
     },
+    "/api/v3/integrator/settlement-config": {
+      "get": {
+        "operationId": "IntegratorController_getMySettlementConfig_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      },
+      "patch": {
+        "operationId": "IntegratorController_updateMySettlementConfig_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntegratorUpdateSettlementConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
+    "/api/v3/integrator/settlement-config/beneficiaries": {
+      "get": {
+        "operationId": "IntegratorController_getMySavedBeneficiaries_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      },
+      "post": {
+        "operationId": "IntegratorController_addMySavedBeneficiary_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedBeneficiaryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
+    "/api/v3/integrator/settlement-config/beneficiaries/{beneficiaryId}": {
+      "patch": {
+        "operationId": "IntegratorController_updateMySavedBeneficiary_api/v3",
+        "parameters": [
+          {
+            "name": "beneficiaryId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedBeneficiaryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      },
+      "delete": {
+        "operationId": "IntegratorController_removeMySavedBeneficiary_api/v3",
+        "parameters": [
+          {
+            "name": "beneficiaryId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
     "/api/v3/auth/login": {
       "post": {
         "description": "Login to your integrator account. This endpoint allows you to login to your account",
@@ -2816,20 +2972,6 @@
         ]
       }
     },
-    "/api/v3/webhook/blockfrost/cardano": {
-      "post": {
-        "operationId": "BlockfrostWebhookController_handleCardanoWebhook_api/v3",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "BlockfrostWebhook"
-        ]
-      }
-    },
     "/api/v3/deposit/mobile-money": {
       "post": {
         "description": "An integrator’s customers can initiate a deposit from their respective mobile money wallets.     An STK push will be sent to the customer and the respective amount will be deducted from their mobile money wallets and deposited into the integrator’s fiat wallet",
@@ -3478,858 +3620,6 @@
         ]
       }
     },
-    "/api/v3/deposit/on-chain": {
-      "post": {
-        "deprecated": true,
-        "description": "Crypto deposits are where a customer's mobile money wallet account is deducted a specific fiat amount which is then converted to a specified stablecoin amount and sent to the integrator's specified public wallet address.",
-        "operationId": "DepositOnchainController_onchain_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateDepositMobileMoneyOnChainDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Deposit has been successfully created."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/DepositResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Not Found"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Duplicate Transaction"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Too Many Requests"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Deposit onChain",
-        "tags": [
-          "DEPOSIT"
-        ]
-      }
-    },
-    "/api/v3/deposit/on-chain/status/{reference_id}": {
-      "get": {
-        "deprecated": true,
-        "description": "This endpoint will be used to get the status of the deposit onchain request",
-        "operationId": "DepositOnchainController_getWithdrawalStatus_api/v3",
-        "parameters": [
-          {
-            "name": "reference_id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Deposit status successfully retrieved."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/OnchainDepositResponse"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Not Found"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Get Deposit Onchain Status",
-        "tags": [
-          "DEPOSIT"
-        ]
-      }
-    },
-    "/api/v3/deposit/on-chain/supported-chains": {
-      "get": {
-        "deprecated": true,
-        "description": "This endpoint will be used to get the supported chains for deposit onchain",
-        "operationId": "DepositOnchainController_getSupportedChains_api/v3",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Deposit onchain supported chains retrieved successfully."
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "FUSE": {
-                          "type": "array",
-                          "example": [
-                            "USDT",
-                            "USDC"
-                          ]
-                        },
-                        "CELO": {
-                          "type": "array",
-                          "example": [
-                            "CUSD"
-                          ]
-                        },
-                        "ETHEREUM": {
-                          "type": "array",
-                          "example": [
-                            "USDT",
-                            "USDC"
-                          ]
-                        },
-                        "POLYGON": {
-                          "type": "array",
-                          "example": [
-                            "USDC"
-                          ]
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Get Deposit Onchain Supported Chains",
-        "tags": [
-          "DEPOSIT"
-        ]
-      }
-    },
-    "/api/v3/deposit/crypto-bridge": {
-      "post": {
-        "description": "Enables cross-border transactions using blockchain as settlement rail. Provider initiates the transaction with a pre-generated payment invoice. Flow: Fiat collection → Crypto payment → Settlement to recipient. Supports Lightning Network, Solana, Base, Ethereum, and other chains. Supports mobile money and bank transfer settlements.",
-        "operationId": "DepositCryptoBridgeController_createCryptoBridgeDeposit_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCryptoBridgeDepositDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Crypto bridge deposit initiated successfully."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/CryptoBridgeDepositResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid invoice or payment details"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Create crypto bridge deposit (Cross-border remittances)",
-        "tags": [
-          "CRYPTO BRIDGE DEPOSIT"
-        ]
-      }
-    },
-    "/api/v3/deposit/crypto-bridge/{kotani_reference_id}/refund-config": {
-      "get": {
-        "description": "Returns the current refund configuration for a transaction — the bolt11 invoice (or fallback address) that the provider pays to return crypto to Kotani if settlement fails. Also returns how many regenerations have been used. If the bolt11 is expired, call POST /:id/refund-config to regenerate.",
-        "operationId": "DepositCryptoBridgeController_getRefundConfig_api/v3",
-        "parameters": [
-          {
-            "name": "kotani_reference_id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Transaction not found"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Get current refund config",
-        "tags": [
-          "CRYPTO BRIDGE DEPOSIT"
-        ]
-      },
-      "post": {
-        "description": "Regenerates the bolt11 refund invoice for a Lightning transaction whose current invoice has expired. The provider uses this invoice to return crypto to Kotani if settlement fails. Only applicable to Lightning transactions. Allowed only after the existing invoice expires. Maximum 3 regenerations per transaction. Minimum 30 seconds between requests.",
-        "operationId": "DepositCryptoBridgeController_regenerateRefundConfig_api/v3",
-        "parameters": [
-          {
-            "name": "kotani_reference_id",
-            "required": true,
-            "in": "path",
-            "description": "Kotani reference ID of the transaction",
-            "schema": {
-              "example": "KOTANI-BR-1732454321-ABC123",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invoice not yet expired or max regenerations reached"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Transaction not found"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Regenerate expired refund config invoice",
-        "tags": [
-          "CRYPTO BRIDGE DEPOSIT"
-        ]
-      }
-    },
-    "/api/v3/deposit/crypto-bridge/status/{kotani_reference_id}": {
-      "get": {
-        "description": "Retrieve detailed status of a crypto bridge transaction including all stages: deposit collection, crypto payment, and settlement.",
-        "operationId": "DepositCryptoBridgeController_getCryptoBridgeStatus_api/v3",
-        "parameters": [
-          {
-            "name": "kotani_reference_id",
-            "required": true,
-            "in": "path",
-            "description": "Kotani reference ID for the transaction",
-            "schema": {
-              "example": "KOTANI-REF-789",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Crypto bridge deposit status retrieved."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/CryptoBridgeStatusResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Transaction not found"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Get crypto bridge deposit status",
-        "tags": [
-          "CRYPTO BRIDGE DEPOSIT"
-        ]
-      }
-    },
-    "/api/v3/deposit/crypto-bridge/internal/deposit-callback": {
-      "post": {
-        "description": "Internal webhook endpoint called by DepositMobileMoneyService when fiat collection completes. Updates the crypto bridge transaction status and triggers crypto payment if successful. No authentication required - internal callback only.",
-        "operationId": "DepositCryptoBridgeWebhookController_handleDepositCallback_api/v3",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "summary": "Internal callback for deposit mobile money completion",
-        "tags": [
-          "CRYPTO BRIDGE DEPOSIT WEBHOOKS"
-        ]
-      }
-    },
-    "/api/v3/deposit/crypto-bridge/webhook/provider/settlement": {
-      "post": {
-        "description": "Receives settlement status updates from settlement provider. Requires signature validation. Statuses: SETTLING, COMPLETED, FAILED. For FAILED status, initiates refund process using configured refund method.",
-        "operationId": "DepositCryptoBridgeWebhookController_handleProviderSettlementWebhook_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProviderSettlementWebhookDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Webhook received and processed."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Transaction not found"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Webhook endpoint for provider settlement status updates",
-        "tags": [
-          "CRYPTO BRIDGE DEPOSIT WEBHOOKS"
-        ]
-      }
-    },
     "/api/v3/withdraw/mobile-money": {
       "post": {
         "description": "This api will withdraw fiat from the integrator’s fiat wallet to the customer’s mobile money wallet.",
@@ -4616,103 +3906,6 @@
           }
         ],
         "summary": "Withdraw to Paybill (Kenya)",
-        "tags": [
-          "WITHDRAW"
-        ]
-      }
-    },
-    "/api/v3/withdraw/bank": {
-      "post": {
-        "description": "Send money from integrator wallet to customer bank account. Supports Kenya and SA.",
-        "operationId": "WithdrawController_bank_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateBankWithdrawDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bank withdrawal has been successfully created."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/WithdrawResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid API Key"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Withdraw Fiat to Bank Account",
         "tags": [
           "WITHDRAW"
         ]
@@ -5862,6 +5055,202 @@
         "summary": "Get withdraw service configuration",
         "tags": [
           "CUSTOMER - COUNTRY SUPPORT"
+        ]
+      }
+    },
+    "/api/v3/integrator/settlements": {
+      "post": {
+        "operationId": "IntegratorSettlementsController_createRequest_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSettlementRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      },
+      "get": {
+        "operationId": "IntegratorSettlementsController_listSettlements_api/v3",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
+    "/api/v3/integrator/settlements/fee-preview": {
+      "get": {
+        "operationId": "IntegratorSettlementsController_feePreview_api/v3",
+        "parameters": [
+          {
+            "name": "amount",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "walletId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
+    "/api/v3/integrator/settlements/schedule": {
+      "get": {
+        "operationId": "IntegratorSettlementsController_getSchedule_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
+    "/api/v3/integrator/settlements/{settlementId}": {
+      "get": {
+        "operationId": "IntegratorSettlementsController_getSettlement_api/v3",
+        "parameters": [
+          {
+            "name": "settlementId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      },
+      "delete": {
+        "operationId": "IntegratorSettlementsController_cancelSettlement_api/v3",
+        "parameters": [
+          {
+            "name": "settlementId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
         ]
       }
     },
@@ -8174,7 +7563,7 @@
   "tags": [],
   "servers": [
     {
-      "url": "https://sandbox-api.kotanipay.com"
+      "url": "https://unshrugging-nonhedonistically-jeri.ngrok-free.dev/api/v3"
     }
   ],
   "components": {
@@ -8305,7 +7694,8 @@
           "USDGLO",
           "CKES",
           "CGHS",
-          "MSAT"
+          "MSAT",
+          "ADA"
         ],
         "description": "To currency"
       },
@@ -9144,6 +8534,10 @@
                 "refund.lightning.invoice_needed",
                 "refund.completed",
                 "refund.failed",
+                "settlement.approved",
+                "settlement.rejected",
+                "settlement.processed",
+                "settlement.cancelled",
                 "system.event"
               ]
             }
@@ -9225,6 +8619,10 @@
                 "refund.lightning.invoice_needed",
                 "refund.completed",
                 "refund.failed",
+                "settlement.approved",
+                "settlement.rejected",
+                "settlement.processed",
+                "settlement.cancelled",
                 "system.event"
               ]
             }
@@ -9272,9 +8670,93 @@
                 "refund.lightning.invoice_needed",
                 "refund.completed",
                 "refund.failed",
+                "settlement.approved",
+                "settlement.rejected",
+                "settlement.processed",
+                "settlement.cancelled",
                 "system.event"
               ]
             }
+          }
+        }
+      },
+      "IntegratorUpdateSettlementConfigDto": {
+        "type": "object",
+        "properties": {
+          "defaultBalanceSource": {
+            "type": "string",
+            "description": "Default balance source pre-selected on the request form",
+            "enum": [
+              "PAYOUT",
+              "DEPOSIT",
+              "ADMIN_SELECT"
+            ]
+          },
+          "defaultCurrency": {
+            "type": "string",
+            "description": "Default settlement currency when integrator has multi-currency wallets",
+            "example": "KES"
+          }
+        }
+      },
+      "SavedBeneficiaryDto": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string",
+            "description": "Human-readable label for this beneficiary"
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Whether this is the default beneficiary"
+          },
+          "beneficiaryType": {
+            "type": "string",
+            "enum": [
+              "bank",
+              "crypto"
+            ],
+            "description": "bank or crypto — determines which fields apply"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "Name on the bank account"
+          },
+          "accountNumber": {
+            "type": "string",
+            "description": "Bank account number"
+          },
+          "bankName": {
+            "type": "string",
+            "description": "Bank name (e.g. Equity Bank)"
+          },
+          "bankCode": {
+            "type": "string",
+            "description": "Bank code / sort code (optional)"
+          },
+          "walletAddress": {
+            "type": "string",
+            "description": "Crypto wallet address"
+          },
+          "chain": {
+            "type": "string",
+            "description": "Blockchain chain (e.g. Polygon, Tron, BSC)"
+          },
+          "token": {
+            "type": "string",
+            "description": "Token/asset symbol on the chain (e.g. USDT, USDC)"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the beneficiary (display)"
+          },
+          "accountType": {
+            "type": "string",
+            "description": "Account type: Exchange / Non-Custodial / Bank (legacy)"
+          },
+          "network": {
+            "type": "string",
+            "description": "Network sub-type (legacy — prefer token field for asset)"
           }
         }
       },
@@ -10261,7 +9743,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-04-09T16:20:23.773Z"
+            "example": "2026-04-29T15:08:18.015Z"
           },
           "transactionCost": {
             "type": "number",
@@ -10299,1277 +9781,6 @@
           "createdAt",
           "transactionCost",
           "transactionAmount"
-        ]
-      },
-      "CreateDepositMobileMoneyOnChainDto": {
-        "type": "object",
-        "properties": {
-          "public_address": {
-            "type": "string",
-            "description": "The transaction public address"
-          },
-          "chain": {
-            "description": "supported chain",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Chain"
-              }
-            ]
-          },
-          "token": {
-            "description": "supported token",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/StableCoin"
-              }
-            ]
-          },
-          "wallet_id": {
-            "type": "string",
-            "description": "The wallet id"
-          },
-          "amount": {
-            "type": "number",
-            "description": "The amount to deposit"
-          },
-          "customer_key": {
-            "type": "string",
-            "description": "The customer key"
-          },
-          "callback_url": {
-            "type": "string",
-            "description": "The callback url"
-          },
-          "reference_id": {
-            "type": "string",
-            "description": "Optional reference id"
-          }
-        },
-        "required": [
-          "chain",
-          "token",
-          "wallet_id",
-          "amount",
-          "customer_key"
-        ]
-      },
-      "DepositMobileMoneyOnchainResponse": {
-        "type": "object",
-        "properties": {
-          "public_address": {
-            "type": "string",
-            "description": "The transaction public address"
-          },
-          "chain": {
-            "description": "supported chain",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Chain"
-              }
-            ]
-          },
-          "token": {
-            "description": "supported token",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/StableCoin"
-              }
-            ]
-          },
-          "reference_id": {
-            "type": "string",
-            "description": "Optional reference id"
-          },
-          "crypto_amount": {
-            "type": "string",
-            "description": "crypto amount"
-          },
-          "transaction_hash": {
-            "type": "string",
-            "description": "transaction hash"
-          },
-          "status": {
-            "description": "transaction status",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DEPOSIT_STATUS"
-              }
-            ]
-          },
-          "crypto_received_status": {
-            "description": "crypto received status",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DEPOSIT_STATUS"
-              }
-            ]
-          }
-        },
-        "required": [
-          "chain",
-          "token"
-        ]
-      },
-      "OnchainDepositResponse": {
-        "type": "object",
-        "properties": {
-          "mobile_money": {
-            "description": "mobile money status",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DepositStatusResponseDto"
-              }
-            ]
-          },
-          "onchain": {
-            "description": "onchain status",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DepositMobileMoneyOnchainResponse"
-              }
-            ]
-          }
-        },
-        "required": [
-          "mobile_money",
-          "onchain"
-        ]
-      },
-      "RefundConfigDto": {
-        "type": "object",
-        "properties": {
-          "primary_method": {
-            "type": "string",
-            "enum": [
-              "CRYPTO_INVOICE",
-              "CRYPTO_ADDRESS"
-            ],
-            "description": "Primary refund method - How Orange should return crypto to Kotani",
-            "example": "CRYPTO_INVOICE"
-          },
-          "chain": {
-            "type": "string",
-            "enum": [
-              "CELO",
-              "ETHEREUM",
-              "ARBITRUM",
-              "AVALANCHE",
-              "BINANCE",
-              "POLYGON",
-              "OPTIMISM",
-              "FUSE",
-              "TRON",
-              "PROVENANCE",
-              "SOLANA",
-              "HEDERA",
-              "STELLAR",
-              "BASE",
-              "LISK",
-              "VICTION",
-              "SCROLL",
-              "LIGHTNING",
-              "CARDANO"
-            ],
-            "description": "Blockchain/network for refund (same as transaction chain)",
-            "example": "LIGHTNING"
-          },
-          "token": {
-            "type": "string",
-            "enum": [
-              "CUSD",
-              "USDC",
-              "USDT",
-              "BUSD",
-              "HASH",
-              "HBAR",
-              "USDGLO",
-              "CKES",
-              "CGHS",
-              "MSAT",
-              "ADA"
-            ],
-            "description": "Token for refund (same as transaction token)",
-            "example": "MSAT"
-          },
-          "refund_invoice": {
-            "type": "string",
-            "description": "Kotani refund invoice (for Lightning) - Orange pays this if settlement fails",
-            "example": "lnbc1500n1p0xyz..."
-          },
-          "refund_payment_hash": {
-            "type": "string",
-            "description": "Refund payment hash for tracking",
-            "example": "a1b2c3d4e5f6..."
-          },
-          "refund_amount_msat": {
-            "type": "number",
-            "description": "Refund amount in millisatoshis (for Lightning)",
-            "example": 150000000
-          },
-          "refund_crypto_amount": {
-            "type": "number",
-            "description": "Refund crypto amount (for non-Lightning chains)",
-            "example": 150.5
-          },
-          "fallback_address": {
-            "type": "string",
-            "description": "Kotani crypto address for refund (if invoice not applicable) - Orange sends to this address if settlement fails",
-            "example": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"
-          },
-          "fallback_method": {
-            "type": "string",
-            "enum": [
-              "CRYPTO_INVOICE",
-              "CRYPTO_ADDRESS"
-            ],
-            "description": "Fallback refund method if primary method fails",
-            "example": "CRYPTO_ADDRESS"
-          },
-          "expires_at": {
-            "type": "string",
-            "description": "Invoice expiration time (ISO 8601)",
-            "example": "2024-11-22T13:00:00Z"
-          }
-        },
-        "required": [
-          "primary_method",
-          "chain",
-          "token"
-        ]
-      },
-      "CollectionInstructionsDto": {
-        "type": "object",
-        "properties": {
-          "bank_name": {
-            "type": "string",
-            "description": "Name of the bank holding Kotani's receiving account",
-            "example": "Equity Bank Kenya"
-          },
-          "account_name": {
-            "type": "string",
-            "description": "Account name for Kotani's receiving account",
-            "example": "Kotani Pay Ltd"
-          },
-          "account_number": {
-            "type": "string",
-            "description": "Account number the sender must transfer to",
-            "example": "0123456789"
-          },
-          "reference": {
-            "type": "string",
-            "description": "Unique payment reference the sender MUST quote as the transfer narrative. Kotani uses this to match the incoming bank payment to the transaction.",
-            "example": "KCB-TXN-20241122-ABC"
-          },
-          "amount": {
-            "type": "number",
-            "description": "Exact amount the sender must transfer",
-            "example": 1000
-          },
-          "currency": {
-            "type": "string",
-            "description": "Currency of the transfer",
-            "example": "KES"
-          },
-          "instructions": {
-            "type": "string",
-            "description": "Human-readable transfer instructions to display to the sender",
-            "example": "Transfer KES 1,000 to the account above. Use the reference exactly as shown as your payment narrative."
-          }
-        },
-        "required": [
-          "bank_name",
-          "account_name",
-          "account_number",
-          "reference",
-          "amount",
-          "currency",
-          "instructions"
-        ]
-      },
-      "CryptoBridgeDepositResponseDto": {
-        "type": "object",
-        "properties": {
-          "kotani_reference_id": {
-            "type": "string",
-            "description": "Kotani reference ID for tracking",
-            "example": "KOTANI-REF-789"
-          },
-          "provider_reference_id": {
-            "type": "string",
-            "description": "Provider reference ID (echoed back)",
-            "example": "PROVIDER-TXN-20241122-001"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "DEPOSIT_INITIATED",
-              "DEPOSIT_CONFIRMED",
-              "PAYMENT_SENT",
-              "PAYMENT_CONFIRMED",
-              "SETTLING",
-              "COMPLETED",
-              "FAILED",
-              "SETTLEMENT_UNCONFIRMED",
-              "REFUNDED"
-            ],
-            "description": "Current transaction status",
-            "example": "DEPOSIT_INITIATED"
-          },
-          "chain": {
-            "type": "string",
-            "enum": [
-              "CELO",
-              "ETHEREUM",
-              "ARBITRUM",
-              "AVALANCHE",
-              "BINANCE",
-              "POLYGON",
-              "OPTIMISM",
-              "FUSE",
-              "TRON",
-              "PROVENANCE",
-              "SOLANA",
-              "HEDERA",
-              "STELLAR",
-              "BASE",
-              "LISK",
-              "VICTION",
-              "SCROLL",
-              "LIGHTNING",
-              "CARDANO"
-            ],
-            "description": "Chain being used",
-            "example": "LIGHTNING"
-          },
-          "token": {
-            "type": "string",
-            "enum": [
-              "CUSD",
-              "USDC",
-              "USDT",
-              "BUSD",
-              "HASH",
-              "HBAR",
-              "USDGLO",
-              "CKES",
-              "CGHS",
-              "MSAT",
-              "ADA"
-            ],
-            "description": "Token being used",
-            "example": "MSAT"
-          },
-          "payment_hash": {
-            "type": "string",
-            "description": "Payment hash for tracking crypto transaction",
-            "example": "a1b2c3d4e5f6..."
-          },
-          "refund_config": {
-            "description": "Refund configuration - Orange must pay this invoice/address if settlement fails to return crypto to Kotani",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RefundConfigDto"
-              }
-            ]
-          },
-          "estimated_completion": {
-            "type": "string",
-            "description": "Estimated completion time (ISO 8601)",
-            "example": "2024-11-22T12:10:00Z"
-          },
-          "created_at": {
-            "type": "string",
-            "description": "Transaction creation timestamp (ISO 8601)",
-            "example": "2024-11-22T12:00:00Z"
-          },
-          "collection_instructions": {
-            "description": "Where the sender should pay to complete the fiat collection. Present only when source.payment_method is BANK_TRANSFER. Contains Kotani's bank account details and the unique reference the sender must quote as the payment narrative. May not be populated immediately — poll GET /status if absent.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CollectionInstructionsDto"
-              }
-            ]
-          }
-        },
-        "required": [
-          "kotani_reference_id",
-          "provider_reference_id",
-          "status",
-          "chain",
-          "token",
-          "payment_hash",
-          "refund_config",
-          "estimated_completion",
-          "created_at"
-        ]
-      },
-      "CryptoPaymentDto": {
-        "type": "object",
-        "properties": {
-          "bolt11": {
-            "type": "string",
-            "description": "Lightning bolt11 invoice (for Lightning Network)",
-            "example": "lnbc1500n1p0xyz..."
-          },
-          "payment_hash": {
-            "type": "string",
-            "description": "Payment hash",
-            "example": "a1b2c3d4e5f6..."
-          },
-          "amount_msat": {
-            "type": "number",
-            "description": "Amount in millisatoshis (for Lightning)",
-            "example": 150000000
-          },
-          "address": {
-            "type": "string",
-            "description": "Crypto wallet address (for non-Lightning chains)",
-            "example": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb"
-          },
-          "crypto_amount": {
-            "type": "number",
-            "description": "Crypto amount (for non-Lightning chains)",
-            "example": 150.5
-          },
-          "expires_at": {
-            "type": "string",
-            "description": "Invoice expiration timestamp (ISO 8601)",
-            "example": "2024-11-22T12:30:00Z"
-          }
-        }
-      },
-      "RecipientDto": {
-        "type": "object",
-        "properties": {
-          "phone_number": {
-            "type": "string",
-            "description": "Recipient phone number (required for all payment methods)",
-            "example": "+27821234567"
-          },
-          "payment_method": {
-            "type": "string",
-            "enum": [
-              "MOBILE_MONEY",
-              "BANK_TRANSFER"
-            ],
-            "description": "Payment method for recipient",
-            "example": "MOBILE_MONEY"
-          },
-          "mobile_money_provider": {
-            "type": "string",
-            "description": "Mobile money provider (required for MOBILE_MONEY)",
-            "example": "VODACOM"
-          },
-          "bank_account_number": {
-            "type": "string",
-            "description": "Bank account number (required for BANK_TRANSFER)",
-            "example": "1234567890"
-          },
-          "bank_code": {
-            "type": "string",
-            "description": "Bank code (required for BANK_TRANSFER)",
-            "example": "ABSA"
-          },
-          "account_holder_name": {
-            "type": "string",
-            "description": "Account holder name (required for BANK_TRANSFER)",
-            "example": "Jane Smith"
-          }
-        },
-        "required": [
-          "phone_number",
-          "payment_method"
-        ]
-      },
-      "SettlementDto": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "number",
-            "description": "Settlement amount in destination currency",
-            "example": 150
-          },
-          "currency": {
-            "type": "string",
-            "description": "Destination fiat currency code",
-            "example": "ZAR"
-          },
-          "country": {
-            "type": "string",
-            "description": "Destination country code (ISO 3166-1 alpha-2)",
-            "example": "ZA"
-          },
-          "recipient": {
-            "description": "Recipient payment details",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RecipientDto"
-              }
-            ]
-          }
-        },
-        "required": [
-          "amount",
-          "currency",
-          "country",
-          "recipient"
-        ]
-      },
-      "TransactionMetadataDto": {
-        "type": "object",
-        "properties": {
-          "sender_name": {
-            "type": "string",
-            "description": "Sender name",
-            "example": "John Doe"
-          },
-          "sender_country": {
-            "type": "string",
-            "description": "Sender country code",
-            "example": "KE"
-          },
-          "recipient_name": {
-            "type": "string",
-            "description": "Recipient name",
-            "example": "Jane Smith"
-          },
-          "recipient_country": {
-            "type": "string",
-            "description": "Recipient country code",
-            "example": "ZA"
-          },
-          "notes": {
-            "type": "string",
-            "description": "Additional notes or context",
-            "example": "Family support payment"
-          }
-        }
-      },
-      "CryptoBridgeSourceDto": {
-        "type": "object",
-        "properties": {
-          "payment_method": {
-            "type": "string",
-            "enum": [
-              "MOBILE_MONEY",
-              "BANK_TRANSFER"
-            ],
-            "description": "How to collect fiat from the sender. MOBILE_MONEY triggers STK push; BANK_TRANSFER creates a bank checkout deposit (provider must poll status for payment details).",
-            "example": "MOBILE_MONEY"
-          }
-        },
-        "required": [
-          "payment_method"
-        ]
-      },
-      "CreateCryptoBridgeDepositDto": {
-        "type": "object",
-        "properties": {
-          "rate_id": {
-            "type": "string",
-            "description": "Rate ID from /rate/crypto-bridge endpoint. Optional but recommended. Validates fiat->crypto conversion rate. Rate expires in 60 seconds.",
-            "example": "RATE-CB-1732454321-XYZ123"
-          },
-          "customer_key": {
-            "type": "string",
-            "description": "Customer key (Provider customer ID in Kotani system)",
-            "example": "PROVIDER_CUSTOMER_123"
-          },
-          "provider_reference_id": {
-            "type": "string",
-            "description": "Provider's unique transaction reference ID",
-            "example": "PROVIDER-TXN-20241122-001"
-          },
-          "amount": {
-            "type": "number",
-            "description": "Source fiat amount",
-            "example": 1000
-          },
-          "source_currency": {
-            "type": "string",
-            "description": "Source fiat currency code",
-            "example": "KES"
-          },
-          "wallet_id": {
-            "type": "string",
-            "description": "Kotani wallet ID to use for transaction",
-            "example": "KOTANI_WALLET_ID"
-          },
-          "transaction_type": {
-            "type": "string",
-            "enum": [
-              "cross_border",
-              "bridge",
-              "chain_settlement"
-            ],
-            "description": "Type of bridge transaction",
-            "example": "cross_border"
-          },
-          "chain": {
-            "type": "string",
-            "enum": [
-              "CELO",
-              "ETHEREUM",
-              "ARBITRUM",
-              "AVALANCHE",
-              "BINANCE",
-              "POLYGON",
-              "OPTIMISM",
-              "FUSE",
-              "TRON",
-              "PROVENANCE",
-              "SOLANA",
-              "HEDERA",
-              "STELLAR",
-              "BASE",
-              "LISK",
-              "VICTION",
-              "SCROLL",
-              "LIGHTNING",
-              "CARDANO"
-            ],
-            "description": "Blockchain/network to use",
-            "example": "LIGHTNING"
-          },
-          "token": {
-            "type": "string",
-            "enum": [
-              "CUSD",
-              "USDC",
-              "USDT",
-              "BUSD",
-              "HASH",
-              "HBAR",
-              "USDGLO",
-              "CKES",
-              "CGHS",
-              "MSAT",
-              "ADA"
-            ],
-            "description": "Token/asset to use",
-            "example": "MSAT"
-          },
-          "crypto_payment": {
-            "description": "Crypto payment details (pre-generated invoice or address)",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CryptoPaymentDto"
-              }
-            ]
-          },
-          "settlement": {
-            "description": "Settlement details for recipient",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SettlementDto"
-              }
-            ]
-          },
-          "callback_url": {
-            "type": "string",
-            "description": "Callback URL for status updates",
-            "example": "https://api.provider.com/webhooks/kotani/status"
-          },
-          "metadata": {
-            "description": "Additional transaction metadata",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TransactionMetadataDto"
-              }
-            ]
-          },
-          "source": {
-            "description": "Source payment configuration. Controls how Kotani collects fiat from the sender. Defaults to mobile money (STK push). Use BANK_TRANSFER for KES PesaLink collection — poll GET /status/:id after creation to retrieve the bank payment reference.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CryptoBridgeSourceDto"
-              }
-            ]
-          }
-        },
-        "required": [
-          "customer_key",
-          "provider_reference_id",
-          "amount",
-          "source_currency",
-          "wallet_id",
-          "transaction_type",
-          "chain",
-          "token",
-          "crypto_payment",
-          "settlement",
-          "callback_url"
-        ]
-      },
-      "StageStatusDto": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "DEPOSIT_INITIATED",
-              "DEPOSIT_CONFIRMED",
-              "PAYMENT_SENT",
-              "PAYMENT_CONFIRMED",
-              "SETTLING",
-              "COMPLETED",
-              "FAILED",
-              "SETTLEMENT_UNCONFIRMED",
-              "REFUNDED"
-            ],
-            "description": "Stage status",
-            "example": "DEPOSIT_CONFIRMED"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "Stage completion timestamp (ISO 8601)",
-            "example": "2024-11-22T12:00:45Z"
-          },
-          "amount": {
-            "type": "number",
-            "description": "Amount for this stage",
-            "example": 1000
-          },
-          "currency": {
-            "type": "string",
-            "description": "Currency for this stage",
-            "example": "KES"
-          },
-          "chain": {
-            "type": "string",
-            "description": "Chain for this stage",
-            "example": "LIGHTNING"
-          },
-          "token": {
-            "type": "string",
-            "description": "Token for this stage",
-            "example": "MSAT"
-          },
-          "payment_hash": {
-            "type": "string",
-            "description": "Payment hash",
-            "example": "a1b2c3d4e5f6..."
-          },
-          "amount_msat": {
-            "type": "number",
-            "description": "Amount in millisatoshis (Lightning)",
-            "example": 150000000
-          }
-        },
-        "required": [
-          "status"
-        ]
-      },
-      "TransactionStagesDto": {
-        "type": "object",
-        "properties": {
-          "deposit": {
-            "description": "Deposit stage status",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/StageStatusDto"
-              }
-            ]
-          },
-          "crypto_payment": {
-            "description": "Crypto payment stage status",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/StageStatusDto"
-              }
-            ]
-          },
-          "settlement": {
-            "description": "Settlement stage status",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/StageStatusDto"
-              }
-            ]
-          }
-        },
-        "required": [
-          "deposit",
-          "crypto_payment",
-          "settlement"
-        ]
-      },
-      "CryptoBridgeStatusResponseDto": {
-        "type": "object",
-        "properties": {
-          "kotani_reference_id": {
-            "type": "string",
-            "description": "Kotani reference ID",
-            "example": "KOTANI-REF-789"
-          },
-          "provider_reference_id": {
-            "type": "string",
-            "description": "Provider reference ID",
-            "example": "PROVIDER-TXN-20241122-001"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "DEPOSIT_INITIATED",
-              "DEPOSIT_CONFIRMED",
-              "PAYMENT_SENT",
-              "PAYMENT_CONFIRMED",
-              "SETTLING",
-              "COMPLETED",
-              "FAILED",
-              "SETTLEMENT_UNCONFIRMED",
-              "REFUNDED"
-            ],
-            "description": "Overall transaction status",
-            "example": "PAYMENT_SENT"
-          },
-          "transaction_type": {
-            "type": "string",
-            "enum": [
-              "cross_border",
-              "bridge",
-              "chain_settlement"
-            ],
-            "description": "Transaction type",
-            "example": "cross_border"
-          },
-          "chain": {
-            "type": "string",
-            "enum": [
-              "CELO",
-              "ETHEREUM",
-              "ARBITRUM",
-              "AVALANCHE",
-              "BINANCE",
-              "POLYGON",
-              "OPTIMISM",
-              "FUSE",
-              "TRON",
-              "PROVENANCE",
-              "SOLANA",
-              "HEDERA",
-              "STELLAR",
-              "BASE",
-              "LISK",
-              "VICTION",
-              "SCROLL",
-              "LIGHTNING",
-              "CARDANO"
-            ],
-            "description": "Chain being used",
-            "example": "LIGHTNING"
-          },
-          "token": {
-            "type": "string",
-            "enum": [
-              "CUSD",
-              "USDC",
-              "USDT",
-              "BUSD",
-              "HASH",
-              "HBAR",
-              "USDGLO",
-              "CKES",
-              "CGHS",
-              "MSAT",
-              "ADA"
-            ],
-            "description": "Token being used",
-            "example": "MSAT"
-          },
-          "stages": {
-            "description": "Detailed status of each transaction stage",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TransactionStagesDto"
-              }
-            ]
-          },
-          "metadata": {
-            "description": "Transaction metadata",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TransactionMetadataDto"
-              }
-            ]
-          },
-          "refund_config": {
-            "description": "Refund configuration. Present when status is FAILED or PAYMENT_SENT. Orange pays this invoice/address to return crypto to Kotani. If bolt11 is expired, call POST /:id/refund-config to regenerate.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RefundConfigDto"
-              }
-            ]
-          },
-          "collection_instructions": {
-            "description": "Where the sender should pay to complete fiat collection. Present when source.payment_method is BANK_TRANSFER. Contains Kotani bank account details + the unique reference the sender must quote as the payment narrative.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CollectionInstructionsDto"
-              }
-            ]
-          }
-        },
-        "required": [
-          "kotani_reference_id",
-          "provider_reference_id",
-          "status",
-          "transaction_type",
-          "chain",
-          "token",
-          "stages"
-        ]
-      },
-      "WebhookCryptoPaymentDto": {
-        "type": "object",
-        "properties": {
-          "chain": {
-            "type": "string",
-            "enum": [
-              "CELO",
-              "ETHEREUM",
-              "ARBITRUM",
-              "AVALANCHE",
-              "BINANCE",
-              "POLYGON",
-              "OPTIMISM",
-              "FUSE",
-              "TRON",
-              "PROVENANCE",
-              "SOLANA",
-              "HEDERA",
-              "STELLAR",
-              "BASE",
-              "LISK",
-              "VICTION",
-              "SCROLL",
-              "LIGHTNING",
-              "CARDANO"
-            ],
-            "description": "Chain used",
-            "example": "LIGHTNING"
-          },
-          "token": {
-            "type": "string",
-            "enum": [
-              "CUSD",
-              "USDC",
-              "USDT",
-              "BUSD",
-              "HASH",
-              "HBAR",
-              "USDGLO",
-              "CKES",
-              "CGHS",
-              "MSAT",
-              "ADA"
-            ],
-            "description": "Token used",
-            "example": "MSAT"
-          },
-          "payment_hash": {
-            "type": "string",
-            "description": "Payment hash",
-            "example": "a1b2c3d4e5f6..."
-          },
-          "received_at": {
-            "type": "string",
-            "description": "When crypto was received (ISO 8601)",
-            "example": "2024-11-22T12:01:30Z"
-          },
-          "amount_msat": {
-            "type": "number",
-            "description": "Amount in millisatoshis (Lightning)",
-            "example": 150000000
-          },
-          "crypto_amount": {
-            "type": "number",
-            "description": "Crypto amount (non-Lightning)",
-            "example": 150.5
-          }
-        },
-        "required": [
-          "chain",
-          "token",
-          "payment_hash",
-          "received_at"
-        ]
-      },
-      "WebhookSettlementDetailsDto": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "number",
-            "description": "Settlement amount",
-            "example": 150
-          },
-          "currency": {
-            "type": "string",
-            "description": "Settlement currency",
-            "example": "ZAR"
-          },
-          "recipient_phone": {
-            "type": "string",
-            "description": "Recipient phone number",
-            "example": "+27821234567"
-          },
-          "payment_method": {
-            "type": "string",
-            "enum": [
-              "MOBILE_MONEY",
-              "BANK_TRANSFER"
-            ],
-            "description": "Payment method used",
-            "example": "MOBILE_MONEY"
-          },
-          "provider": {
-            "type": "string",
-            "description": "Mobile money provider",
-            "example": "VODACOM"
-          },
-          "bank_name": {
-            "type": "string",
-            "description": "Bank name",
-            "example": "ABSA Bank"
-          },
-          "transaction_id": {
-            "type": "string",
-            "description": "Settlement transaction ID from provider",
-            "example": "ZA-TXN-789456"
-          },
-          "settled_at": {
-            "type": "string",
-            "description": "When settlement completed (ISO 8601)",
-            "example": "2024-11-22T12:05:00Z"
-          }
-        },
-        "required": [
-          "amount",
-          "currency",
-          "recipient_phone",
-          "payment_method",
-          "transaction_id",
-          "settled_at"
-        ]
-      },
-      "WebhookFailureDetailsDto": {
-        "type": "object",
-        "properties": {
-          "failure_stage": {
-            "type": "string",
-            "enum": [
-              "DEPOSIT_COLLECTION",
-              "CRYPTO_PAYMENT",
-              "SETTLEMENT"
-            ],
-            "description": "Stage where failure occurred",
-            "example": "SETTLEMENT"
-          },
-          "failure_reason": {
-            "type": "string",
-            "description": "Failure reason code",
-            "example": "RECIPIENT_ACCOUNT_INVALID"
-          },
-          "failure_message": {
-            "type": "string",
-            "description": "Human-readable failure message",
-            "example": "Mobile number not registered with provider"
-          },
-          "failed_at": {
-            "type": "string",
-            "description": "When failure occurred (ISO 8601)",
-            "example": "2024-11-22T12:04:00Z"
-          }
-        },
-        "required": [
-          "failure_stage",
-          "failure_reason",
-          "failure_message",
-          "failed_at"
-        ]
-      },
-      "WebhookRefundDetailsDto": {
-        "type": "object",
-        "properties": {
-          "refund_method_used": {
-            "type": "string",
-            "enum": [
-              "CRYPTO_INVOICE",
-              "CRYPTO_ADDRESS"
-            ],
-            "description": "Refund method used",
-            "example": "CRYPTO_INVOICE"
-          },
-          "chain": {
-            "type": "string",
-            "enum": [
-              "CELO",
-              "ETHEREUM",
-              "ARBITRUM",
-              "AVALANCHE",
-              "BINANCE",
-              "POLYGON",
-              "OPTIMISM",
-              "FUSE",
-              "TRON",
-              "PROVENANCE",
-              "SOLANA",
-              "HEDERA",
-              "STELLAR",
-              "BASE",
-              "LISK",
-              "VICTION",
-              "SCROLL",
-              "LIGHTNING",
-              "CARDANO"
-            ],
-            "description": "Chain used for refund",
-            "example": "LIGHTNING"
-          },
-          "token": {
-            "type": "string",
-            "enum": [
-              "CUSD",
-              "USDC",
-              "USDT",
-              "BUSD",
-              "HASH",
-              "HBAR",
-              "USDGLO",
-              "CKES",
-              "CGHS",
-              "MSAT",
-              "ADA"
-            ],
-            "description": "Token used for refund",
-            "example": "MSAT"
-          },
-          "refund_invoice": {
-            "type": "string",
-            "description": "Refund invoice (if using invoice method)",
-            "example": "lnbc1500n1p0refund..."
-          },
-          "refund_payment_hash": {
-            "type": "string",
-            "description": "Refund payment hash",
-            "example": "refund123..."
-          },
-          "refund_amount_msat": {
-            "type": "number",
-            "description": "Refund amount in millisatoshis (Lightning)",
-            "example": 150000000
-          },
-          "refund_crypto_amount": {
-            "type": "number",
-            "description": "Refund crypto amount (non-Lightning)",
-            "example": 150.5
-          },
-          "refund_initiated_at": {
-            "type": "string",
-            "description": "When refund was initiated (ISO 8601)",
-            "example": "2024-11-22T12:04:05Z"
-          },
-          "refund_status": {
-            "type": "string",
-            "description": "Current refund status",
-            "example": "PENDING"
-          }
-        },
-        "required": [
-          "refund_method_used",
-          "chain",
-          "token",
-          "refund_initiated_at",
-          "refund_status"
-        ]
-      },
-      "ProviderSettlementWebhookDto": {
-        "type": "object",
-        "properties": {
-          "webhook_type": {
-            "type": "string",
-            "description": "Webhook type identifier",
-            "example": "SETTLEMENT_STATUS_UPDATE"
-          },
-          "provider_reference_id": {
-            "type": "string",
-            "description": "Provider reference ID",
-            "example": "PROVIDER-TXN-20241122-001"
-          },
-          "kotani_reference_id": {
-            "type": "string",
-            "description": "Kotani reference ID",
-            "example": "KOTANI-REF-789"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "DEPOSIT_INITIATED",
-              "DEPOSIT_CONFIRMED",
-              "PAYMENT_SENT",
-              "PAYMENT_CONFIRMED",
-              "SETTLING",
-              "COMPLETED",
-              "FAILED",
-              "SETTLEMENT_UNCONFIRMED",
-              "REFUNDED"
-            ],
-            "description": "Updated settlement status",
-            "example": "COMPLETED"
-          },
-          "timestamp": {
-            "type": "string",
-            "description": "Webhook timestamp (ISO 8601)",
-            "example": "2024-11-22T12:05:00Z"
-          },
-          "crypto_payment": {
-            "description": "Crypto payment details",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/WebhookCryptoPaymentDto"
-              }
-            ]
-          },
-          "settlement_details": {
-            "description": "Settlement details (if successful)",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/WebhookSettlementDetailsDto"
-              }
-            ]
-          },
-          "failure_details": {
-            "description": "Failure details (if failed)",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/WebhookFailureDetailsDto"
-              }
-            ]
-          },
-          "refund_details": {
-            "description": "Refund details (if failed and refund initiated)",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/WebhookRefundDetailsDto"
-              }
-            ]
-          },
-          "metadata": {
-            "description": "Transaction metadata",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/TransactionMetadataDto"
-              }
-            ]
-          }
-        },
-        "required": [
-          "webhook_type",
-          "provider_reference_id",
-          "kotani_reference_id",
-          "status",
-          "timestamp",
-          "crypto_payment"
         ]
       },
       "WithdrawResponseDto": {
@@ -11766,144 +9977,6 @@
           "amount",
           "walletId",
           "paybillDetails"
-        ]
-      },
-      "BANK": {
-        "type": "string",
-        "enum": [
-          "ABSA",
-          "Access",
-          "Afribank",
-          "AfricanBank",
-          "Bidvest",
-          "BNY",
-          "Capitec",
-          "DiscoveryBank",
-          "Firstrand",
-          "FNB",
-          "Grindrod",
-          "HSBC",
-          "Imperial",
-          "Investec",
-          "Merchantile",
-          "Nedbank",
-          "OldMutualMoney",
-          "Sasfin",
-          "Standard",
-          "Tyme",
-          "Ubank",
-          "windhoek",
-          "KCB",
-          "Equity Bank",
-          "Co-operative Bank",
-          "ABSA Kenya",
-          "NCBA Bank",
-          "Stanbic Bank Kenya",
-          "Standard Chartered Kenya",
-          "Diamond Trust Bank",
-          "Family Bank",
-          "Sidian Bank",
-          "Barclays Bank Kenya",
-          "Prime Bank",
-          "Gulf African Bank",
-          "Ecobank Kenya",
-          "Choice Bank",
-          "Citibank Kenya",
-          "I&M Bank",
-          "Bank of Africa Kenya",
-          "Middle East Bank Kenya",
-          "Consolidated Bank",
-          "Victoria Commercial Bank",
-          "Guardian Bank",
-          "Habib Bank",
-          "UBA Kenya",
-          "Kingdom Bank"
-        ],
-        "description": "Bank name"
-      },
-      "WithdrawBankDto": {
-        "type": "object",
-        "properties": {
-          "account_bank": {
-            "description": "Bank name",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BANK"
-              }
-            ]
-          },
-          "account_name": {
-            "type": "string",
-            "description": "Account holder name"
-          },
-          "account_number": {
-            "type": "string",
-            "description": "Bank account number"
-          },
-          "branch_code": {
-            "type": "string",
-            "description": "Bank branch code (required for some Kenyan banks)",
-            "example": "001"
-          },
-          "swift_code": {
-            "type": "string",
-            "description": "SWIFT/BIC code (for international transfers)",
-            "example": "KCBLKENX"
-          },
-          "phone_number": {
-            "type": "string",
-            "description": "Phone number for SMS notification",
-            "example": "+254712345678"
-          }
-        },
-        "required": [
-          "account_bank",
-          "account_name",
-          "account_number"
-        ]
-      },
-      "CreateBankWithdrawDto": {
-        "type": "object",
-        "properties": {
-          "customer_key": {
-            "type": "string",
-            "example": "customer-key-123",
-            "description": "Customer key"
-          },
-          "amount": {
-            "type": "number",
-            "description": "amount to withdraw",
-            "example": 10
-          },
-          "walletId": {
-            "type": "string",
-            "description": "wallet id",
-            "example": "5f9b2c7b9c9d6b0017b4e6b1"
-          },
-          "callbackUrl": {
-            "type": "string",
-            "description": "callback url",
-            "example": "https://example.com"
-          },
-          "referenceId": {
-            "type": "string",
-            "description": "reference id",
-            "example": "5f9b2c7b9c9d6b0017b4e6b1"
-          },
-          "currency": {
-            "type": "string",
-            "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
-            "example": "USD"
-          },
-          "bankDetails": {
-            "$ref": "#/components/schemas/WithdrawBankDto"
-          }
-        },
-        "required": [
-          "customer_key",
-          "amount",
-          "walletId",
-          "bankDetails"
         ]
       },
       "WithdrawStatus": {
@@ -12496,6 +10569,91 @@
           "serviceType",
           "countries",
           "totalCountries"
+        ]
+      },
+      "BeneficiaryDetailsDto": {
+        "type": "object",
+        "properties": {
+          "beneficiaryType": {
+            "type": "string",
+            "enum": [
+              "bank",
+              "crypto"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "walletAddress": {
+            "type": "string"
+          },
+          "chain": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string",
+            "description": "Token/asset symbol (e.g. USDT, USDC)"
+          },
+          "network": {
+            "type": "string",
+            "description": "Network sub-type (legacy)"
+          },
+          "bankName": {
+            "type": "string"
+          },
+          "bankCode": {
+            "type": "string"
+          },
+          "accountNumber": {
+            "type": "string"
+          },
+          "accountName": {
+            "type": "string"
+          },
+          "accountType": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateSettlementRequestDto": {
+        "type": "object",
+        "properties": {
+          "walletId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "balanceSource": {
+            "type": "string",
+            "enum": [
+              "PAYOUT",
+              "DEPOSIT",
+              "ADMIN_SELECT"
+            ]
+          },
+          "integratorNote": {
+            "type": "string"
+          },
+          "callbackUrl": {
+            "type": "string"
+          },
+          "beneficiaryDetails": {
+            "$ref": "#/components/schemas/BeneficiaryDetailsDto"
+          },
+          "savedBeneficiaryId": {
+            "type": "string",
+            "description": "ID of a saved beneficiary on the integrator config — used when beneficiaryDetails is not explicitly provided"
+          },
+          "overrideUsdRate": {
+            "type": "number",
+            "description": "Admin-supplied exchange rate as \"1 USD = X local currency\". Overrides the auto-fetched rate for USD snapshot computation. Only meaningful for non-USD wallets.",
+            "example": 129.5
+          }
+        },
+        "required": [
+          "walletId",
+          "amount"
         ]
       },
       "OfframpResponseDto": {

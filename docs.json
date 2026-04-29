@@ -35,7 +35,9 @@
             "groups": [
               {
                 "group": "Testing",
-                "pages": ["v3/run-in-postman"]
+                "pages": [
+                  "v3/run-in-postman"
+                ]
               },
               {
                 "group": "Getting Started",
@@ -76,7 +78,9 @@
             "groups": [
               {
                 "group": "Getting Started",
-                "pages": ["v3/api-reference/introduction"]
+                "pages": [
+                  "v3/api-reference/introduction"
+                ]
               },
               {
                 "group": "Health & System",
@@ -227,6 +231,19 @@
                   "v3/api-reference/offramp/list-transactions",
                   "v3/api-reference/offramp/refund-status",
                   "v3/api-reference/offramp/retry-refund"
+                ]
+              },
+              {
+                "group": "Settlement Requests",
+                "pages": [
+                  "v3/api-reference/settlements/settlement-config",
+                  "v3/api-reference/settlements/request-settlement",
+                  "v3/api-reference/settlements/list-settlements",
+                  "v3/api-reference/settlements/fee-preview",
+                  "v3/api-reference/settlements/schedule",
+                  "v3/api-reference/settlements/get-settlement",
+                  "v3/api-reference/settlements/settlement-config/beneficiaries",
+                  "v3/api-reference/settlements/settlement-config/get-beneficiary"
                 ]
               },
               {
