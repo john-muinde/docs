@@ -1,0 +1,6 @@
+---
+title: "Create Batch Settlement"
+openapi: "POST /api/v3/integrator/settlements/batch"
+---
+
+Submit multiple settlement requests as a single batch. Each item in `requests[]` follows the same shape as a single settlement request. All children share one admin approval step.

@@ -1,0 +1,6 @@
+---
+title: "Merge Settlements into Batch"
+openapi: "POST /api/v3/integrator/settlements/merge"
+---
+
+Group two or more existing `PENDING` or `UNDER_REVIEW` settlements into a single batch. The source settlements become children of the new batch and continue through their individual lifecycles under one approval.

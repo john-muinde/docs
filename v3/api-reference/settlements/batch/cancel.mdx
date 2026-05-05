@@ -1,0 +1,6 @@
+---
+title: "Cancel Settlement Batch"
+openapi: "DELETE /api/v3/integrator/settlements/batch/{batchId}"
+---
+
+Cancel an entire settlement batch. All child settlements in `PENDING` status are cancelled. Children already in `UNDER_REVIEW` or later are not affected.

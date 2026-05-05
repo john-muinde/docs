@@ -68,7 +68,8 @@
                   "v3/flows/onramp-flow",
                   "v3/flows/offramp-flow",
                   "v3/flows/payment-links-flow",
-                  "v3/flows/bulk-payments-flow"
+                  "v3/flows/bulk-payments-flow",
+                  "v3/flows/settlement-flow"
                 ]
               }
             ]
@@ -236,15 +237,34 @@
               {
                 "group": "Settlement Requests",
                 "pages": [
+                  "v3/api-reference/settlements/dashboard-settlements",
                   "v3/api-reference/settlements/request-settlement",
-                  "v3/api-reference/settlements/settlement-config",
                   "v3/api-reference/settlements/list-settlements",
+                  "v3/api-reference/settlements/get-settlement",
+                  "v3/api-reference/settlements/cancel",
                   "v3/api-reference/settlements/fee-preview",
                   "v3/api-reference/settlements/schedule",
-                  "v3/api-reference/settlements/get-settlement",
+                  "v3/api-reference/settlements/notification-preferences",
+                  "v3/api-reference/settlements/merge"
+                ]
+              },
+              {
+                "group": "Settlement Batches",
+                "pages": [
+                  "v3/api-reference/settlements/batch/create",
+                  "v3/api-reference/settlements/batch/list",
+                  "v3/api-reference/settlements/batch/get",
+                  "v3/api-reference/settlements/batch/cancel"
+                ]
+              },
+              {
+                "group": "Saved Beneficiaries",
+                "pages": [
+                  "v3/api-reference/settlements/settlement-config",
                   "v3/api-reference/settlements/settlement-config/beneficiaries",
                   "v3/api-reference/settlements/settlement-config/create-beneficiary",
-                  "v3/api-reference/settlements/settlement-config/get-beneficiary"
+                  "v3/api-reference/settlements/settlement-config/get-beneficiary",
+                  "v3/api-reference/settlements/settlement-config/delete-beneficiary"
                 ]
               },
               {

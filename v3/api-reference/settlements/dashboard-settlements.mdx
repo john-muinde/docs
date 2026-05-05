@@ -1,0 +1,180 @@
+---
+title: "Dashboard Settlements"
+description: "API reference for settlement requests, batch settlements, merging, beneficiaries, and notification preferences"
+---
+
+The settlements API lets you request, track, and manage the movement of your Kotani Pay balance to an external account. You can submit individual requests, group them into batches, merge existing requests, and configure saved beneficiaries for faster reuse.
+
+All endpoints require a valid API key — see [API Keys](/v3/getting-started/api-keys).
+
+---
+
+## Schedule & Limits
+
+Before submitting a settlement, check the active schedule to understand allowed days, cutoff times, and amount limits.
+
+### GET /api/v3/integrator/settlements/schedule
+
+See [Settlement Schedule](/v3/api-reference/settlements/schedule).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `enabled` | boolean | Whether settlements are currently open for requests |
+| `allowedDays` | number[] | Days of the week accepted (0 = Sunday … 6 = Saturday) |
+| `cutoffEnabled` | boolean | Whether a daily cutoff time is enforced |
+| `cutoffTime` | string | Cutoff in `HH:MM` format — requests after this are queued to the next allowed day |
+| `timezone` | string | IANA timezone for cutoff evaluation (e.g. `"Africa/Nairobi"`) |
+| `minAmount` | number | Minimum settlement amount in USD |
+| `maxAmount` | number | Maximum settlement amount in USD |
+
+---
+
+## Fee Preview
+
+Preview the fee before submitting.
+
+### GET /api/v3/integrator/settlements/fee-preview
+
+See [Settlement Fee Preview](/v3/api-reference/settlements/fee-preview).
+
+Query parameters: `amount` (required), `walletId` (required).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | number | The queried amount in local currency |
+| `fee` | number | Fee amount in local currency |
+| `feePercentage` | number | Fee as a percentage of `amount` |
+| `netAmount` | number | Amount received after fee (`amount - fee`) |
+| `currency` | string | Local currency code |
+| `usdRate` | number | Exchange rate used to convert to USD |
+| `usdAmount` | number | `amount` in USD |
+| `usdNetAmount` | number | `netAmount` in USD |
+
+---
+
+## Single Settlement Requests
+
+### POST /api/v3/integrator/settlements
+
+See [Request Settlement](/v3/api-reference/settlements/request-settlement).
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `walletId` | string | Yes | Fiat wallet to settle from |
+| `amount` | number | Yes | Amount in the wallet's local currency |
+| `balanceSource` | string | Yes | `PAYOUT` or `DEPOSIT` |
+| `beneficiaryDetails` | object | Conditional | Inline beneficiary — required if `savedBeneficiaryId` is omitted |
+| `savedBeneficiaryId` | string | Conditional | Saved beneficiary ID — required if `beneficiaryDetails` is omitted |
+| `integratorNote` | string | No | Internal memo |
+| `callbackUrl` | string | No | URL to receive webhook on status change |
+
+### GET /api/v3/integrator/settlements
+
+See [List Settlements](/v3/api-reference/settlements/list-settlements). Query: `limit`, `offset`, `status`, `from`, `to`.
+
+### GET /api/v3/integrator/settlements/:id
+
+See [Get Settlement](/v3/api-reference/settlements/get-settlement).
+
+### DELETE /api/v3/integrator/settlements/:id
+
+See [Cancel Settlement](/v3/api-reference/settlements/cancel). Only `PENDING` settlements can be cancelled.
+
+---
+
+## Batch Settlements
+
+Group multiple wallet settlements into one operation under a single admin approval.
+
+### POST /api/v3/integrator/settlements/batch
+
+See [Create Batch Settlement](/v3/api-reference/settlements/batch/create).
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `requests` | object[] | Yes | Array of settlement sub-requests. Each accepts `walletId`, `amount`, `balanceSource`, and optionally `beneficiaryDetails` or `savedBeneficiaryId` |
+| `batchReference` | string | No | Your own idempotency reference for the batch |
+| `integratorNote` | string | No | Internal memo for the batch |
+
+### GET /api/v3/integrator/settlements/batch
+
+See [List Settlement Batches](/v3/api-reference/settlements/batch/list).
+
+### GET /api/v3/integrator/settlements/batch/:batchId
+
+See [Get Settlement Batch](/v3/api-reference/settlements/batch/get).
+
+### DELETE /api/v3/integrator/settlements/batch/:batchId
+
+See [Cancel Settlement Batch](/v3/api-reference/settlements/batch/cancel). Cancels all children still in `PENDING`.
+
+---
+
+## Merge Into Batch
+
+Convert two or more existing settlements into a batch after the fact.
+
+### POST /api/v3/integrator/settlements/merge
+
+See [Merge Settlements into Batch](/v3/api-reference/settlements/merge).
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `settlementIds` | string[] | Yes | IDs to merge. Minimum 2. All must be `PENDING` or `UNDER_REVIEW` and not already in a batch |
+| `integratorNote` | string | No | Internal memo for the resulting batch |
+
+---
+
+## Notification Preferences
+
+### PATCH /api/v3/integrator/settlements/notification-preferences
+
+See [Update Notification Preferences](/v3/api-reference/settlements/notification-preferences).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `settlementNotificationEmail` | string | Email address for settlement notifications |
+| `settlementNotificationsEnabled` | boolean | Toggle email notifications |
+| `settlementSlackWebhookUrl` | string | Slack incoming webhook URL |
+| `settlementSlackEnabled` | boolean | Toggle Slack notifications |
+
+---
+
+## Saved Beneficiaries
+
+Store destination account details once and reuse with `savedBeneficiaryId`.
+
+### GET /api/v3/integrator/settlement-config/beneficiaries
+
+See [List Beneficiaries](/v3/api-reference/settlements/settlement-config/beneficiaries).
+
+### POST /api/v3/integrator/settlement-config/beneficiaries
+
+See [Create Beneficiary](/v3/api-reference/settlements/settlement-config/create-beneficiary).
+
+### PATCH /api/v3/integrator/settlement-config/beneficiaries/:id
+
+See [Update Beneficiary](/v3/api-reference/settlements/settlement-config/get-beneficiary).
+
+### DELETE /api/v3/integrator/settlement-config/beneficiaries/:id
+
+See [Delete Beneficiary](/v3/api-reference/settlements/settlement-config/delete-beneficiary).
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Settlement Flow" icon="arrow-right" href="/v3/flows/settlement-flow">
+    Lifecycle states, batch flow, webhooks, and schedule rules
+  </Card>
+  <Card title="Balances & Settlement" icon="wallet" href="/v3/essentials/balances-and-settlement">
+    How deposit and payout balances work
+  </Card>
+  <Card title="Webhook Notifications" icon="bell" href="/v3/essentials/webhooks">
+    How to verify and handle signed webhook events
+  </Card>
+  <Card title="Transaction Statuses" icon="circle-dot" href="/v3/essentials/transaction-statuses">
+    All status codes used across the API
+  </Card>
+</CardGroup>

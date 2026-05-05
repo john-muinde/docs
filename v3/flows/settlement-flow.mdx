@@ -1,0 +1,221 @@
+---
+title: "Settlement Flow"
+description: "Settlement lifecycle, batch and merge flows, webhook events, and schedule rules"
+---
+
+A settlement moves your Kotani Pay balance to an external account — a bank account, mobile money wallet, or crypto address. This guide covers the full lifecycle from submission to completion, including batch and merge patterns, the PAUSED state, and the webhook events fired at each transition.
+
+---
+
+## Before You Start
+
+- An API key — see [API Keys](/v3/getting-started/api-keys)
+- A fiat wallet with a deposit or payout balance to settle from
+- A beneficiary destination — either inline `beneficiaryDetails` or a [saved beneficiary](/v3/api-reference/settlements/settlement-config/beneficiaries)
+- A `callbackUrl` on your server if you want programmatic status notifications
+
+---
+
+## Settlement Lifecycle
+
+```
+PENDING → UNDER_REVIEW → APPROVED → PROCESSED
+```
+
+### Active States
+
+| State | Description |
+|-------|-------------|
+| `PENDING` | Request submitted and awaiting review. The only state in which you can cancel. |
+| `UNDER_REVIEW` | A Kotani Pay agent has picked up the request for manual review. |
+| `APPROVED` | Review passed. Funds are being disbursed to the destination account. |
+| `PAUSED` | An admin has paused the settlement pending additional information or due to a compliance hold — see [PAUSED State](#paused-state). |
+
+### Terminal States
+
+| State | Description |
+|-------|-------------|
+| `PROCESSED` | Funds have been delivered. The settlement is complete. |
+| `REJECTED` | Review failed. Not approved. The reason is recorded on the settlement record. |
+| `CANCELLED` | Cancelled by the integrator before review began. Only possible from `PENDING`. |
+| `FAILED` | An error occurred during disbursement after approval. Contact support with the settlement ID. |
+| `REVERSED` | Disbursement was sent but subsequently reversed. Contact support to confirm balance treatment. |
+
+<Note>
+Stop polling once a settlement reaches a terminal state. Use the `callbackUrl` or configure [notification preferences](/v3/api-reference/settlements/notification-preferences) to receive status-change events instead.
+</Note>
+
+---
+
+## PAUSED State
+
+An admin can pause a settlement at any point before `PROCESSED`. When paused:
+
+- `pauseReason` on the settlement record explains why it was paused
+- `pausedUntil` indicates when the system will automatically resume the settlement (if set)
+- A `settlement.paused` webhook fires immediately — see [Webhook Events](#webhook-events)
+
+The settlement resumes automatically on `pausedUntil` if set. Otherwise it resumes when the admin lifts the hold. Check your registered notification email or Slack channel for context from the Kotani Pay team.
+
+---
+
+## Checking the Schedule
+
+Call [GET /api/v3/integrator/settlements/schedule](/v3/api-reference/settlements/schedule) before submitting to confirm settlements are open and your amount is within limits.
+
+Key fields:
+
+- `enabled` — if `false`, requests will be rejected
+- `allowedDays` — requests on unlisted days are queued to the next allowed day
+- `cutoffEnabled` / `cutoffTime` / `timezone` — requests after the cutoff are queued to the next allowed day
+- `minAmount` / `maxAmount` — both in USD; your local-currency amount is converted before this check
+
+---
+
+## Previewing Fees
+
+Call [GET /api/v3/integrator/settlements/fee-preview](/v3/api-reference/settlements/fee-preview) with `?amount=&walletId=` before submitting. The response shows the fee, net amount, and USD-equivalent values used for limit checking.
+
+---
+
+## Single Settlement Flow
+
+**1. Check the schedule** — confirm settlements are enabled and your amount is within `minAmount`/`maxAmount`.
+
+**2. Preview the fee** — confirm the net amount is acceptable.
+
+**3. Submit** — call [POST /api/v3/integrator/settlements](/v3/api-reference/settlements/request-settlement). The response includes the settlement ID and initial status `PENDING`.
+
+**4. Wait for review** — status moves to `UNDER_REVIEW` then `APPROVED`.
+
+**5. Funds disbursed** — status moves to `PROCESSED` once funds reach your destination.
+
+**6. You are notified** — via `callbackUrl` or [notification preferences](/v3/api-reference/settlements/notification-preferences) at each status transition.
+
+---
+
+## Batch Settlement Flow
+
+Batch settlements submit multiple wallet requests in one call. Each child settlement is processed independently. The batch status reflects the aggregate of its children.
+
+**1. Prepare your requests array** — each item follows the same schema as a single settlement request: `walletId`, `amount`, `balanceSource`, plus `beneficiaryDetails` or `savedBeneficiaryId`.
+
+**2. Submit the batch** — call [POST /api/v3/integrator/settlements/batch](/v3/api-reference/settlements/batch/create) with an optional `batchReference` for your own tracking.
+
+**3. Track the batch** — call [GET /api/v3/integrator/settlements/batch/:batchId](/v3/api-reference/settlements/batch/get) for the overall status. Each child can also be fetched individually via [GET /api/v3/integrator/settlements/:id](/v3/api-reference/settlements/get-settlement).
+
+**4. Cancelling** — call [DELETE /api/v3/integrator/settlements/batch/:batchId](/v3/api-reference/settlements/batch/cancel). Children still in `PENDING` are cancelled; children in `UNDER_REVIEW` or later are not affected.
+
+### Batch Status at Completion
+
+| Condition | Webhook fired |
+|-----------|---------------|
+| All children `PROCESSED` | `settlement.batch.processed` |
+| All children `REJECTED` | `settlement.batch.rejected` |
+| Mix of `PROCESSED` and `REJECTED`/`FAILED` | `settlement.batch.partial` |
+| Batch cancelled | `settlement.batch.cancelled` |
+| Batch approved by admin | `settlement.batch.approved` |
+
+---
+
+## Merge Flow
+
+The merge endpoint converts two or more existing individual settlements into a batch after the fact.
+
+**1. Identify settlements to merge** — all must be `PENDING` or `UNDER_REVIEW` and not already in a batch.
+
+**2. Submit the merge** — call [POST /api/v3/integrator/settlements/merge](/v3/api-reference/settlements/merge) with the `settlementIds` array (minimum 2).
+
+**3. A new batch is created** — the response contains the new batch ID. The source settlements become children of that batch.
+
+<Warning>
+You cannot un-merge settlements once grouped into a batch. To cancel, use [DELETE /api/v3/integrator/settlements/batch/:batchId](/v3/api-reference/settlements/batch/cancel).
+</Warning>
+
+---
+
+## Webhook Events
+
+Settlement events are delivered via the signed webhook system — see [Webhook Notifications](/v3/essentials/webhooks) for verification and retry details.
+
+| Event | When it fires |
+|-------|---------------|
+| `settlement.approved` | Settlement moves to `APPROVED` |
+| `settlement.rejected` | Settlement is `REJECTED` after review |
+| `settlement.processed` | Settlement reaches `PROCESSED` — funds delivered |
+| `settlement.cancelled` | Settlement cancelled by integrator |
+| `settlement.paused` | Admin pauses the settlement |
+| `settlement.batch.approved` | Batch approved by admin |
+| `settlement.batch.rejected` | All children in a batch are `REJECTED` |
+| `settlement.batch.processed` | All children in a batch reach `PROCESSED` |
+| `settlement.batch.partial` | Some children `PROCESSED`, others `REJECTED` or `FAILED` |
+| `settlement.batch.cancelled` | Batch cancelled by integrator |
+
+### Example: `settlement.paused`
+
+```json
+{
+  "event": "settlement.paused",
+  "data": {
+    "settlementId": "stl_abc123",
+    "status": "PAUSED",
+    "pauseReason": "Additional KYC documentation required for this destination",
+    "pausedUntil": "2025-05-10T00:00:00.000Z",
+    "currency": "KES",
+    "amount": 50000
+  },
+  "signature": "sha256=a1b2c3..."
+}
+```
+
+### Example: `settlement.batch.partial`
+
+```json
+{
+  "event": "settlement.batch.partial",
+  "data": {
+    "batchId": "bat_def789",
+    "processedCount": 3,
+    "rejectedCount": 1,
+    "failedCount": 0,
+    "totalCount": 4
+  },
+  "signature": "sha256=b2c3d4..."
+}
+```
+
+---
+
+## Saved Beneficiaries
+
+Store destination details once and reference by ID on any settlement or batch request.
+
+1. Create — [POST /api/v3/integrator/settlement-config/beneficiaries](/v3/api-reference/settlements/settlement-config/create-beneficiary)
+2. Use `savedBeneficiaryId` in your settlement or batch request
+3. Update — [PATCH /api/v3/integrator/settlement-config/beneficiaries/:id](/v3/api-reference/settlements/settlement-config/get-beneficiary)
+4. Delete — [DELETE /api/v3/integrator/settlement-config/beneficiaries/:id](/v3/api-reference/settlements/settlement-config/delete-beneficiary)
+
+---
+
+## Notification Preferences
+
+Configure email and Slack notifications via [PATCH /api/v3/integrator/settlements/notification-preferences](/v3/api-reference/settlements/notification-preferences). These supplement signed webhook delivery and are intended for human awareness rather than programmatic integration.
+
+---
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Dashboard Settlements API" icon="code" href="/v3/api-reference/settlements/dashboard-settlements">
+    Full parameter reference for all settlement endpoints
+  </Card>
+  <Card title="Webhook Notifications" icon="bell" href="/v3/essentials/webhooks">
+    Signed webhooks, verification, and retry behaviour
+  </Card>
+  <Card title="Balances & Settlement" icon="wallet" href="/v3/essentials/balances-and-settlement">
+    Deposit vs payout balances
+  </Card>
+  <Card title="Transaction Statuses" icon="circle-dot" href="/v3/essentials/transaction-statuses">
+    All status codes across the API
+  </Card>
+</CardGroup>
