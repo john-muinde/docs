@@ -5145,6 +5145,245 @@
         ]
       }
     },
+    "/api/v3/integrator/settlements/batch": {
+      "post": {
+        "operationId": "IntegratorSettlementsController_createBatch_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSettlementBatchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      },
+      "get": {
+        "operationId": "IntegratorSettlementsController_listBatches_api/v3",
+        "parameters": [
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
+    "/api/v3/integrator/settlements/merge": {
+      "post": {
+        "operationId": "IntegratorSettlementsController_mergeSettlements_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MergeSettlementsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
+    "/api/v3/integrator/settlements/batch/{batchId}/approve-merge": {
+      "patch": {
+        "operationId": "IntegratorSettlementsController_approveAdminMerge_api/v3",
+        "parameters": [
+          {
+            "name": "batchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
+    "/api/v3/integrator/settlements/batch/{batchId}/reject-merge": {
+      "patch": {
+        "operationId": "IntegratorSettlementsController_rejectAdminMerge_api/v3",
+        "parameters": [
+          {
+            "name": "batchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
+    "/api/v3/integrator/settlements/batch/{batchId}": {
+      "delete": {
+        "operationId": "IntegratorSettlementsController_cancelBatch_api/v3",
+        "parameters": [
+          {
+            "name": "batchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      },
+      "get": {
+        "operationId": "IntegratorSettlementsController_getBatch_api/v3",
+        "parameters": [
+          {
+            "name": "batchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
+    "/api/v3/integrator/settlements/notification-preferences": {
+      "patch": {
+        "operationId": "IntegratorSettlementsController_updateNotificationPrefs_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettlementNotificationPrefsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "tags": [
+          "INTEGRATOR"
+        ]
+      }
+    },
     "/api/v3/integrator/settlements/fee-preview": {
       "get": {
         "operationId": "IntegratorSettlementsController_feePreview_api/v3",
@@ -8538,6 +8777,12 @@
                 "settlement.rejected",
                 "settlement.processed",
                 "settlement.cancelled",
+                "settlement.paused",
+                "settlement.batch.approved",
+                "settlement.batch.rejected",
+                "settlement.batch.processed",
+                "settlement.batch.partial",
+                "settlement.batch.cancelled",
                 "system.event"
               ]
             }
@@ -8623,6 +8868,12 @@
                 "settlement.rejected",
                 "settlement.processed",
                 "settlement.cancelled",
+                "settlement.paused",
+                "settlement.batch.approved",
+                "settlement.batch.rejected",
+                "settlement.batch.processed",
+                "settlement.batch.partial",
+                "settlement.batch.cancelled",
                 "system.event"
               ]
             }
@@ -8674,6 +8925,12 @@
                 "settlement.rejected",
                 "settlement.processed",
                 "settlement.cancelled",
+                "settlement.paused",
+                "settlement.batch.approved",
+                "settlement.batch.rejected",
+                "settlement.batch.processed",
+                "settlement.batch.partial",
+                "settlement.batch.cancelled",
                 "system.event"
               ]
             }
@@ -9743,7 +10000,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-04-29T15:08:18.015Z"
+            "example": "2026-05-05T17:28:12.325Z"
           },
           "transactionCost": {
             "type": "number",
@@ -10644,12 +10901,121 @@
           "savedBeneficiaryId": {
             "type": "string",
             "description": "ID of a saved beneficiary on the integrator config — used when beneficiaryDetails is not explicitly provided"
+          },
+          "overrideUsdRate": {
+            "type": "number",
+            "description": "Admin-supplied exchange rate as \"1 USD = X local currency\". Overrides the auto-fetched rate for USD snapshot computation. Only meaningful for non-USD wallets.",
+            "example": 129.5
           }
         },
         "required": [
           "walletId",
           "amount"
         ]
+      },
+      "BatchSubRequestDto": {
+        "type": "object",
+        "properties": {
+          "walletId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "balanceSource": {
+            "type": "string",
+            "enum": [
+              "PAYOUT",
+              "DEPOSIT",
+              "ADMIN_SELECT"
+            ]
+          },
+          "savedBeneficiaryId": {
+            "type": "string"
+          },
+          "beneficiaryDetails": {
+            "$ref": "#/components/schemas/BeneficiaryDetailsDto"
+          },
+          "subReference": {
+            "type": "string"
+          },
+          "integratorNote": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "walletId",
+          "amount"
+        ]
+      },
+      "CreateSettlementBatchDto": {
+        "type": "object",
+        "properties": {
+          "batchReference": {
+            "type": "string",
+            "description": "Unique reference per batch — idempotency key on retry"
+          },
+          "callbackUrl": {
+            "type": "string",
+            "description": "Shared callback URL for all batch events"
+          },
+          "integratorNote": {
+            "type": "string"
+          },
+          "requests": {
+            "description": "One entry per wallet to settle",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BatchSubRequestDto"
+            }
+          }
+        },
+        "required": [
+          "requests"
+        ]
+      },
+      "MergeSettlementsDto": {
+        "type": "object",
+        "properties": {
+          "settlementIds": {
+            "description": "IDs of existing settlements to merge",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "batchReference": {
+            "type": "string"
+          },
+          "callbackUrl": {
+            "type": "string"
+          },
+          "integratorNote": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "settlementIds"
+        ]
+      },
+      "UpdateSettlementNotificationPrefsDto": {
+        "type": "object",
+        "properties": {
+          "settlementNotificationEmail": {
+            "type": "string",
+            "description": "Email to receive settlement updates (defaults to profile email)"
+          },
+          "settlementNotificationsEnabled": {
+            "type": "boolean"
+          },
+          "settlementSlackWebhookUrl": {
+            "type": "string",
+            "description": "Slack incoming webhook URL for settlement notifications"
+          },
+          "settlementSlackEnabled": {
+            "type": "boolean"
+          }
+        }
       },
       "OfframpResponseDto": {
         "type": "object",
