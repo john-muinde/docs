@@ -53,6 +53,61 @@ where `lastPathSegment` is the final segment of the request URL path. For exampl
 
 ---
 
+## Postman Pre-request Script
+
+Paste this into the **Pre-request Script** tab of your Postman collection or individual request. It reads your secret from a Postman environment variable and automatically injects the three signing headers before each request.
+
+```javascript
+// Kotani Pay — Request Signing Pre-request Script
+// Add KOTANI_PAY_SIGNATURE to your Postman environment before running.
+
+const secret = pm.environment.get("KOTANI_PAY_SIGNATURE");
+if (!secret) {
+  console.warn("[KotaniPay] KOTANI_PAY_SIGNATURE is not set in the active environment.");
+}
+
+const timestamp = Math.floor(Date.now() / 1000).toString();
+
+// UUID v4 — Postman sandbox does not expose a uuid library
+const nonce = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+  const r = (Math.random() * 16) | 0;
+  return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+});
+
+const method = pm.request.method;
+let payload;
+
+if (method === "GET") {
+  const parts = pm.request.url.getPath().split("/");
+  const lastSegment = parts[parts.length - 1] || "";
+  payload = `${timestamp}.${nonce}.${lastSegment}`;
+} else {
+  const body = pm.request.body?.raw || "{}";
+  payload = `${timestamp}.${nonce}.${body}`;
+}
+
+// CryptoJS is available globally in the Postman sandbox
+const signature = CryptoJS.HmacSHA256(payload, secret).toString();
+
+pm.request.headers.add({ key: "x-timestamp", value: timestamp });
+pm.request.headers.add({ key: "x-nonce",     value: nonce });
+pm.request.headers.add({ key: "x-signature", value: signature });
+
+console.log("[KotaniPay] Signed:", { timestamp, nonce, payload });
+```
+
+**Setup steps:**
+
+1. Open your collection → **Variables** tab (or **Environments**) and add `KOTANI_PAY_SIGNATURE` with your secret value.
+2. Paste the script into the collection's **Pre-request Script** tab so it runs for every request automatically.
+3. Set your request body as **raw → JSON**. The script reads `pm.request.body.raw` directly, so the body must already be the final JSON string before the script runs.
+
+<Note>
+  Postman uses **CryptoJS** (not Node's `crypto` module) — `CryptoJS` is available globally with no `require()` needed. Do not use `crypto.createHmac` here; it will throw a reference error.
+</Note>
+
+---
+
 ## Code Snippets
 
 ### Node.js
@@ -94,7 +149,7 @@ Usage:
 
 ```typescript
 const headers = signRequest({
-  secret: process.env.KOTANI_API_SECRET!,
+  secret: process.env.KOTANI_PAY_SIGNATURE!,
   body: { wallet_id: "64a1b2c3d4e5f6a7b8c9d0e2", amount: 1000 },
   method: "POST",
 });
