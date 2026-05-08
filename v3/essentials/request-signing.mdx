@@ -1,0 +1,151 @@
+---
+title: "Request Signing"
+description: "Protect outbound API requests with HMAC-SHA256 signatures when secure mode is enabled on your account."
+---
+
+When request signing (`isSecure` mode) is enabled on your integrator account, every request you send to the Kotani Pay API must include three additional headers carrying an HMAC-SHA256 signature. The server rejects any request that is missing these headers, uses a stale timestamp, or replays a nonce it has already seen.
+
+<Note>
+  Request signing governs requests **from your server to Kotani Pay**. It is separate from webhook signature verification, which covers the opposite direction — notifications Kotani Pay sends to your server. See [Webhook Notifications](/v3/essentials/webhooks) for that.
+</Note>
+
+---
+
+## Required Headers
+
+Include all three headers on every request.
+
+| Header | Description |
+|--------|-------------|
+| `x-timestamp` | Unix timestamp in seconds (e.g. `1715123456`). Must be within ±5 minutes of server time. |
+| `x-nonce` | UUID v4. Must be unique per request — each value is accepted exactly once. |
+| `x-signature` | HMAC-SHA256 of the signing payload using your API secret, hex-encoded. |
+
+---
+
+## Signing Payload
+
+Construct the payload string before computing the signature.
+
+**POST / PUT / PATCH**
+
+```
+${timestamp}.${nonce}.${JSON.stringify(requestBody)}
+```
+
+**GET**
+
+```
+${timestamp}.${nonce}.${lastPathSegment}
+```
+
+where `lastPathSegment` is the final segment of the request URL path. For example, a request to `/api/v3/wallets/fiat/64a1b2c3d4e5f6a7b8c9d0e2` uses `64a1b2c3d4e5f6a7b8c9d0e2`.
+
+<Warning>
+  Serialize the request body with **no extra spaces** — compact JSON only. Any whitespace difference between your serialisation and the server's will cause a signature mismatch and a `401 Unauthorized` response.
+</Warning>
+
+### Example signature value
+
+```
+8b5a21c2e33f3cf33a2e9c92d585cb5a1c304b6f63f91d2f6b0a428cbe9854d1
+```
+
+---
+
+## Code Snippets
+
+### Node.js
+
+```typescript
+import crypto from "crypto";
+import { v4 as uuidv4 } from "uuid";
+
+function signRequest({
+  secret,
+  body,
+  method,
+}: {
+  secret: string;
+  body: Record<string, unknown> | string;
+  method: string;
+}) {
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+  const nonce = uuidv4();
+  const payload =
+    method === "GET"
+      ? `${timestamp}.${nonce}.${body}` // body = last path segment for GETs
+      : `${timestamp}.${nonce}.${JSON.stringify(body)}`;
+
+  const signature = crypto
+    .createHmac("sha256", secret)
+    .update(payload, "utf8")
+    .digest("hex");
+
+  return {
+    "x-timestamp": timestamp,
+    "x-nonce": nonce,
+    "x-signature": signature,
+  };
+}
+```
+
+Usage:
+
+```typescript
+const headers = signRequest({
+  secret: process.env.KOTANI_API_SECRET!,
+  body: { wallet_id: "64a1b2c3d4e5f6a7b8c9d0e2", amount: 1000 },
+  method: "POST",
+});
+
+await fetch("https://api.kotanipay.com/api/v3/deposits/mobile-money", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${process.env.KOTANI_API_KEY}`,
+    "Content-Type": "application/json",
+    ...headers,
+  },
+  body: JSON.stringify({ wallet_id: "64a1b2c3d4e5f6a7b8c9d0e2", amount: 1000 }),
+});
+```
+
+### Python
+
+```python
+import hmac, hashlib, time, uuid, json
+
+def sign_request(secret: str, body: dict | str, method: str) -> dict:
+    timestamp = str(int(time.time()))
+    nonce = str(uuid.uuid4())
+    if method.upper() == "GET":
+        payload = f"{timestamp}.{nonce}.{body}"
+    else:
+        payload = f"{timestamp}.{nonce}.{json.dumps(body, separators=(',', ':'))}"
+    signature = hmac.new(
+        secret.encode(), payload.encode(), hashlib.sha256
+    ).hexdigest()
+    return {"x-timestamp": timestamp, "x-nonce": nonce, "x-signature": signature}
+```
+
+---
+
+## Security Notes
+
+- **The nonce is single-use.** Reusing a nonce that the server has already accepted returns `401 Unauthorized`. Generate a fresh UUID v4 for every request.
+- **The timestamp window is ±5 minutes.** A request whose `x-timestamp` falls outside that window returns `401 Unauthorized`. Ensure your server clock is NTP-synchronised.
+- **Compact JSON serialisation is required.** Use `JSON.stringify` without formatting options in Node.js, and `json.dumps(..., separators=(',', ':'))` in Python. Extra whitespace breaks the signature.
+- **Your API secret is shown once.** The secret is displayed at key generation time and cannot be retrieved afterwards. Store it in a secrets manager or environment variable — never in source code.
+- **Secure mode is permanent.** Once request signing is activated for your account it cannot be turned off. Test your signing implementation in the sandbox environment before going live.
+
+---
+
+## Getting Your API Secret
+
+Your API secret is generated alongside your API key in the dashboard.
+
+1. Log in → **Settings** → **API Keys**
+2. Click **Generate Key** and choose **Secure** mode
+3. Copy both the API key and the API secret immediately — the secret is shown only once
+
+If you have an existing API key without a secure secret, generate a new key with secure mode enabled. See [API Keys](/v3/getting-started/api-keys) for full key management instructions.

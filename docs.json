@@ -54,6 +54,7 @@
                 "pages": [
                   "v3/essentials/balances-and-settlement",
                   "v3/essentials/webhooks",
+                  "v3/essentials/request-signing",
                   "v3/essentials/offramp-refunds",
                   "v3/essentials/transaction-statuses",
                   "v3/essentials/error-handling",
