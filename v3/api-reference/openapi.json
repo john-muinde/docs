@@ -3188,6 +3188,113 @@
         ]
       }
     },
+    "/api/v3/deposit/mobile-money/transactions": {
+      "get": {
+        "description": "Returns a paginated list of the integrator's deposit transactions. Supports filtering by status, date range, telco ID, and currency.",
+        "operationId": "DepositMobileMoneyController_listDeposits_api/v3",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Transaction status (e.g. PENDING, SUCCESSFUL, FAILED)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start_date",
+            "required": false,
+            "in": "query",
+            "description": "ISO date string, e.g. 2024-01-01",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "required": false,
+            "in": "query",
+            "description": "ISO date string, e.g. 2024-12-31",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "telco_id",
+            "required": false,
+            "in": "query",
+            "description": "Filter by telco/MNO transaction ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "Filter by currency code, e.g. KES",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "1-based page index",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "per_page",
+            "required": false,
+            "in": "query",
+            "description": "Items per page (max 100)",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "List deposit transactions",
+        "tags": [
+          "MOBILE MONEY DEPOSIT"
+        ]
+      }
+    },
     "/api/v3/deposit/bank/checkout": {
       "post": {
         "description": "Customer Completed transaction using Checkout Url",
@@ -4007,6 +4114,113 @@
         ]
       }
     },
+    "/api/v3/withdraw/transactions": {
+      "get": {
+        "description": "Returns a paginated list of the integrator's withdrawal transactions. Supports filtering by status, date range, telco ID, and currency.",
+        "operationId": "WithdrawController_listWithdrawals_api/v3",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Transaction status (e.g. PENDING, SUCCESSFUL, FAILED)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "start_date",
+            "required": false,
+            "in": "query",
+            "description": "ISO date string, e.g. 2024-01-01",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "end_date",
+            "required": false,
+            "in": "query",
+            "description": "ISO date string, e.g. 2024-12-31",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "telco_id",
+            "required": false,
+            "in": "query",
+            "description": "Filter by telco/MNO transaction ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "currency",
+            "required": false,
+            "in": "query",
+            "description": "Filter by currency code, e.g. KES",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "1-based page index",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "per_page",
+            "required": false,
+            "in": "query",
+            "description": "Items per page (max 100)",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "List withdrawal transactions",
+        "tags": [
+          "WITHDRAW"
+        ]
+      }
+    },
     "/api/v3/providers": {
       "post": {
         "description": "This Api Handles fetching of payment providers",
@@ -4027,6 +4241,11 @@
             "description": ""
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Get Payment Providers",
         "tags": [
           "PAYMENT PROVIDERS"
@@ -8705,6 +8924,11 @@
             "type": "string",
             "description": "Fiat currency used for wallet balance conversion",
             "example": "USD"
+          },
+          "explorerUrl": {
+            "type": "string",
+            "description": "Block explorer URL for this wallet address",
+            "example": "https://etherscan.io/address/0xabc..."
           }
         },
         "required": [
@@ -9631,9 +9855,6 @@
           "integratorsAmount": {
             "type": "number"
           },
-          "wallet": {
-            "type": "object"
-          },
           "customer": {
             "type": "object"
           },
@@ -10000,7 +10221,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-05-05T17:28:12.325Z"
+            "example": "2026-05-22T10:10:48.333Z"
           },
           "transactionCost": {
             "type": "number",
@@ -10348,6 +10569,11 @@
           "telcoId": {
             "type": "string",
             "description": "Telco/MNO transaction ID from the mobile money provider"
+          },
+          "completed_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "When the transaction reached a terminal status"
           }
         },
         "required": [

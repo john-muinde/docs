@@ -159,7 +159,8 @@
                 "group": "Mobile Money Deposits",
                 "pages": [
                   "v3/api-reference/deposits/mobile-money",
-                  "v3/api-reference/deposits/mobile-money-status"
+                  "v3/api-reference/deposits/mobile-money-status",
+                  "v3/api-reference/deposits/list-transactions"
                 ]
               },
               {
@@ -187,7 +188,8 @@
                 "group": "Mobile Money Withdrawals",
                 "pages": [
                   "v3/api-reference/withdrawals/mobile-money",
-                  "v3/api-reference/withdrawals/mobile-money-status"
+                  "v3/api-reference/withdrawals/mobile-money-status",
+                  "v3/api-reference/withdrawals/list-transactions"
                 ]
               },
               {
