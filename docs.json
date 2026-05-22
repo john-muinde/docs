@@ -104,16 +104,6 @@
                 ]
               },
               {
-                "group": "Exchange Rates",
-                "pages": [
-                  "v3/api-reference/rates/get-all-rates",
-                  "v3/api-reference/rates/get-rate",
-                  "v3/api-reference/rates/onramp-rate",
-                  "v3/api-reference/rates/offramp-rate",
-                  "v3/api-reference/rates/fiat-to-fiat"
-                ]
-              },
-              {
                 "group": "Fiat Wallets",
                 "pages": [
                   "v3/api-reference/wallets/fiat/create",
@@ -145,43 +135,11 @@
                 ]
               },
               {
-                "group": "Country & Service Support",
-                "pages": [
-                  "v3/api-reference/country-support/countries",
-                  "v3/api-reference/country-support/country-details",
-                  "v3/api-reference/country-support/networks",
-                  "v3/api-reference/country-support/banks",
-                  "v3/api-reference/country-support/deposit-services",
-                  "v3/api-reference/country-support/withdraw-services"
-                ]
-              },
-              {
                 "group": "Mobile Money Deposits",
                 "pages": [
                   "v3/api-reference/deposits/mobile-money",
                   "v3/api-reference/deposits/mobile-money-status",
                   "v3/api-reference/deposits/list-transactions"
-                ]
-              },
-              {
-                "group": "Bank Deposits",
-                "pages": [
-                  "v3/api-reference/deposits/bank-checkout",
-                  "v3/api-reference/deposits/bank-checkout-status"
-                ]
-              },
-              {
-                "group": "Card Deposits",
-                "pages": [
-                  "v3/api-reference/deposits/card",
-                  "v3/api-reference/deposits/card-status"
-                ]
-              },
-              {
-                "group": "General Deposits",
-                "pages": [
-                  "v3/api-reference/deposits/initiate",
-                  "v3/api-reference/deposits/status"
                 ]
               },
               {
@@ -193,10 +151,17 @@
                 ]
               },
               {
-                "group": "Kenya Withdrawals",
+                "group": "Card Deposits",
                 "pages": [
-                  "v3/api-reference/withdrawals/lipa-na-mpesa",
-                  "v3/api-reference/withdrawals/paybill"
+                  "v3/api-reference/deposits/card",
+                  "v3/api-reference/deposits/card-status"
+                ]
+              },
+              {
+                "group": "Bank Deposits",
+                "pages": [
+                  "v3/api-reference/deposits/bank-checkout",
+                  "v3/api-reference/deposits/bank-checkout-status"
                 ]
               },
               {
@@ -208,10 +173,31 @@
                 ]
               },
               {
-                "group": "Payouts",
+                "group": "Kenya Withdrawals",
                 "pages": [
-                  "v3/api-reference/payouts/initiate",
-                  "v3/api-reference/payouts/status"
+                  "v3/api-reference/withdrawals/lipa-na-mpesa",
+                  "v3/api-reference/withdrawals/paybill"
+                ]
+              },
+              {
+                "group": "Country & Service Support",
+                "pages": [
+                  "v3/api-reference/country-support/countries",
+                  "v3/api-reference/country-support/country-details",
+                  "v3/api-reference/country-support/networks",
+                  "v3/api-reference/country-support/banks",
+                  "v3/api-reference/country-support/deposit-services",
+                  "v3/api-reference/country-support/withdraw-services"
+                ]
+              },
+              {
+                "group": "Exchange Rates",
+                "pages": [
+                  "v3/api-reference/rates/get-all-rates",
+                  "v3/api-reference/rates/get-rate",
+                  "v3/api-reference/rates/onramp-rate",
+                  "v3/api-reference/rates/offramp-rate",
+                  "v3/api-reference/rates/fiat-to-fiat"
                 ]
               },
               {
