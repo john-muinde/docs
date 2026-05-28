@@ -8010,6 +8010,158 @@
           "CROSS BOARDER"
         ]
       }
+    },
+    "/api/v3/sms/send": {
+      "post": {
+        "description": "Send a standard SMS message",
+        "operationId": "SmsController_sendSms_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendSmsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Send SMS",
+        "tags": [
+          "SMS"
+        ]
+      }
+    },
+    "/api/v3/sms/clients": {
+      "post": {
+        "description": "Register a webhook client to receive SMS notifications",
+        "operationId": "SmsController_registerWebhook_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterSmsClientDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Register SMS Webhook",
+        "tags": [
+          "SMS"
+        ]
+      }
+    },
+    "/api/v3/sms/incoming": {
+      "post": {
+        "description": "Webhook endpoint for AfricasTalking incoming SMS messages.",
+        "operationId": "SmsController_handleIncomingMessages_api/v3",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Incoming message processed successfully"
+          }
+        },
+        "summary": "Incoming SMS Webhook",
+        "tags": [
+          "SMS"
+        ]
+      }
+    },
+    "/api/v3/internal/integrators/provision": {
+      "post": {
+        "operationId": "InternalController_provisionIntegrator_api/v3",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Internal"
+        ]
+      }
+    },
+    "/api/v3/internal/go-live/notify": {
+      "post": {
+        "operationId": "InternalController_notifyGoLiveApproved_api/v3",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Internal"
+        ]
+      }
+    },
+    "/api/v3/internal/integrators/backfill-docs": {
+      "post": {
+        "operationId": "InternalController_backfillComplianceDocs_api/v3",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Internal"
+        ]
+      }
+    },
+    "/api/v3/internal/integrators/sync-config": {
+      "post": {
+        "operationId": "InternalController_syncIntegratorConfig_api/v3",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Internal"
+        ]
+      }
+    },
+    "/api/v3/internal/integrators/sync-wallets": {
+      "post": {
+        "operationId": "InternalController_syncWallets_api/v3",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Internal"
+        ]
+      }
+    },
+    "/api/v3/internal/compliance-docs/notify-review": {
+      "post": {
+        "operationId": "InternalController_notifyDocReview_api/v3",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Internal"
+        ]
+      }
     }
   },
   "info": {
@@ -10221,7 +10373,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-05-22T10:10:48.333Z"
+            "example": "2026-05-28T13:25:18.921Z"
           },
           "transactionCost": {
             "type": "number",
@@ -11625,6 +11777,10 @@
             "type": "object",
             "description": "The token of the onramp crypto transaction"
           },
+          "amountToSend": {
+            "type": "number",
+            "description": "Total crypto the sender must dispatch (cryptoAmountReceived + feeInCrypto)"
+          },
           "transactionHash": {
             "type": "string",
             "description": "The transaction hash of the onramp crypto transaction"
@@ -11640,6 +11796,7 @@
           "cryptoWallet",
           "chain",
           "token",
+          "amountToSend",
           "transactionHash"
         ]
       },
@@ -11673,6 +11830,10 @@
           "referenceId": {
             "type": "string",
             "description": "The reference ID of the onramp crypto transaction"
+          },
+          "callbackUrl": {
+            "type": "string",
+            "description": "Webhook URL to notify when the crypto transfer completes or fails."
           }
         },
         "required": [
@@ -11829,7 +11990,7 @@
           },
           "fiatWalletId": {
             "type": "string",
-            "description": "Specific fiat wallet ID to use for fiat-to-crypto conversion. If not provided, a wallet will be selected automatically based on currency."
+            "description": "Optional. Links this transaction to a specific fiat wallet for currency resolution and audit. No fiat is debited — crypto is sent directly from your pre-loaded crypto wallet. If omitted, a wallet is auto-selected by currency."
           }
         },
         "required": [
@@ -11895,7 +12056,15 @@
           },
           "fiatAmount": {
             "type": "number",
-            "description": "Fiat amount"
+            "description": "Base fiat amount (before fee)"
+          },
+          "fiatFee": {
+            "type": "number",
+            "description": "Platform fee charged on the fiat side"
+          },
+          "fiatAmountToSend": {
+            "type": "number",
+            "description": "Total fiat the customer must pay (fiatAmount + fiatFee)"
           },
           "cryptoAmount": {
             "type": "number",
@@ -11917,6 +12086,8 @@
           "onchainStatus",
           "rate",
           "fiatAmount",
+          "fiatFee",
+          "fiatAmountToSend",
           "cryptoAmount"
         ]
       },
@@ -12848,6 +13019,38 @@
           "amount",
           "referenceId",
           "status"
+        ]
+      },
+      "SendSmsDto": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string",
+            "description": "Phone number to send SMS to",
+            "example": "+254712345678"
+          },
+          "message": {
+            "type": "string",
+            "description": "SMS message content",
+            "example": "Hello, this is a test message"
+          }
+        },
+        "required": [
+          "to",
+          "message"
+        ]
+      },
+      "RegisterSmsClientDto": {
+        "type": "object",
+        "properties": {
+          "webhookUrl": {
+            "type": "string",
+            "description": "Webhook URL to receive SMS notifications",
+            "example": "https://myapp.com/webhooks/sms"
+          }
+        },
+        "required": [
+          "webhookUrl"
         ]
       }
     }

@@ -29,21 +29,7 @@ The body is always wrapped in this envelope:
 ```json
 {
   "event": "transaction.deposit.status.updated",
-  "data": {
-    "status": "SUCCESSFUL",
-    "reference_id": "order-abc-001",
-    "reference_number": "MP250101001",
-    "id": "64a1b2c3d4e5f6a7b8c9d0e1",
-    "amount": 1000,
-    "wallet_id": "64a1b2c3d4e5f6a7b8c9d0e2",
-    "callback_url": "https://your-server.com/webhook",
-    "created_at": "2025-01-01T00:00:00.000Z",
-    "transaction_amount": 975,
-    "transaction_cost": 25,
-    "customer_key": "cust_abc123",
-    "telco_id": "OEI2AK4D9X",
-    "timestamp": "2025-01-01T00:01:30.000Z"
-  },
+  "data": { ... },
   "signature": "sha256=a1b2c3d4e5f6..."
 }
 ```
@@ -60,70 +46,42 @@ If no webhook secret is configured, Kotani Pay posts directly to the `callbackUr
 - Do **not** include `X-Kotani-Signature`, `X-Kotani-Event`, or `X-Kotani-Integrator` headers
 - Contain the transaction data fields **directly** in the body — no `event` or `signature` wrapper
 
-Example deposit callback body:
-
-```json
-{
-  "status": "SUCCESSFUL",
-  "reference_id": "order-abc-001",
-  "reference_number": "MP250101001",
-  "id": "64a1b2c3d4e5f6a7b8c9d0e1",
-  "amount": 1000,
-  "wallet_id": "64a1b2c3d4e5f6a7b8c9d0e2",
-  "callback_url": "https://your-server.com/webhook",
-  "created_at": "2025-01-01T00:00:00.000Z",
-  "transaction_amount": 975,
-  "transaction_cost": 25,
-  "customer_key": "cust_abc123",
-  "telco_id": "OEI2AK4D9X"
-}
-```
-
-Example withdrawal callback body:
-
-```json
-{
-  "status": "SUCCESSFUL",
-  "referenceId": "payout-xyz-001",
-  "referenceNumber": "MW250101001",
-  "id": "64a1b2c3d4e5f6a7b8c9d0e3",
-  "amount": 500,
-  "walletId": "64a1b2c3d4e5f6a7b8c9d0e2",
-  "callbackUrl": "https://your-server.com/webhook",
-  "created_at": "2025-01-01T00:00:00.000Z",
-  "transactionAmount": 480,
-  "transactionCost": 20,
-  "customerKey": "cust_abc123",
-  "telcoId": "OEI2AK4D9X"
-}
-```
-
 Configure a webhook secret in **Settings** to switch to signed webhooks.
 
 ---
 
 ## Supported Events
 
-The following events are fired by the signed webhook system.
-
 | Event | When it fires |
 |-------|---------------|
-| `transaction.deposit.status.updated` | A deposit transaction changes status |
-| `transaction.withdrawal.status.updated` | A withdrawal transaction changes status |
-| `transaction.onramp.status.updated` | An onramp (fiat→crypto) transaction changes status |
-| `transaction.offramp.status.updated` | An offramp (crypto→fiat) transaction changes status |
+| `transaction.deposit.status.updated` | A deposit changes status |
+| `transaction.withdrawal.status.updated` | A withdrawal changes status |
+| `transaction.onramp.status.updated` | An onramp (fiat→crypto) changes status |
+| `transaction.offramp.status.updated` | An offramp (crypto→fiat) changes status |
 | `kyc.status.changed` | A customer's KYC verification outcome changes |
 | `refund.completed` | Crypto refund successfully sent back to the sender |
-| `refund.failed` | Refund exhausted all retry attempts — manual intervention required |
+| `refund.failed` | Refund exhausted all retry attempts |
 | `refund.lightning.invoice_needed` | Lightning offramp needs a bolt11 invoice to process the refund |
+| `settlement.approved` | A settlement request was approved |
+| `settlement.processed` | A settlement was completed and funds disbursed |
+| `settlement.rejected` | A settlement request was rejected |
+| `settlement.paused` | A settlement was paused pending review |
+| `settlement.batch.approved` | A settlement batch was approved |
+| `settlement.batch.processed` | A settlement batch completed (fully or partially) |
+| `settlement.batch.rejected` | A settlement batch was rejected |
+| `settlement.batch.cancelled` | A settlement batch was cancelled |
 | `system.event` | Operational notices and maintenance alerts |
-| `transaction.status.updated` | _(Deprecated)_ Generic status update — use the specific events above |
+| `transaction.status.updated` | _(Deprecated)_ Use the specific events above |
+
+<Note>
+  Settlement events are opt-in. Subscribe to them in **Settings → Webhooks**.
+</Note>
 
 ---
 
 ## Verifying Signatures
 
-Always verify the `X-Kotani-Signature` header before processing the event.
+Always verify the `X-Kotani-Signature` header before processing any event.
 
 1. Parse the JSON body.
 2. **Remove the `signature` field** from the parsed object.
@@ -185,11 +143,99 @@ app.post('/webhook', express.json(), (req, res) => {
 
 ## Event Payloads
 
-Each event type carries a different `data` shape. **Deposits use `snake_case` field names; withdrawals, onramp, and offramp use `camelCase`.**
+<Note>
+  **Casing conventions:** Deposit fields use `snake_case` (`reference_id`, `wallet_id`, `customer_key`). Withdrawal, onramp, and offramp fields use `camelCase` (`referenceId`, `walletId`, `customerKey`). Handle both in your webhook handler.
+</Note>
 
 ---
 
 ### `transaction.deposit.status.updated`
+
+Fired whenever a deposit changes status — including intermediate states like `INITIATED` and `IN_PROGRESS` as well as terminal states (`SUCCESSFUL`, `FAILED`, `CANCELLED`).
+
+#### Payload fields
+
+<ParamField body="status" type="string" required>
+  Current deposit status. See [Transaction Statuses](/v3/essentials/transaction-statuses).
+</ParamField>
+
+<ParamField body="reference_id" type="string" required>
+  Your reference ID (or system-generated if not provided).
+</ParamField>
+
+<ParamField body="reference_number" type="number" required>
+  Auto-generated sequential reference number.
+</ParamField>
+
+<ParamField body="id" type="string" required>
+  Kotani internal record ID.
+</ParamField>
+
+<ParamField body="amount" type="number" required>
+  Amount the customer was asked to pay.
+</ParamField>
+
+<ParamField body="wallet_id" type="string" required>
+  ID of the integrator fiat wallet credited.
+</ParamField>
+
+<ParamField body="transaction_amount" type="number" required>
+  Amount actually credited to your wallet after fees.
+</ParamField>
+
+<ParamField body="transaction_cost" type="number" required>
+  Processing fee charged.
+</ParamField>
+
+<ParamField body="customer_key" type="string" required>
+  The customer identifier supplied at deposit creation.
+</ParamField>
+
+<ParamField body="callback_url" type="string">
+  Callback URL set on the transaction.
+</ParamField>
+
+<ParamField body="created_at" type="string">
+  ISO 8601 creation timestamp.
+</ParamField>
+
+<ParamField body="telco_id" type="string">
+  Mobile money receipt code from the network (e.g. Mpesa confirmation code like `OEI2AK4D9X`). Present on successful mobile money deposits.
+</ParamField>
+
+<ParamField body="confirmation_id" type="string">
+  Provider-level confirmation reference. May differ from `telco_id` for some providers.
+</ParamField>
+
+<ParamField body="bank_name" type="string">
+  Bank name for bank-based deposit methods (e.g. `Capitec`, `FNB`). Only present for bank deposits.
+</ParamField>
+
+<ParamField body="bank_code" type="string">
+  Bank code for bank-based deposit methods. Only present for bank deposits.
+</ParamField>
+
+<ParamField body="payment_brand" type="string">
+  Card payment brand for card deposits (e.g. `VISA`, `MASTERCARD`). Only present for card deposits.
+</ParamField>
+
+<ParamField body="error_message" type="string">
+  Human-readable failure reason. Always present (may be empty string) for non-successful statuses.
+</ParamField>
+
+<ParamField body="error_description" type="string">
+  Detailed provider error description. Always present (may be empty string) for non-successful statuses.
+</ParamField>
+
+<ParamField body="error_code" type="string">
+  Provider error code. Always present (may be empty string) for non-successful statuses.
+</ParamField>
+
+<ParamField body="transactionError" type="string">
+  Raw internal error from the processing pipeline. Always present (may be empty string) for non-successful statuses.
+</ParamField>
+
+#### Example — successful mobile money deposit
 
 ```json
 {
@@ -197,7 +243,7 @@ Each event type carries a different `data` shape. **Deposits use `snake_case` fi
   "data": {
     "status": "SUCCESSFUL",
     "reference_id": "order-abc-001",
-    "reference_number": "MP250101001",
+    "reference_number": 1001,
     "id": "64a1b2c3d4e5f6a7b8c9d0e1",
     "amount": 1000,
     "wallet_id": "64a1b2c3d4e5f6a7b8c9d0e2",
@@ -206,38 +252,130 @@ Each event type carries a different `data` shape. **Deposits use `snake_case` fi
     "transaction_amount": 975,
     "transaction_cost": 25,
     "customer_key": "cust_abc123",
-    "telco_id": "OEI2AK4D9X",
-    "timestamp": "2025-01-01T00:01:30.000Z"
+    "telco_id": "OEI2AK4D9X"
   },
   "signature": "sha256=a1b2c3d4e5f6..."
 }
 ```
 
-For non-successful deposits the payload also includes all four error fields (they may be empty strings if no detail is available):
+#### Example — failed deposit
 
 ```json
 {
-  "error_message": "Insufficient funds",
-  "error_description": "The customer does not have enough funds",
-  "error_code": "INSUFFICIENT_FUNDS",
-  "transactionError": "..."
+  "event": "transaction.deposit.status.updated",
+  "data": {
+    "status": "FAILED",
+    "reference_id": "order-abc-002",
+    "reference_number": 1002,
+    "id": "64a1b2c3d4e5f6a7b8c9d0e3",
+    "amount": 500,
+    "wallet_id": "64a1b2c3d4e5f6a7b8c9d0e2",
+    "created_at": "2025-01-01T00:00:00.000Z",
+    "transaction_amount": 0,
+    "transaction_cost": 0,
+    "customer_key": "cust_abc123",
+    "error_message": "Insufficient funds",
+    "error_description": "The customer does not have enough funds",
+    "error_code": "INSUFFICIENT_FUNDS",
+    "transactionError": ""
+  },
+  "signature": "sha256=a1b2c3d4e5f6..."
 }
 ```
 
-| Field | Description |
-|-------|-------------|
-| `status` | Current transaction status |
-| `reference_id` | Your reference ID (or system-generated) |
-| `amount` | Amount requested |
-| `transaction_amount` | Amount actually collected (after fees) |
-| `transaction_cost` | Fee charged |
-| `customer_key` | The customer identifier |
-| `telco_id` | Mobile money network (e.g. `MPESA`, `MTN`) |
-| `confirmation_id` | Provider transaction reference (e.g. M-Pesa confirmation code) |
+#### Example — bank deposit (additional fields)
+
+```json
+{
+  "event": "transaction.deposit.status.updated",
+  "data": {
+    "status": "SUCCESSFUL",
+    "reference_id": "order-bank-001",
+    "amount": 2000,
+    "transaction_amount": 1960,
+    "transaction_cost": 40,
+    "customer_key": "cust_za_001",
+    "bank_name": "Capitec",
+    "bank_code": "470010",
+    "payment_brand": "VISA"
+  },
+  "signature": "sha256=a1b2c3d4e5f6..."
+}
+```
 
 ---
 
 ### `transaction.withdrawal.status.updated`
+
+Fired whenever a withdrawal changes status.
+
+#### Payload fields
+
+<ParamField body="status" type="string" required>
+  Current withdrawal status.
+</ParamField>
+
+<ParamField body="referenceId" type="string" required>
+  Your reference ID.
+</ParamField>
+
+<ParamField body="referenceNumber" type="number" required>
+  Auto-generated sequential reference number.
+</ParamField>
+
+<ParamField body="id" type="string" required>
+  Kotani internal record ID.
+</ParamField>
+
+<ParamField body="amount" type="number" required>
+  Amount requested for withdrawal.
+</ParamField>
+
+<ParamField body="walletId" type="string" required>
+  ID of the integrator fiat wallet debited.
+</ParamField>
+
+<ParamField body="transactionAmount" type="number" required>
+  Amount debited from your wallet including fees.
+</ParamField>
+
+<ParamField body="transactionCost" type="number" required>
+  Processing fee charged.
+</ParamField>
+
+<ParamField body="customerKey" type="string" required>
+  The customer identifier supplied at withdrawal creation.
+</ParamField>
+
+<ParamField body="callbackUrl" type="string">
+  Callback URL set on the transaction.
+</ParamField>
+
+<ParamField body="created_at" type="string">
+  ISO 8601 creation timestamp.
+</ParamField>
+
+<ParamField body="telcoId" type="string">
+  Mobile money receipt code from the network. Present on successful mobile money payouts.
+</ParamField>
+
+<ParamField body="confirmationId" type="string">
+  Provider-level confirmation reference.
+</ParamField>
+
+<ParamField body="integratorFeeAmount" type="number">
+  Additional integrator fee charged on the transaction, if configured.
+</ParamField>
+
+<ParamField body="errorMessage" type="string">
+  Human-readable failure reason. Always present (may be empty string) for non-successful statuses.
+</ParamField>
+
+<ParamField body="transactionError" type="string">
+  Raw error from the processing pipeline. Always present (may be empty string) for non-successful statuses.
+</ParamField>
+
+#### Example — successful withdrawal
 
 ```json
 {
@@ -245,86 +383,252 @@ For non-successful deposits the payload also includes all four error fields (the
   "data": {
     "status": "SUCCESSFUL",
     "referenceId": "payout-xyz-001",
-    "referenceNumber": "MW250101001",
+    "referenceNumber": 2001,
     "id": "64a1b2c3d4e5f6a7b8c9d0e3",
     "amount": 500,
     "walletId": "64a1b2c3d4e5f6a7b8c9d0e2",
     "callbackUrl": "https://your-server.com/webhook",
     "created_at": "2025-01-01T00:00:00.000Z",
-    "transactionAmount": 480,
+    "transactionAmount": 520,
     "transactionCost": 20,
     "customerKey": "cust_abc123",
-    "telcoId": "MPESA",
-    "confirmationId": "OEI2AK4D9Y",
-    "timestamp": "2025-01-01T00:02:00.000Z"
+    "telcoId": "OEI2AK4D9Y"
   },
   "signature": "sha256=a1b2c3d4e5f6..."
 }
 ```
 
-For failed withdrawals, also includes:
+#### Example — failed withdrawal
 
 ```json
 {
-  "errorMessage": "Recipient number not found",
-  "transactionError": "..."
+  "event": "transaction.withdrawal.status.updated",
+  "data": {
+    "status": "FAILED",
+    "referenceId": "payout-xyz-002",
+    "referenceNumber": 2002,
+    "id": "64a1b2c3d4e5f6a7b8c9d0e4",
+    "amount": 300,
+    "walletId": "64a1b2c3d4e5f6a7b8c9d0e2",
+    "transactionAmount": 300,
+    "transactionCost": 0,
+    "customerKey": "cust_abc123",
+    "errorMessage": "Recipient number not found",
+    "transactionError": "INVALID_PHONE_NUMBER"
+  },
+  "signature": "sha256=a1b2c3d4e5f6..."
 }
 ```
-
-<Note>
-  Withdrawal fields are camelCase (`referenceId`, `walletId`, `customerKey`) whereas deposit fields are snake_case (`reference_id`, `wallet_id`, `customer_key`). Handle both in your webhook handler.
-</Note>
 
 ---
 
 ### `transaction.onramp.status.updated`
 
-Onramp has two separate status fields — one for the fiat collection and one for the on-chain crypto transfer.
+Fired when a fiat→crypto onramp transaction changes status. Onramp has **two independent status fields** — fiat collection (`depositStatus`) and on-chain delivery (`onchainStatus`).
+
+#### Payload fields
+
+<ParamField body="referenceId" type="string" required>
+  Your reference ID for the onramp transaction.
+</ParamField>
+
+<ParamField body="status" type="string" required>
+  Combined overall status of the onramp.
+</ParamField>
+
+<ParamField body="depositStatus" type="string" required>
+  Status of the fiat payment collection leg.
+</ParamField>
+
+<ParamField body="onchainStatus" type="string" required>
+  Status of the on-chain crypto delivery leg.
+</ParamField>
+
+<ParamField body="chain" type="string" required>
+  Blockchain the crypto was sent on (e.g. `POLYGON`, `STELLAR`).
+</ParamField>
+
+<ParamField body="token" type="string" required>
+  Token delivered (e.g. `USDT`, `USDC`).
+</ParamField>
+
+<ParamField body="cryptoAmount" type="number" required>
+  Expected crypto amount to deliver.
+</ParamField>
+
+<ParamField body="cryptoAmountReceived" type="number">
+  Actual crypto amount delivered on-chain (may differ from `cryptoAmount` due to gas).
+</ParamField>
+
+<ParamField body="fiatAmount" type="number" required>
+  Base fiat amount collected (before fee).
+</ParamField>
+
+<ParamField body="fiatFee" type="number" required>
+  Platform fee on the fiat side.
+</ParamField>
+
+<ParamField body="fiatAmountToSend" type="number" required>
+  Total fiat the customer paid (`fiatAmount + fiatFee`).
+</ParamField>
+
+<ParamField body="receiverAddress" type="string">
+  On-chain address the crypto was delivered to.
+</ParamField>
+
+<ParamField body="transactionHash" type="string">
+  Blockchain transaction hash once on-chain delivery completes.
+</ParamField>
+
+<ParamField body="rate" type="object">
+  Rate used for the conversion (`from`, `to`, `cryptoAmount`).
+</ParamField>
+
+<ParamField body="error" type="object">
+  Error details if the onramp failed. Contains `message`, `code`, and `details`.
+</ParamField>
+
+#### Example — successful onramp
 
 ```json
 {
   "event": "transaction.onramp.status.updated",
   "data": {
     "referenceId": "onramp-001",
+    "status": "SUCCESSFUL",
     "depositStatus": "SUCCESSFUL",
     "onchainStatus": "SUCCESSFUL",
-    "transactionHash": "0xabc123def456...",
-    "cryptoAmount": 0.00125,
+    "chain": "POLYGON",
+    "token": "USDT",
+    "cryptoAmount": 38.5,
+    "cryptoAmountReceived": 38.5,
     "fiatAmount": 5000,
+    "fiatFee": 100,
+    "fiatAmountToSend": 5100,
+    "receiverAddress": "0xrecipient123...",
+    "transactionHash": "0xabc123def456...",
     "rate": {
       "from": "KES",
       "to": "USDT",
-      "cryptoAmount": 0.00125
-    },
-    "timestamp": "2025-01-01T00:05:00.000Z"
+      "cryptoAmount": 38.5
+    }
   },
   "signature": "sha256=a1b2c3d4e5f6..."
 }
 ```
 
-For failed onramp:
+#### Example — fiat collected, crypto transfer failed
 
 ```json
 {
-  "error": {
-    "message": "Crypto transfer failed after retries",
-    "code": "CRYPTO_TRANSFER_FAILED",
-    "details": {}
-  }
+  "event": "transaction.onramp.status.updated",
+  "data": {
+    "referenceId": "onramp-002",
+    "status": "FAILED",
+    "depositStatus": "SUCCESSFUL",
+    "onchainStatus": "FAILED",
+    "chain": "POLYGON",
+    "token": "USDT",
+    "cryptoAmount": 38.5,
+    "fiatAmount": 5000,
+    "fiatFee": 100,
+    "fiatAmountToSend": 5100,
+    "transactionHash": null,
+    "error": {
+      "message": "Crypto transfer failed after retries",
+      "code": "CRYPTO_TRANSFER_FAILED",
+      "details": {}
+    }
+  },
+  "signature": "sha256=a1b2c3d4e5f6..."
 }
 ```
-
-| Field | Description |
-|-------|-------------|
-| `depositStatus` | Status of the fiat payment collection |
-| `onchainStatus` | Status of the crypto delivery to the wallet |
-| `transactionHash` | Blockchain transaction hash (once on-chain transfer completes) |
-| `cryptoAmount` | Amount of crypto delivered |
-| `fiatAmount` | Fiat amount collected |
 
 ---
 
 ### `transaction.offramp.status.updated`
+
+Fired when a crypto→fiat offramp changes status.
+
+#### Payload fields
+
+<ParamField body="referenceId" type="string" required>
+  Your reference ID for the offramp transaction.
+</ParamField>
+
+<ParamField body="status" type="string" required>
+  Overall offramp status (`SUCCESSFUL`, `FAILED`, `PENDING`, etc.).
+</ParamField>
+
+<ParamField body="onchainStatus" type="string" required>
+  Status of the on-chain crypto receipt leg.
+</ParamField>
+
+<ParamField body="fiatAmount" type="number" required>
+  Full fiat amount before fees.
+</ParamField>
+
+<ParamField body="fiatTransactionAmount" type="number" required>
+  Amount actually disbursed to the recipient after fees.
+</ParamField>
+
+<ParamField body="cryptoAmount" type="number" required>
+  Crypto amount received from the sender.
+</ParamField>
+
+<ParamField body="fiatCurrency" type="string" required>
+  Fiat currency code (e.g. `KES`, `GHS`).
+</ParamField>
+
+<ParamField body="customerKey" type="string" required>
+  Customer identifier.
+</ParamField>
+
+<ParamField body="senderAddress" type="string" required>
+  On-chain address that sent the crypto.
+</ParamField>
+
+<ParamField body="escrowAddress" type="string" required>
+  Kotani escrow address the crypto was sent to.
+</ParamField>
+
+<ParamField body="fiatWalletId" type="string">
+  ID of the integrator fiat wallet used, if applicable.
+</ParamField>
+
+<ParamField body="transactionHash" type="string">
+  On-chain transaction hash of the crypto receipt.
+</ParamField>
+
+<ParamField body="transactionHashAmount" type="number">
+  Exact on-chain amount confirmed (may differ from `cryptoAmount` due to network fees).
+</ParamField>
+
+<ParamField body="rate" type="object">
+  Rate used for the conversion (`from`, `to`, `fiatAmount`).
+</ParamField>
+
+<ParamField body="usingIntegratedWallet" type="boolean">
+  Whether the platform's own integrated crypto wallet was used.
+</ParamField>
+
+<ParamField body="created_at" type="string">
+  ISO 8601 creation timestamp.
+</ParamField>
+
+<ParamField body="updated_at" type="string">
+  ISO 8601 last-updated timestamp.
+</ParamField>
+
+<ParamField body="onchainError" type="object">
+  On-chain error details if the crypto receipt failed. Present (may be `{}`) for non-successful transactions.
+</ParamField>
+
+<ParamField body="transactionError" type="object|string">
+  Fiat disbursement error details. Present (may be `{}`) for non-successful transactions.
+</ParamField>
+
+#### Example — successful offramp
 
 ```json
 {
@@ -350,29 +654,81 @@ For failed onramp:
     "escrowAddress": "0xescrow123...",
     "usingIntegratedWallet": false,
     "created_at": "2025-01-01T00:00:00.000Z",
-    "updated_at": "2025-01-01T00:05:00.000Z",
-    "timestamp": "2025-01-01T00:05:00.000Z"
+    "updated_at": "2025-01-01T00:05:00.000Z"
   },
   "signature": "sha256=a1b2c3d4e5f6..."
 }
 ```
 
-| Field | Description |
-|-------|-------------|
-| `status` | Overall offramp status |
-| `onchainStatus` | On-chain crypto receipt status |
-| `fiatAmount` | Full fiat amount before fees |
-| `fiatTransactionAmount` | Amount actually disbursed to recipient |
-| `cryptoAmount` | Crypto amount received from sender |
-| `senderAddress` | Address that sent the crypto |
-| `escrowAddress` | Kotani escrow address the crypto was sent to |
-| `usingIntegratedWallet` | Whether the platform's own wallet was used |
+#### Example — fiat disbursement failed
+
+```json
+{
+  "event": "transaction.offramp.status.updated",
+  "data": {
+    "referenceId": "offramp-002",
+    "status": "FAILED",
+    "onchainStatus": "SUCCESSFUL",
+    "fiatAmount": 5000,
+    "fiatTransactionAmount": 0,
+    "cryptoAmount": 38.5,
+    "fiatCurrency": "KES",
+    "customerKey": "cust_abc123",
+    "senderAddress": "0xabc123...",
+    "escrowAddress": "0xescrow123...",
+    "transactionHash": "0xdef456...",
+    "onchainError": {},
+    "transactionError": "Recipient mobile number is not registered"
+  },
+  "signature": "sha256=a1b2c3d4e5f6..."
+}
+```
 
 ---
 
 ### `refund.completed`
 
 Fired when a crypto refund has been successfully sent back to the sender.
+
+#### Payload fields
+
+<ParamField body="referenceId" type="string" required>
+  Reference ID of the original offramp transaction.
+</ParamField>
+
+<ParamField body="status" type="string" required>
+  Always `REVERSED`.
+</ParamField>
+
+<ParamField body="refundStatus" type="string" required>
+  Always `SUCCESSFUL`.
+</ParamField>
+
+<ParamField body="refundTransactionHash" type="string" required>
+  On-chain transaction hash of the refund.
+</ParamField>
+
+<ParamField body="refundAmount" type="number" required>
+  Amount refunded (in the token's native units — sats for Lightning, token units for EVM/Solana).
+</ParamField>
+
+<ParamField body="chain" type="string" required>
+  Chain the refund was sent on.
+</ParamField>
+
+<ParamField body="token" type="string" required>
+  Token refunded.
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  Fiat currency of the original transaction.
+</ParamField>
+
+<ParamField body="timestamp" type="string" required>
+  ISO 8601 timestamp of the refund.
+</ParamField>
+
+#### Example
 
 ```json
 {
@@ -396,7 +752,47 @@ Fired when a crypto refund has been successfully sent back to the sender.
 
 ### `refund.failed`
 
-Fired when a refund has exhausted all retry attempts. Manual intervention is required.
+Fired when a refund has exhausted all retry attempts. Manual intervention is required — contact support with the `referenceId`.
+
+#### Payload fields
+
+<ParamField body="referenceId" type="string" required>
+  Reference ID of the original offramp transaction.
+</ParamField>
+
+<ParamField body="refundStatus" type="string" required>
+  Always `FAILED`.
+</ParamField>
+
+<ParamField body="refundAmount" type="number" required>
+  Amount that was attempted for refund.
+</ParamField>
+
+<ParamField body="chain" type="string" required>
+  Chain the refund was attempted on.
+</ParamField>
+
+<ParamField body="token" type="string" required>
+  Token that was being refunded.
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  Fiat currency of the original transaction.
+</ParamField>
+
+<ParamField body="error" type="string" required>
+  Error message from the last refund attempt.
+</ParamField>
+
+<ParamField body="totalRetries" type="number" required>
+  Number of refund attempts made before giving up.
+</ParamField>
+
+<ParamField body="timestamp" type="string" required>
+  ISO 8601 timestamp of the final failure.
+</ParamField>
+
+#### Example
 
 ```json
 {
@@ -416,13 +812,55 @@ Fired when a refund has exhausted all retry attempts. Manual intervention is req
 }
 ```
 
-Contact support with the `referenceId` when you receive this — the refund cannot proceed automatically.
-
 ---
 
 ### `refund.lightning.invoice_needed`
 
-Fired when a Lightning offramp fails and a bolt11 invoice is needed to return the funds. You must submit an invoice before the refund can proceed.
+Fired when a Lightning offramp fiat disbursement fails and Kotani needs a bolt11 invoice to return the funds. You must submit a valid invoice before the refund can proceed.
+
+#### Payload fields
+
+<ParamField body="referenceId" type="string" required>
+  Reference ID of the original offramp transaction.
+</ParamField>
+
+<ParamField body="status" type="string" required>
+  Status of the offramp (typically `FAILED`).
+</ParamField>
+
+<ParamField body="onchainStatus" type="string" required>
+  On-chain crypto receipt status (typically `SUCCESSFUL` — crypto was received).
+</ParamField>
+
+<ParamField body="refundStatus" type="string" required>
+  Always `INVOICE_NEEDED` when this event fires.
+</ParamField>
+
+<ParamField body="refundAmount" type="number" required>
+  Amount to be refunded in millisatoshis.
+</ParamField>
+
+<ParamField body="refundAmountSats" type="number" required>
+  Amount to be refunded in satoshis.
+</ParamField>
+
+<ParamField body="chain" type="string" required>
+  Always `LIGHTNING`.
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  Fiat currency of the original transaction.
+</ParamField>
+
+<ParamField body="requiresAction" type="boolean" required>
+  Always `true` — you must submit an invoice.
+</ParamField>
+
+<ParamField body="action" type="object" required>
+  Instructions for submitting the invoice. Contains `type`, `description`, `submitUrl`, `method`, `body`, and `invoiceRequirements`.
+</ParamField>
+
+#### Example
 
 ```json
 {
@@ -441,9 +879,9 @@ Fired when a Lightning offramp fails and a bolt11 invoice is needed to return th
       "type": "SUBMIT_LIGHTNING_INVOICE",
       "description": "Submit Lightning invoice for 1500 sats to receive refund",
       "submitUrl": "https://api.kotanipay.com/api/v3/offramp/submit-refund-invoice/offramp-lightning-001",
-      "method": "POST"
-    },
-    "timestamp": "2025-01-01T00:10:00.000Z"
+      "method": "POST",
+      "body": { "invoice": "lnbc..." }
+    }
   },
   "signature": "sha256=a1b2c3d4e5f6..."
 }
@@ -459,6 +897,132 @@ curl -X POST https://api.kotanipay.com/api/v3/offramp/submit-refund-invoice/offr
 ```
 
 See [Offramp Refunds](/v3/essentials/offramp-refunds) for the full refund lifecycle.
+
+---
+
+### Settlement events
+
+Settlement events are **opt-in** — subscribe to them in **Settings → Webhooks**.
+
+All single-settlement events (`settlement.approved`, `settlement.processed`, `settlement.rejected`, `settlement.paused`) share the same payload shape.
+
+#### Single settlement payload fields
+
+<ParamField body="settlementId" type="string" required>
+  Kotani internal settlement ID.
+</ParamField>
+
+<ParamField body="referenceId" type="string" required>
+  Settlement reference ID.
+</ParamField>
+
+<ParamField body="status" type="string" required>
+  New settlement status (`APPROVED`, `PROCESSED`, `REJECTED`, `PAUSED`).
+</ParamField>
+
+<ParamField body="amount" type="number" required>
+  Gross settlement amount.
+</ParamField>
+
+<ParamField body="fee" type="number" required>
+  Fee charged on this settlement.
+</ParamField>
+
+<ParamField body="feePercentage" type="number" required>
+  Fee as a percentage of the gross amount.
+</ParamField>
+
+<ParamField body="netAmount" type="number" required>
+  Amount disbursed after fee (`amount - fee`).
+</ParamField>
+
+<ParamField body="currency" type="string" required>
+  Settlement currency (e.g. `KES`, `GHS`).
+</ParamField>
+
+<ParamField body="tentativeUsdAmount" type="number">
+  Approximate USD value of the gross amount at time of settlement.
+</ParamField>
+
+<ParamField body="tentativeUsdFee" type="number">
+  Approximate USD value of the fee.
+</ParamField>
+
+<ParamField body="tentativeUsdNetAmount" type="number">
+  Approximate USD value of the net disbursement.
+</ParamField>
+
+<ParamField body="balanceSource" type="string">
+  Which wallet balance was settled (e.g. `DEPOSIT`, `WITHDRAWAL`).
+</ParamField>
+
+<ParamField body="batchId" type="string">
+  Batch ID if this settlement is part of a batch.
+</ParamField>
+
+<ParamField body="subReference" type="string">
+  Sub-reference within a batch, if applicable.
+</ParamField>
+
+<ParamField body="beneficiaryDetails" type="object">
+  Destination bank/wallet details for the disbursement.
+</ParamField>
+
+<ParamField body="timestamp" type="string" required>
+  ISO 8601 event timestamp.
+</ParamField>
+
+#### Example — `settlement.processed`
+
+```json
+{
+  "event": "settlement.processed",
+  "data": {
+    "settlementId": "64a1b2c3d4e5f6a7b8c9d0f1",
+    "referenceId": "SET-2025-001",
+    "status": "PROCESSED",
+    "amount": 50000,
+    "fee": 750,
+    "feePercentage": 1.5,
+    "netAmount": 49250,
+    "currency": "KES",
+    "tentativeUsdAmount": 387.50,
+    "tentativeUsdFee": 5.81,
+    "tentativeUsdNetAmount": 381.69,
+    "balanceSource": "DEPOSIT",
+    "beneficiaryDetails": {
+      "bankName": "Equity Bank",
+      "accountNumber": "0123456789"
+    },
+    "timestamp": "2025-01-01T12:00:00.000Z"
+  },
+  "signature": "sha256=a1b2c3d4e5f6..."
+}
+```
+
+#### Batch settlement payload fields
+
+Batch events (`settlement.batch.approved`, `settlement.batch.processed`, `settlement.batch.rejected`, `settlement.batch.cancelled`) carry the same fields plus a `settlements` array.
+
+<ParamField body="batchId" type="string" required>
+  Kotani internal batch ID.
+</ParamField>
+
+<ParamField body="batchReference" type="string" required>
+  Human-readable batch reference.
+</ParamField>
+
+<ParamField body="status" type="string" required>
+  New batch status.
+</ParamField>
+
+<ParamField body="totalTentativeUsdAmount" type="number">
+  Total approximate USD value of all settlements in the batch.
+</ParamField>
+
+<ParamField body="settlements" type="array" required>
+  Array of settlement summaries in the batch. Each entry contains `_id`, `subReference`, `status`, `currency`, `netAmount`, `tentativeUsdNetAmount`, `referenceId`, and `channels`.
+</ParamField>
 
 ---
 
