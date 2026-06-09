@@ -98,7 +98,6 @@
                   "v3/api-reference/authentication/generate-key",
                   "v3/api-reference/authentication/refresh-token",
                   "v3/api-reference/authentication/human-verify",
-                  "v3/api-reference/integrator/create",
                   "v3/api-reference/integrator/get",
                   "v3/api-reference/integrator/update-webhook"
                 ]
