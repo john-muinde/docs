@@ -146,7 +146,8 @@
                 "pages": [
                   "v3/api-reference/withdrawals/mobile-money",
                   "v3/api-reference/withdrawals/mobile-money-status",
-                  "v3/api-reference/withdrawals/list-transactions"
+                  "v3/api-reference/withdrawals/list-transactions",
+                  "v3/api-reference/withdrawals/name-lookup"
                 ]
               },
               {
