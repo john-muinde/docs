@@ -1380,96 +1380,6 @@
       }
     },
     "/api/v3/integrator": {
-      "post": {
-        "description": "This endpoint will help you create an integrator",
-        "operationId": "IntegratorController_createIntegrator_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateIntegratorDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "The record has been successfully created."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/IntegratorResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "summary": "Create an integrator",
-        "tags": [
-          "INTEGRATOR"
-        ]
-      },
       "get": {
         "description": "This endpoint is used to retrieve an integrator details",
         "operationId": "IntegratorController_getIntegrator_api/v3",
@@ -1852,6 +1762,37 @@
         ],
         "tags": [
           "INTEGRATOR"
+        ]
+      }
+    },
+    "/api/v3/providers": {
+      "post": {
+        "description": "This Api Handles fetching of payment providers",
+        "operationId": "PaymentProviderController_providers_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentProviderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get Payment Providers",
+        "tags": [
+          "PAYMENT PROVIDERS"
         ]
       }
     },
@@ -2414,7 +2355,24 @@
       "get": {
         "description": "An integrator can use this endpoint to get all the customers who will be either receiving or sending money using mobile money.",
         "operationId": "MobileMoneyCustomerController_getUserCustomers_api/v3",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -3260,6 +3218,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Deposit transactions retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepositTransactionListResponseDto"
+                }
+              }
+            }
+          },
           "401": {
             "description": "",
             "content": {
@@ -3605,7 +3573,8 @@
         "summary": "Deposit via card",
         "tags": [
           "CARD DEPOSIT"
-        ]
+        ],
+        "x-beta": true
       }
     },
     "/api/v3/deposit/card/{reference_id}": {
@@ -3724,7 +3693,8 @@
         "summary": "Get Deposit status",
         "tags": [
           "CARD DEPOSIT"
-        ]
+        ],
+        "x-beta": true
       }
     },
     "/api/v3/withdraw/mobile-money": {
@@ -4186,6 +4156,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Withdrawal transactions retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WithdrawTransactionListResponseDto"
+                }
+              }
+            }
+          },
           "401": {
             "description": "",
             "content": {
@@ -4221,21 +4201,20 @@
         ]
       }
     },
-    "/api/v3/providers": {
+    "/api/v3/withdraw/{referenceId}/resolve-duplicate": {
       "post": {
-        "description": "This Api Handles fetching of payment providers",
-        "operationId": "PaymentProviderController_providers_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PaymentProviderDto"
-              }
+        "description": "Confirm or cancel a withdrawal that was held as a suspected duplicate. Pass action=\"proceed\" to release it for processing or action=\"cancel\" to decline it.",
+        "operationId": "WithdrawController_resolveDuplicate_api/v3",
+        "parameters": [
+          {
+            "name": "referenceId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "201": {
             "description": ""
@@ -4243,12 +4222,12 @@
         },
         "security": [
           {
-            "bearer": []
+            "JWT": []
           }
         ],
-        "summary": "Get Payment Providers",
+        "summary": "Resolve a duplicate-pending withdrawal",
         "tags": [
-          "PAYMENT PROVIDERS"
+          "WITHDRAW"
         ]
       }
     },
@@ -4695,7 +4674,8 @@
                 "DEPOSIT",
                 "CARD_DEPOSIT",
                 "WITHDRAW",
-                "DETAILS"
+                "DETAILS",
+                "NAME_LOOKUP"
               ]
             }
           },
@@ -4706,33 +4686,7 @@
             "description": "Filter by currency",
             "schema": {
               "example": "KES",
-              "type": "string",
-              "enum": [
-                "KES",
-                "GHS",
-                "NGN",
-                "ZAR",
-                "ZAR",
-                "USD",
-                "XOF",
-                "ZMW",
-                "XAF",
-                "SLE",
-                "CDF",
-                "TZS",
-                "UGX",
-                "EGP",
-                "MWK",
-                "RWF",
-                "ETB",
-                "MZN",
-                "LSL",
-                "GNF",
-                "USDT",
-                "BTC",
-                "ETH",
-                "USDC"
-              ]
+              "type": "string"
             }
           },
           {
@@ -5025,33 +4979,7 @@
             "description": "Filter by currency",
             "schema": {
               "example": "KES",
-              "type": "string",
-              "enum": [
-                "KES",
-                "GHS",
-                "NGN",
-                "ZAR",
-                "ZAR",
-                "USD",
-                "XOF",
-                "ZMW",
-                "XAF",
-                "SLE",
-                "CDF",
-                "TZS",
-                "UGX",
-                "EGP",
-                "MWK",
-                "RWF",
-                "ETB",
-                "MZN",
-                "LSL",
-                "GNF",
-                "USDT",
-                "BTC",
-                "ETH",
-                "USDC"
-              ]
+              "type": "string"
             }
           },
           {
@@ -5464,62 +5392,6 @@
         ]
       }
     },
-    "/api/v3/integrator/settlements/batch/{batchId}/approve-merge": {
-      "patch": {
-        "operationId": "IntegratorSettlementsController_approveAdminMerge_api/v3",
-        "parameters": [
-          {
-            "name": "batchId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "tags": [
-          "INTEGRATOR"
-        ]
-      }
-    },
-    "/api/v3/integrator/settlements/batch/{batchId}/reject-merge": {
-      "patch": {
-        "operationId": "IntegratorSettlementsController_rejectAdminMerge_api/v3",
-        "parameters": [
-          {
-            "name": "batchId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "tags": [
-          "INTEGRATOR"
-        ]
-      }
-    },
     "/api/v3/integrator/settlements/batch/{batchId}": {
       "delete": {
         "operationId": "IntegratorSettlementsController_cancelBatch_api/v3",
@@ -5719,7 +5591,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "The Health Check is successful",
+            "description": "Health check\n\nThe Health Check is successful",
             "content": {
               "application/json": {
                 "schema": {
@@ -5882,6 +5754,103 @@
         ]
       }
     },
+    "/api/v3/name-lookup": {
+      "post": {
+        "description": "Checks the phone number and network already on file for the given customer_key against whichever provider (pawaPay or Onafriq) would actually handle a payout to them, reducing the risk of sending funds to the wrong recipient.",
+        "operationId": "NameLookupController_lookup_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NameLookupRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Name lookup completed."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/NameLookupResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bad Request"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid API Key"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Validate a phone number against a customer name before payout",
+        "tags": [
+          "NAME LOOKUP"
+        ]
+      }
+    },
     "/api/v3/offramp": {
       "post": {
         "description": "This endpoint will create a offramp request for a customer. If the fiat transfer fails after successful crypto receipt, an automatic refund will be initiated after 5 minutes. Use the refund-status endpoint to check refund status.",
@@ -5976,7 +5945,10 @@
         "summary": "Offramp Request",
         "tags": [
           "OFFRAMP"
-        ]
+        ],
+        "x-beta": {
+          "description": "This endpoint is in beta"
+        }
       }
     },
     "/api/v3/offramp/transactions": {
@@ -6042,7 +6014,10 @@
         "summary": "Get Integrator Offramp Transactions",
         "tags": [
           "OFFRAMP"
-        ]
+        ],
+        "x-beta": {
+          "description": "This endpoint is in beta"
+        }
       }
     },
     "/api/v3/offramp/{referenceId}": {
@@ -6138,7 +6113,10 @@
         "summary": "Get Offramp MobileMoney Status",
         "tags": [
           "OFFRAMP"
-        ]
+        ],
+        "x-beta": {
+          "description": "This endpoint is in beta"
+        }
       }
     },
     "/api/v3/offramp/cancel/{referenceId}": {
@@ -6211,7 +6189,10 @@
         "summary": "Cancel Offramp Transaction",
         "tags": [
           "OFFRAMP"
-        ]
+        ],
+        "x-beta": {
+          "description": "This endpoint is in beta"
+        }
       }
     },
     "/api/v3/offramp/refund-status/{referenceId}": {
@@ -6241,7 +6222,10 @@
         "summary": "Get Refund Status",
         "tags": [
           "OFFRAMP"
-        ]
+        ],
+        "x-beta": {
+          "description": "This endpoint is in beta"
+        }
       }
     },
     "/api/v3/offramp/retry-refund/{referenceId}": {
@@ -6337,7 +6321,10 @@
         "summary": "Retry Failed Refund",
         "tags": [
           "OFFRAMP"
-        ]
+        ],
+        "x-beta": {
+          "description": "This endpoint is in beta"
+        }
       }
     },
     "/api/v3/offramp/retry-refunds-multiple": {
@@ -6427,7 +6414,10 @@
         "summary": "Retry Multiple Failed Refunds",
         "tags": [
           "OFFRAMP"
-        ]
+        ],
+        "x-beta": {
+          "description": "This endpoint is in beta"
+        }
       }
     },
     "/api/v3/offramp/retry-all-failed-refunds": {
@@ -6491,7 +6481,10 @@
         "summary": "Retry All Eligible Failed Refunds",
         "tags": [
           "OFFRAMP"
-        ]
+        ],
+        "x-beta": {
+          "description": "This endpoint is in beta"
+        }
       }
     },
     "/api/v3/offramp/submit-refund-invoice/{referenceId}": {
@@ -6608,7 +6601,10 @@
         "summary": "Submit Lightning Invoice for Refund",
         "tags": [
           "OFFRAMP"
-        ]
+        ],
+        "x-beta": {
+          "description": "This endpoint is in beta"
+        }
       }
     },
     "/api/v3/onramp/crypto": {
@@ -7116,33 +7112,7 @@
             "in": "query",
             "description": "Filter by currency",
             "schema": {
-              "type": "string",
-              "enum": [
-                "KES",
-                "GHS",
-                "NGN",
-                "ZAR",
-                "ZAR",
-                "USD",
-                "XOF",
-                "ZMW",
-                "XAF",
-                "SLE",
-                "CDF",
-                "TZS",
-                "UGX",
-                "EGP",
-                "MWK",
-                "RWF",
-                "ETB",
-                "MZN",
-                "LSL",
-                "GNF",
-                "USDT",
-                "BTC",
-                "ETH",
-                "USDC"
-              ]
+              "type": "string"
             }
           }
         ],
@@ -7333,33 +7303,7 @@
             "in": "query",
             "description": "Filter by currency",
             "schema": {
-              "type": "string",
-              "enum": [
-                "KES",
-                "GHS",
-                "NGN",
-                "ZAR",
-                "ZAR",
-                "USD",
-                "XOF",
-                "ZMW",
-                "XAF",
-                "SLE",
-                "CDF",
-                "TZS",
-                "UGX",
-                "EGP",
-                "MWK",
-                "RWF",
-                "ETB",
-                "MZN",
-                "LSL",
-                "GNF",
-                "USDT",
-                "BTC",
-                "ETH",
-                "USDC"
-              ]
+              "type": "string"
             }
           }
         ],
@@ -7416,33 +7360,7 @@
             "in": "query",
             "description": "Filter by currency",
             "schema": {
-              "type": "string",
-              "enum": [
-                "KES",
-                "GHS",
-                "NGN",
-                "ZAR",
-                "ZAR",
-                "USD",
-                "XOF",
-                "ZMW",
-                "XAF",
-                "SLE",
-                "CDF",
-                "TZS",
-                "UGX",
-                "EGP",
-                "MWK",
-                "RWF",
-                "ETB",
-                "MZN",
-                "LSL",
-                "GNF",
-                "USDT",
-                "BTC",
-                "ETH",
-                "USDC"
-              ]
+              "type": "string"
             }
           }
         ],
@@ -7579,33 +7497,7 @@
             "in": "query",
             "description": "Filter by currency",
             "schema": {
-              "type": "string",
-              "enum": [
-                "KES",
-                "GHS",
-                "NGN",
-                "ZAR",
-                "ZAR",
-                "USD",
-                "XOF",
-                "ZMW",
-                "XAF",
-                "SLE",
-                "CDF",
-                "TZS",
-                "UGX",
-                "EGP",
-                "MWK",
-                "RWF",
-                "ETB",
-                "MZN",
-                "LSL",
-                "GNF",
-                "USDT",
-                "BTC",
-                "ETH",
-                "USDC"
-              ]
+              "type": "string"
             }
           }
         ],
@@ -7622,392 +7514,6 @@
         "summary": "Get payments for a specific batch",
         "tags": [
           "API Bulk Payments"
-        ]
-      }
-    },
-    "/api/v3/cross-boarder/invoice": {
-      "post": {
-        "description": "Generate Invoice",
-        "operationId": "FiatToFiatController_generateInvoice_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GenerateInvoiceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invoice has been successfully created"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/DepositResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid API Key"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Generate Invoice",
-        "tags": [
-          "CROSS BOARDER"
-        ]
-      }
-    },
-    "/api/v3/cross-boarder/invoice/{referenceId}": {
-      "get": {
-        "description": "Get Invoice",
-        "operationId": "FiatToFiatController_getInvoice_api/v3",
-        "parameters": [
-          {
-            "name": "referenceId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invoice successfully retrieved"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/GetInvoiceResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid API Key"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Get Invoice",
-        "tags": [
-          "CROSS BOARDER"
-        ]
-      }
-    },
-    "/api/v3/cross-boarder/invoice/pay": {
-      "post": {
-        "description": "Pay Invoice",
-        "operationId": "FiatToFiatController_payInvoice_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PayInvoiceDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invoice successfully retrieved"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/PayInvoiceResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid API Key"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Pay Invoice",
-        "tags": [
-          "CROSS BOARDER"
-        ]
-      }
-    },
-    "/api/v3/cross-boarder/invoice/pay/{referenceId}": {
-      "get": {
-        "description": "Get Paid Invoice Status",
-        "operationId": "FiatToFiatController_getPaidInvoiceStatus_api/v3",
-        "parameters": [
-          {
-            "name": "referenceId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invoice successfully retrieved"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/PayInvoiceResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid API Key"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Get Paid Invoice Status",
-        "tags": [
-          "CROSS BOARDER"
         ]
       }
     },
@@ -8076,90 +7582,6 @@
         "summary": "Incoming SMS Webhook",
         "tags": [
           "SMS"
-        ]
-      }
-    },
-    "/api/v3/internal/integrators/provision": {
-      "post": {
-        "operationId": "InternalController_provisionIntegrator_api/v3",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Internal"
-        ]
-      }
-    },
-    "/api/v3/internal/go-live/notify": {
-      "post": {
-        "operationId": "InternalController_notifyGoLiveApproved_api/v3",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Internal"
-        ]
-      }
-    },
-    "/api/v3/internal/integrators/backfill-docs": {
-      "post": {
-        "operationId": "InternalController_backfillComplianceDocs_api/v3",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Internal"
-        ]
-      }
-    },
-    "/api/v3/internal/integrators/sync-config": {
-      "post": {
-        "operationId": "InternalController_syncIntegratorConfig_api/v3",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Internal"
-        ]
-      }
-    },
-    "/api/v3/internal/integrators/sync-wallets": {
-      "post": {
-        "operationId": "InternalController_syncWallets_api/v3",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Internal"
-        ]
-      }
-    },
-    "/api/v3/internal/compliance-docs/notify-review": {
-      "post": {
-        "operationId": "InternalController_notifyDocReview_api/v3",
-        "parameters": [],
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Internal"
         ]
       }
     }
@@ -8265,36 +7687,6 @@
           "fee"
         ]
       },
-      "Currency": {
-        "type": "string",
-        "enum": [
-          "KES",
-          "GHS",
-          "NGN",
-          "ZAR",
-          "ZAR",
-          "USD",
-          "XOF",
-          "ZMW",
-          "XAF",
-          "SLE",
-          "CDF",
-          "TZS",
-          "UGX",
-          "EGP",
-          "MWK",
-          "RWF",
-          "ETB",
-          "MZN",
-          "LSL",
-          "GNF",
-          "USDT",
-          "BTC",
-          "ETH",
-          "USDC"
-        ],
-        "description": "From currency"
-      },
       "STABLE_COIN": {
         "type": "string",
         "enum": [
@@ -8309,17 +7701,21 @@
         ],
         "description": "To currency"
       },
+      "RATE_SOURCE": {
+        "type": "string",
+        "enum": [
+          "fiat",
+          "crypto"
+        ],
+        "description": "Which currency the amount field represents. Defaults to 'fiat' (current behavior — fiatAmount holds a fiat value). Set to 'crypto' to instead pass the desired crypto amount in fiatAmount and get back the equivalent fiat cost."
+      },
       "OnrampRateRequest": {
         "type": "object",
         "properties": {
           "from": {
+            "type": "string",
             "description": "From currency",
-            "example": "KES",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
+            "example": "KES"
           },
           "to": {
             "description": "To currency",
@@ -8334,6 +7730,15 @@
             "type": "number",
             "description": "Rate value",
             "example": "0.85"
+          },
+          "source": {
+            "description": "Which currency the amount field represents. Defaults to 'fiat' (current behavior — fiatAmount holds a fiat value). Set to 'crypto' to instead pass the desired crypto amount in fiatAmount and get back the equivalent fiat cost.",
+            "example": "fiat",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RATE_SOURCE"
+              }
+            ]
           }
         },
         "required": [
@@ -8355,18 +7760,23 @@
             ]
           },
           "to": {
+            "type": "string",
             "description": "To currency",
-            "example": "EUR",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
+            "example": "EUR"
           },
           "cryptoAmount": {
             "type": "number",
             "description": "Rate value",
             "example": "0.85"
+          },
+          "source": {
+            "description": "Which currency the amount field represents. Defaults to 'crypto' (current behavior — cryptoAmount holds a crypto value). Set to 'fiat' to instead pass the desired fiat amount in cryptoAmount and get back the equivalent crypto cost.",
+            "example": "crypto",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RATE_SOURCE"
+              }
+            ]
           }
         },
         "required": [
@@ -8440,22 +7850,14 @@
         "type": "object",
         "properties": {
           "from": {
+            "type": "string",
             "description": "From currency",
-            "example": "KES",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
+            "example": "KES"
           },
           "to": {
+            "type": "string",
             "description": "To currency",
-            "example": "EUR",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
+            "example": "EUR"
           },
           "amount": {
             "type": "number",
@@ -8610,13 +8012,9 @@
         "type": "object",
         "properties": {
           "source_currency": {
+            "type": "string",
             "description": "Source fiat currency",
-            "example": "KES",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
+            "example": "KES"
           },
           "source_amount": {
             "type": "number",
@@ -8713,13 +8111,9 @@
             ]
           },
           "currency": {
+            "type": "string",
             "description": "The currency of the wallet",
-            "example": "eg NGN or GHS or KES",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
+            "example": "KES"
           },
           "country": {
             "type": "string",
@@ -8775,13 +8169,9 @@
             "example": "My Wallet"
           },
           "currency": {
+            "type": "string",
             "description": "The currency of the wallet",
-            "example": "eg NGN or GHS or KES",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
+            "example": "KES"
           },
           "country": {
             "type": "string",
@@ -8863,6 +8253,7 @@
           "POLYGON",
           "ARBITRUM",
           "OPTIMISM",
+          "BINANCE",
           "STELLAR",
           "TRON",
           "FUSE",
@@ -9159,6 +8550,7 @@
                 "settlement.batch.processed",
                 "settlement.batch.partial",
                 "settlement.batch.cancelled",
+                "settlement.batch.consolidated",
                 "system.event"
               ]
             }
@@ -9170,99 +8562,6 @@
           "last_name",
           "email",
           "phone"
-        ]
-      },
-      "CreateIntegratorDto": {
-        "type": "object",
-        "properties": {
-          "organization": {
-            "type": "string",
-            "description": "organization",
-            "example": "A&B Company"
-          },
-          "product_name": {
-            "type": "string",
-            "description": "product name",
-            "example": "MY APP NAME"
-          },
-          "first_name": {
-            "type": "string",
-            "description": "first_name",
-            "example": "John"
-          },
-          "last_name": {
-            "type": "string",
-            "description": "last_name",
-            "example": "Doe"
-          },
-          "email": {
-            "type": "string",
-            "description": "email",
-            "example": "ab@gmail.com"
-          },
-          "phone": {
-            "type": "string",
-            "description": "phone",
-            "example": "+xxx xxx xxx xxx"
-          },
-          "country_code": {
-            "type": "string",
-            "description": "Country code (accepts ISO-2 or ISO-3, auto-converts to ISO-2)",
-            "example": "US or USA"
-          },
-          "webhook_url": {
-            "type": "string",
-            "description": "Default webhook callback URL",
-            "example": "https://example.com/kotani/webhooks"
-          },
-          "webhook_secret": {
-            "type": "string",
-            "description": "Shared secret used to sign webhook payloads",
-            "example": "whsec_xxx"
-          },
-          "webhook_events": {
-            "type": "array",
-            "description": "Webhook events this integrator is subscribed to",
-            "example": [
-              "transaction.deposit.status.updated",
-              "payment.confirmed"
-            ],
-            "items": {
-              "type": "string",
-              "enum": [
-                "transaction.status.updated",
-                "transaction.deposit.status.updated",
-                "transaction.withdrawal.status.updated",
-                "transaction.onramp.status.updated",
-                "transaction.offramp.status.updated",
-                "payment.confirmed",
-                "kyc.status.changed",
-                "refund.lightning.invoice_needed",
-                "refund.completed",
-                "refund.failed",
-                "settlement.approved",
-                "settlement.rejected",
-                "settlement.processed",
-                "settlement.cancelled",
-                "settlement.paused",
-                "settlement.batch.approved",
-                "settlement.batch.rejected",
-                "settlement.batch.processed",
-                "settlement.batch.partial",
-                "settlement.batch.cancelled",
-                "system.event"
-              ]
-            }
-          }
-        },
-        "required": [
-          "organization",
-          "product_name",
-          "first_name",
-          "last_name",
-          "email",
-          "phone",
-          "country_code"
         ]
       },
       "UpdateIntegratorWebhookDto": {
@@ -9307,6 +8606,7 @@
                 "settlement.batch.processed",
                 "settlement.batch.partial",
                 "settlement.batch.cancelled",
+                "settlement.batch.consolidated",
                 "system.event"
               ]
             }
@@ -9392,6 +8692,31 @@
             "description": "Network sub-type (legacy — prefer token field for asset)"
           }
         }
+      },
+      "PaymentProviderDto": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "Currency",
+            "example": "NGN"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "description": "Payment method",
+            "example": "BANK_TRANSFER",
+            "enum": [
+              "mobile_money",
+              "bank",
+              "card",
+              "crypto"
+            ]
+          }
+        },
+        "required": [
+          "currency",
+          "paymentMethod"
+        ]
       },
       "ApiKeyResponseDto": {
         "type": "object",
@@ -9873,7 +9198,7 @@
           },
           "wallet_id": {
             "type": "string",
-            "description": "deposit id",
+            "description": "Fiat wallet ID",
             "example": "5f9b2c7b9c9d6b0017b4e6b1"
           },
           "callback_url": {
@@ -9908,26 +9233,6 @@
           "wallet_id"
         ]
       },
-      "DEPOSIT_STATUS": {
-        "type": "string",
-        "enum": [
-          "PENDING",
-          "INITIATED",
-          "SUCCESSFUL",
-          "FAILED",
-          "EXPIRED",
-          "CANCELLED",
-          "DECLINED",
-          "REVERSED",
-          "IN_PROGRESS",
-          "DUPLICATE",
-          "ERROR_OCCURRED",
-          "REQUIRE_REVIEW",
-          "SUCCESS",
-          "RETRY",
-          "PERMANENTLY_FAILED"
-        ]
-      },
       "DepositStatusResponseDto": {
         "type": "object",
         "properties": {
@@ -9943,7 +9248,7 @@
           },
           "wallet_id": {
             "type": "string",
-            "description": "deposit id",
+            "description": "Fiat wallet ID",
             "example": "5f9b2c7b9c9d6b0017b4e6b1"
           },
           "callback_url": {
@@ -10017,10 +9322,23 @@
             "type": "string"
           },
           "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DEPOSIT_STATUS"
-              }
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "INITIATED",
+              "SUCCESSFUL",
+              "FAILED",
+              "EXPIRED",
+              "CANCELLED",
+              "DECLINED",
+              "REVERSED",
+              "IN_PROGRESS",
+              "DUPLICATE",
+              "ERROR_OCCURRED",
+              "REQUIRE_REVIEW",
+              "SUCCESS",
+              "RETRY",
+              "PERMANENTLY_FAILED"
             ]
           },
           "confirmation_id": {
@@ -10066,6 +9384,18 @@
           "telco_id": {
             "type": "string",
             "description": "Telco/MNO transaction ID from the mobile money provider (e.g. Mpesa transaction code)"
+          },
+          "bank_name": {
+            "type": "string",
+            "description": "Bank name for bank-based deposit methods (e.g. Capitec, FNB)"
+          },
+          "bank_code": {
+            "type": "string",
+            "description": "Bank code for bank-based deposit methods"
+          },
+          "payment_brand": {
+            "type": "string",
+            "description": "Payment brand for card deposits (e.g. VISA, MASTERCARD)"
           }
         },
         "required": [
@@ -10080,14 +9410,159 @@
           "customer_key"
         ]
       },
-      "CheckoutPaymentMethod": {
-        "type": "string",
-        "enum": [
-          "PAYBYBANK",
-          "CARD",
-          "CAPITECPAY"
-        ],
-        "description": "Payment Method"
+      "DepositTransactionItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Record ID"
+          },
+          "reference_id": {
+            "type": "string",
+            "description": "Integrator-supplied reference ID"
+          },
+          "reference_number": {
+            "type": "number",
+            "description": "Auto-generated reference number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "INITIATED",
+              "SUCCESSFUL",
+              "FAILED",
+              "EXPIRED",
+              "CANCELLED",
+              "DECLINED",
+              "REVERSED",
+              "IN_PROGRESS",
+              "DUPLICATE",
+              "ERROR_OCCURRED",
+              "REQUIRE_REVIEW",
+              "SUCCESS",
+              "RETRY",
+              "PERMANENTLY_FAILED"
+            ]
+          },
+          "amount": {
+            "type": "number",
+            "description": "Original deposit amount"
+          },
+          "transaction_amount": {
+            "type": "number",
+            "description": "Amount credited to integrator wallet after fees"
+          },
+          "transaction_cost": {
+            "type": "number",
+            "description": "Transaction processing fee"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code (e.g. KES, GHS)"
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO-2 country code"
+          },
+          "network": {
+            "type": "string",
+            "description": "Mobile network / deposit channel (e.g. MPESA, MTN)"
+          },
+          "customer_key": {
+            "type": "string",
+            "description": "Customer key associated with the transaction"
+          },
+          "telco_id": {
+            "type": "string",
+            "description": "Telco/MNO receipt code (e.g. Mpesa confirmation code)"
+          },
+          "provider_reference": {
+            "type": "string",
+            "description": "Provider-side reference number"
+          },
+          "bank_name": {
+            "type": "string",
+            "description": "Bank name for bank-based deposits"
+          },
+          "bank_code": {
+            "type": "string",
+            "description": "Bank code for bank-based deposits"
+          },
+          "payment_brand": {
+            "type": "string",
+            "description": "Payment brand for card deposits (e.g. VISA, MASTERCARD)"
+          },
+          "completed_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp the transaction reached a terminal status"
+          },
+          "error_message": {
+            "type": "string",
+            "description": "Error message if the transaction failed"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation timestamp"
+          }
+        },
+        "required": [
+          "id",
+          "reference_id",
+          "reference_number",
+          "status",
+          "amount",
+          "transaction_amount",
+          "transaction_cost",
+          "customer_key"
+        ]
+      },
+      "PaginatedMetaDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number",
+            "description": "Total number of records matching the filter"
+          },
+          "page": {
+            "type": "number",
+            "description": "1-based current page index"
+          },
+          "per_page": {
+            "type": "number",
+            "description": "Items per page"
+          },
+          "total_pages": {
+            "type": "number",
+            "description": "Total number of pages"
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "per_page",
+          "total_pages"
+        ]
+      },
+      "DepositTransactionListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DepositTransactionItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginatedMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
       },
       "BankDepositCheckoutDto": {
         "type": "object",
@@ -10103,22 +9578,19 @@
             "example": "+245XXXXXXXXX"
           },
           "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "PAYBYBANK",
+              "CARD",
+              "CAPITECPAY"
+            ],
             "description": "Payment Method",
-            "example": "PAYBYBANK",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CheckoutPaymentMethod"
-              }
-            ]
+            "example": "PAYBYBANK"
           },
           "currency": {
+            "type": "string",
             "description": "Transaction currency",
-            "example": "eg ZAR",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
+            "example": "ZAR"
           },
           "country": {
             "type": "string",
@@ -10207,14 +9679,6 @@
           "message"
         ]
       },
-      "CARD_TYPE": {
-        "type": "string",
-        "enum": [
-          "VISA",
-          "MASTER"
-        ],
-        "description": "Payment Method"
-      },
       "CardDetailsDto": {
         "type": "object",
         "properties": {
@@ -10244,13 +9708,13 @@
             "example": "123"
           },
           "paymentBrand": {
+            "type": "string",
+            "enum": [
+              "VISA",
+              "MASTER"
+            ],
             "description": "Payment Method",
-            "example": "VISA",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CARD_TYPE"
-              }
-            ]
+            "example": "VISA"
           },
           "customerRedirectUrl": {
             "type": "string",
@@ -10281,13 +9745,9 @@
             "example": "+245XXXXXXXXX"
           },
           "currency": {
+            "type": "string",
             "description": "ZAR is currently supported",
-            "example": "eg ZAR",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
+            "example": "ZAR"
           },
           "card": {
             "description": "Card Details",
@@ -10373,7 +9833,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-05-28T13:25:18.921Z"
+            "example": "2026-07-14T10:56:46.042Z"
           },
           "transactionCost": {
             "type": "number",
@@ -10468,6 +9928,10 @@
             "type": "string",
             "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
             "example": "USD"
+          },
+          "network": {
+            "type": "string",
+            "description": "Mobile network / payout channel (e.g. MPESA, MTN)"
           }
         },
         "required": [
@@ -10609,28 +10073,6 @@
           "paybillDetails"
         ]
       },
-      "WithdrawStatus": {
-        "type": "string",
-        "enum": [
-          "RETRY",
-          "PENDING",
-          "SUCCESSFUL",
-          "FAILED",
-          "CANCELLED",
-          "REVERSED",
-          "IN_PROGRESS",
-          "INITIATED",
-          "ERROR_OCCURRED",
-          "DECLINED",
-          "EXPIRED",
-          "REQUIRE_REVIEW",
-          "NOT_INITIATED",
-          "TRANSACTION_INITIATED",
-          "TRANSACTION_RETRY",
-          "TRANSACTION_RETRY_SUCCESSFUL",
-          "TRANSACTION_RETRY_FAILED"
-        ]
-      },
       "INTEGRATOR_FEE_TYPE": {
         "type": "string",
         "enum": [
@@ -10672,11 +10114,31 @@
             "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
             "example": "USD"
           },
+          "network": {
+            "type": "string",
+            "description": "Mobile network / payout channel (e.g. MPESA, MTN)"
+          },
           "status": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/WithdrawStatus"
-              }
+            "type": "string",
+            "enum": [
+              "RETRY",
+              "PENDING",
+              "SUCCESSFUL",
+              "FAILED",
+              "CANCELLED",
+              "REVERSED",
+              "IN_PROGRESS",
+              "INITIATED",
+              "ERROR_OCCURRED",
+              "DECLINED",
+              "EXPIRED",
+              "REQUIRE_REVIEW",
+              "NOT_INITIATED",
+              "TRANSACTION_INITIATED",
+              "TRANSACTION_RETRY",
+              "TRANSACTION_RETRY_SUCCESSFUL",
+              "TRANSACTION_RETRY_FAILED",
+              "DUPLICATE_PENDING"
             ]
           },
           "referenceNumber": {
@@ -10744,58 +10206,149 @@
           "errorMessage"
         ]
       },
-      "CURRENCY": {
-        "type": "string",
-        "enum": [
-          "KES",
-          "GHS",
-          "TZS",
-          "UGX",
-          "ZMW",
-          "XAF",
-          "XOF",
-          "CDF",
-          "RWF",
-          "ETB",
-          "ZAR"
-        ],
-        "description": "Currency"
-      },
-      "PAYMENT_METHOD": {
-        "type": "string",
-        "enum": [
-          "mobile_money",
-          "bank",
-          "card",
-          "crypto"
-        ],
-        "description": "Payment method"
-      },
-      "PaymentProviderDto": {
+      "WithdrawTransactionItemDto": {
         "type": "object",
         "properties": {
-          "currency": {
-            "description": "Currency",
-            "example": "NGN",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CURRENCY"
-              }
+          "id": {
+            "type": "string",
+            "description": "Record ID"
+          },
+          "reference_id": {
+            "type": "string",
+            "description": "Integrator-supplied reference ID"
+          },
+          "reference_number": {
+            "type": "number",
+            "description": "Auto-generated reference number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "RETRY",
+              "PENDING",
+              "SUCCESSFUL",
+              "FAILED",
+              "CANCELLED",
+              "REVERSED",
+              "IN_PROGRESS",
+              "INITIATED",
+              "ERROR_OCCURRED",
+              "DECLINED",
+              "EXPIRED",
+              "REQUIRE_REVIEW",
+              "NOT_INITIATED",
+              "TRANSACTION_INITIATED",
+              "TRANSACTION_RETRY",
+              "TRANSACTION_RETRY_SUCCESSFUL",
+              "TRANSACTION_RETRY_FAILED",
+              "DUPLICATE_PENDING"
             ]
           },
-          "paymentMethod": {
-            "description": "Payment method",
-            "example": "BANK_TRANSFER",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PAYMENT_METHOD"
-              }
-            ]
+          "amount": {
+            "type": "number",
+            "description": "Original withdrawal amount"
+          },
+          "transaction_amount": {
+            "type": "number",
+            "description": "Amount debited from integrator wallet including fees"
+          },
+          "transaction_cost": {
+            "type": "number",
+            "description": "Transaction processing fee"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code (e.g. KES, GHS)"
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO-2 country code"
+          },
+          "network": {
+            "type": "string",
+            "description": "Mobile network / payout channel (e.g. MPESA, MTN)"
+          },
+          "customer_key": {
+            "type": "string",
+            "description": "Customer key associated with the transaction"
+          },
+          "telco_id": {
+            "type": "string",
+            "description": "Telco/MNO receipt code (e.g. Mpesa confirmation code)"
+          },
+          "provider_reference": {
+            "type": "string",
+            "description": "Provider-side reference number"
+          },
+          "integrator_fee_amount": {
+            "type": "number",
+            "description": "Integrator fee amount charged on the transaction"
+          },
+          "completed_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Timestamp the transaction reached a terminal status"
+          },
+          "transaction_error": {
+            "type": "string",
+            "description": "Transaction error message if the transaction failed"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation timestamp"
           }
         },
         "required": [
-          "currency",
-          "paymentMethod"
+          "id",
+          "reference_id",
+          "reference_number",
+          "status",
+          "amount",
+          "transaction_amount",
+          "transaction_cost",
+          "customer_key"
+        ]
+      },
+      "WithdrawPaginatedMetaDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "per_page": {
+            "type": "number"
+          },
+          "total_pages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "per_page",
+          "total_pages"
+        ]
+      },
+      "WithdrawTransactionListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WithdrawTransactionItemDto"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/WithdrawPaginatedMetaDto"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
         ]
       },
       "BankDetailsDto": {
@@ -10853,13 +10406,9 @@
             "$ref": "#/components/schemas/BankDetailsDto"
           },
           "currency": {
+            "type": "string",
             "description": "The currency of the transaction",
-            "example": "ZAR",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
+            "example": "ZAR"
           },
           "amount": {
             "type": "number",
@@ -11395,6 +10944,25 @@
           }
         }
       },
+      "NameLookupRequestDto": {
+        "type": "object",
+        "properties": {
+          "walletId": {
+            "type": "string",
+            "description": "The fiat wallet the payout would be debited from — used to resolve which provider would actually handle it.",
+            "example": "5f9b2c7b9c9d6b0017b4e6b1"
+          },
+          "customer_key": {
+            "type": "string",
+            "description": "Customer key of an existing mobile-money customer. The phone number, network, and name validated are always the ones already on file for this customer — not arbitrary values — so the result reflects who would actually receive this payout.",
+            "example": "customer-key-123"
+          }
+        },
+        "required": [
+          "walletId",
+          "customer_key"
+        ]
+      },
       "OfframpResponseDto": {
         "type": "object",
         "properties": {
@@ -11415,12 +10983,8 @@
             "description": "Crypto amount"
           },
           "fiatCurrency": {
-            "description": "Fiat currency",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CURRENCY"
-              }
-            ]
+            "type": "string",
+            "description": "Fiat currency"
           },
           "customerKey": {
             "type": "string",
@@ -11682,12 +11246,8 @@
             "description": "The crypto amount"
           },
           "currency": {
-            "description": "Fiat currency",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CURRENCY"
-              }
-            ]
+            "type": "string",
+            "description": "Fiat currency (e.g. KES, GHS, SLE, TZS)"
           },
           "chain": {
             "description": "Chain",
@@ -11715,11 +11275,11 @@
           },
           "callbackUrl": {
             "type": "string",
-            "description": "Callback Url"
+            "description": "Callback URL"
           },
           "rateId": {
             "type": "string",
-            "description": "Rate ID"
+            "description": "Rate ID obtained from the /offramp/rate endpoint"
           },
           "refund_config": {
             "description": "Optional refund destination for this transaction. For Lightning: provide a bolt11 invoice so Kotani can refund immediately if fiat disbursement fails, without waiting for you to submit one manually. Include generate_invoice_url so Kotani can refresh the invoice if it expires. For on-chain chains: provide address as the fallback refund destination. If omitted, Kotani notifies you via webhook and email when a refund is needed and you submit via POST /offramp/submit-refund-invoice/:referenceId.",
@@ -11808,20 +11368,50 @@
             "description": "The receiver address of the onramp crypto transaction"
           },
           "chain": {
-            "description": "The chain of the onramp crypto transaction",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Chain"
-              }
-            ]
+            "type": "string",
+            "enum": [
+              "ETHEREUM",
+              "CELO",
+              "AVALANCHE",
+              "POLYGON",
+              "ARBITRUM",
+              "OPTIMISM",
+              "BINANCE",
+              "STELLAR",
+              "TRON",
+              "FUSE",
+              "LIGHTNING",
+              "SOLANA",
+              "PROVENANCE",
+              "CARDANO",
+              "HEDERA",
+              "BASE",
+              "LISK",
+              "VICTION",
+              "SCROLL"
+            ],
+            "description": "The chain of the onramp crypto transaction"
           },
           "token": {
-            "description": "The token of the onramp crypto transaction",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/StableCoin"
-              }
-            ]
+            "type": "string",
+            "enum": [
+              "CUSD",
+              "USDC",
+              "USDT",
+              "USDT0",
+              "SAT",
+              "BTC",
+              "HASH",
+              "FUSE",
+              "HBAR",
+              "USDGLO",
+              "CKES",
+              "CGHS",
+              "MSAT",
+              "XLM",
+              "ADA"
+            ],
+            "description": "The token of the onramp crypto transaction"
           },
           "cryptoAmount": {
             "type": "number",
@@ -11948,29 +11538,55 @@
             "description": "Fiat amount"
           },
           "currency": {
+            "type": "string",
             "description": "The currency of the wallet",
-            "example": "eg NGN or GHS or KES",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
+            "example": "KES"
           },
           "chain": {
-            "description": "Chain",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Chain"
-              }
-            ]
+            "type": "string",
+            "enum": [
+              "ETHEREUM",
+              "CELO",
+              "AVALANCHE",
+              "POLYGON",
+              "ARBITRUM",
+              "OPTIMISM",
+              "BINANCE",
+              "STELLAR",
+              "TRON",
+              "FUSE",
+              "LIGHTNING",
+              "SOLANA",
+              "PROVENANCE",
+              "CARDANO",
+              "HEDERA",
+              "BASE",
+              "LISK",
+              "VICTION",
+              "SCROLL"
+            ],
+            "description": "Chain"
           },
           "token": {
-            "description": "Stable Coin",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/StableCoin"
-              }
-            ]
+            "type": "string",
+            "enum": [
+              "CUSD",
+              "USDC",
+              "USDT",
+              "USDT0",
+              "SAT",
+              "BTC",
+              "HASH",
+              "FUSE",
+              "HBAR",
+              "USDGLO",
+              "CKES",
+              "CGHS",
+              "MSAT",
+              "XLM",
+              "ADA"
+            ],
+            "description": "Stable Coin"
           },
           "receiverAddress": {
             "type": "string",
@@ -12031,20 +11647,46 @@
             "description": "Onramp reference ID"
           },
           "depositStatus": {
-            "description": "Deposit status",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DEPOSIT_STATUS"
-              }
-            ]
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "INITIATED",
+              "SUCCESSFUL",
+              "FAILED",
+              "EXPIRED",
+              "CANCELLED",
+              "DECLINED",
+              "REVERSED",
+              "IN_PROGRESS",
+              "DUPLICATE",
+              "ERROR_OCCURRED",
+              "REQUIRE_REVIEW",
+              "SUCCESS",
+              "RETRY",
+              "PERMANENTLY_FAILED"
+            ],
+            "description": "Deposit status"
           },
           "onchainStatus": {
-            "description": "Onchain status",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DEPOSIT_STATUS"
-              }
-            ]
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "INITIATED",
+              "SUCCESSFUL",
+              "FAILED",
+              "EXPIRED",
+              "CANCELLED",
+              "DECLINED",
+              "REVERSED",
+              "IN_PROGRESS",
+              "DUPLICATE",
+              "ERROR_OCCURRED",
+              "REQUIRE_REVIEW",
+              "SUCCESS",
+              "RETRY",
+              "PERMANENTLY_FAILED"
+            ],
+            "description": "Onchain status"
           },
           "transactionHash": {
             "type": "string",
@@ -12073,6 +11715,7 @@
           "error": {
             "description": "Error details if the transaction failed",
             "nullable": true,
+            "type": "object",
             "allOf": [
               {
                 "$ref": "#/components/schemas/OnrampErrorDto"
@@ -12145,6 +11788,10 @@
             "type": "string",
             "description": "Batch status"
           },
+          "currency": {
+            "type": "string",
+            "description": "Currency"
+          },
           "totalAmount": {
             "type": "number",
             "description": "Total amount"
@@ -12160,6 +11807,10 @@
           "failedPayments": {
             "type": "number",
             "description": "Failed payments count"
+          },
+          "pendingPayments": {
+            "type": "number",
+            "description": "Pending payments count"
           },
           "createdAt": {
             "format": "date-time",
@@ -12178,10 +11829,12 @@
           "id",
           "batchName",
           "status",
+          "currency",
           "totalAmount",
           "totalPayments",
           "successfulPayments",
           "failedPayments",
+          "pendingPayments",
           "createdAt",
           "progress"
         ]
@@ -12282,33 +11935,7 @@
           },
           "currency": {
             "type": "string",
-            "description": "Wallet currency",
-            "enum": [
-              "KES",
-              "GHS",
-              "NGN",
-              "ZAR",
-              "ZAR",
-              "USD",
-              "XOF",
-              "ZMW",
-              "XAF",
-              "SLE",
-              "CDF",
-              "TZS",
-              "UGX",
-              "EGP",
-              "MWK",
-              "RWF",
-              "ETB",
-              "MZN",
-              "LSL",
-              "GNF",
-              "USDT",
-              "BTC",
-              "ETH",
-              "USDC"
-            ]
+            "description": "Wallet currency"
           },
           "balance": {
             "type": "number",
@@ -12399,37 +12026,15 @@
           },
           "currency": {
             "type": "string",
-            "description": "Payment currency",
-            "enum": [
-              "KES",
-              "GHS",
-              "NGN",
-              "ZAR",
-              "ZAR",
-              "USD",
-              "XOF",
-              "ZMW",
-              "XAF",
-              "SLE",
-              "CDF",
-              "TZS",
-              "UGX",
-              "EGP",
-              "MWK",
-              "RWF",
-              "ETB",
-              "MZN",
-              "LSL",
-              "GNF",
-              "USDT",
-              "BTC",
-              "ETH",
-              "USDC"
-            ]
+            "description": "Payment currency"
           },
           "reference": {
             "type": "string",
             "description": "Unique payment reference"
+          },
+          "network": {
+            "type": "string",
+            "description": "Mobile network provider (e.g. MPESA, MTN, AIRTEL)"
           }
         },
         "required": [
@@ -12438,7 +12043,8 @@
           "recipientPhone",
           "amount",
           "currency",
-          "reference"
+          "reference",
+          "network"
         ]
       },
       "CurrencyWalletSelectionDto": {
@@ -12446,33 +12052,7 @@
         "properties": {
           "currency": {
             "type": "string",
-            "description": "Currency code",
-            "enum": [
-              "KES",
-              "GHS",
-              "NGN",
-              "ZAR",
-              "ZAR",
-              "USD",
-              "XOF",
-              "ZMW",
-              "XAF",
-              "SLE",
-              "CDF",
-              "TZS",
-              "UGX",
-              "EGP",
-              "MWK",
-              "RWF",
-              "ETB",
-              "MZN",
-              "LSL",
-              "GNF",
-              "USDT",
-              "BTC",
-              "ETH",
-              "USDC"
-            ]
+            "description": "Currency code"
           },
           "walletId": {
             "type": "string",
@@ -12529,33 +12109,7 @@
         "properties": {
           "currency": {
             "type": "string",
-            "description": "Currency",
-            "enum": [
-              "KES",
-              "GHS",
-              "NGN",
-              "ZAR",
-              "ZAR",
-              "USD",
-              "XOF",
-              "ZMW",
-              "XAF",
-              "SLE",
-              "CDF",
-              "TZS",
-              "UGX",
-              "EGP",
-              "MWK",
-              "RWF",
-              "ETB",
-              "MZN",
-              "LSL",
-              "GNF",
-              "USDT",
-              "BTC",
-              "ETH",
-              "USDC"
-            ]
+            "description": "Currency"
           },
           "recipientCount": {
             "type": "number",
@@ -12684,33 +12238,7 @@
           },
           "currency": {
             "type": "string",
-            "description": "Currency",
-            "enum": [
-              "KES",
-              "GHS",
-              "NGN",
-              "ZAR",
-              "ZAR",
-              "USD",
-              "XOF",
-              "ZMW",
-              "XAF",
-              "SLE",
-              "CDF",
-              "TZS",
-              "UGX",
-              "EGP",
-              "MWK",
-              "RWF",
-              "ETB",
-              "MZN",
-              "LSL",
-              "GNF",
-              "USDT",
-              "BTC",
-              "ETH",
-              "USDC"
-            ]
+            "description": "Currency"
           },
           "reference": {
             "type": "string",
@@ -12732,10 +12260,35 @@
             "type": "string",
             "description": "Error message if failed"
           },
+          "retryCount": {
+            "type": "number",
+            "description": "Number of retry attempts made"
+          },
+          "network": {
+            "type": "string",
+            "description": "Mobile network provider"
+          },
+          "telcoId": {
+            "type": "string",
+            "description": "Telco receipt code from provider"
+          },
+          "fee": {
+            "type": "number",
+            "description": "Total fee charged (provider cost + integrator fee)"
+          },
+          "transactionAmount": {
+            "type": "number",
+            "description": "Total amount deducted from wallet (amount + fee)"
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string",
             "description": "Created date"
+          },
+          "completedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Completed date"
           }
         },
         "required": [
@@ -12748,277 +12301,6 @@
           "reference",
           "status",
           "createdAt"
-        ]
-      },
-      "FiatToFiatInvoiceResponseDto": {
-        "type": "object",
-        "properties": {
-          "invoiceId": {
-            "type": "string",
-            "description": "The id of the invoice",
-            "example": "1e476673-0931-4eba-8373-37b368ce59f7"
-          },
-          "referenceId": {
-            "type": "string",
-            "description": "The reference id of the invoice",
-            "example": "1e476673-0931-4eba-8373-37b368ce59f7"
-          }
-        },
-        "required": [
-          "invoiceId",
-          "referenceId"
-        ]
-      },
-      "GenerateInvoiceDto": {
-        "type": "object",
-        "properties": {
-          "currency": {
-            "description": "The currency of the invoice",
-            "example": "KES",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
-          },
-          "amount": {
-            "type": "number",
-            "description": "The amount of the invoice",
-            "example": 1000
-          },
-          "bank": {
-            "description": "The bank details of the invoice",
-            "example": {
-              "accountName": "John Doe",
-              "address": "123 Main St",
-              "phoneNumber": "+254712345678",
-              "bankCode": 123456,
-              "accountNumber": "1234567890",
-              "country": "Kenya"
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BankDto"
-              }
-            ]
-          },
-          "referenceId": {
-            "type": "string",
-            "description": "The reference id of the invoice",
-            "example": "1e476673-0931-4eba-8373-37b368ce59f7"
-          },
-          "userReference": {
-            "type": "string",
-            "description": "The user reference of the invoice",
-            "example": "1e476673-0931-4eba-8373-37b368ce59f7"
-          }
-        },
-        "required": [
-          "currency",
-          "amount",
-          "bank",
-          "referenceId"
-        ]
-      },
-      "GetInvoiceResponseDto": {
-        "type": "object",
-        "properties": {
-          "referenceId": {
-            "type": "string",
-            "description": "The reference id of the invoice",
-            "example": "1e476673-0931-4eba-8373-37b368ce59f7"
-          },
-          "amount": {
-            "type": "number",
-            "description": "Amount to be paid",
-            "example": "John Doe"
-          },
-          "currency": {
-            "description": "Currency of the amount",
-            "example": "+254712345678",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
-          },
-          "accountName": {
-            "type": "string",
-            "description": "The account name of the invoice",
-            "example": "John Doe"
-          },
-          "address": {
-            "type": "string",
-            "description": "The address of the invoice",
-            "example": "123 Main St"
-          },
-          "phoneNumber": {
-            "type": "string",
-            "description": "The phone number of the invoice",
-            "example": "+254712345678"
-          },
-          "bankCode": {
-            "type": "string",
-            "description": "The bank code of the invoice",
-            "example": "123456"
-          },
-          "accountNumber": {
-            "type": "string",
-            "description": "The account number of the invoice",
-            "example": "1234567890"
-          },
-          "country": {
-            "type": "string",
-            "description": "The country of the invoice",
-            "example": "Kenya"
-          },
-          "invoice": {
-            "type": "object",
-            "description": "The invoice details",
-            "example": {
-              "referenceId": "1e476673-0931-4eba-8373-37b368ce59f7",
-              "invoiceId": "1e476673-0931-4eba-8373-37b368ce59f7",
-              "amount": 1000,
-              "currency": "KES"
-            }
-          }
-        },
-        "required": [
-          "referenceId",
-          "amount",
-          "currency",
-          "accountName",
-          "address",
-          "phoneNumber",
-          "bankCode",
-          "accountNumber",
-          "country",
-          "invoice"
-        ]
-      },
-      "PayInvoiceDto": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "number",
-            "description": "The amount of the invoice",
-            "example": 1000
-          },
-          "currency": {
-            "description": "The currency of the invoice",
-            "example": "KES",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
-          },
-          "referenceId": {
-            "type": "string",
-            "description": "The reference id of the invoice",
-            "example": "1e476673-0931-4eba-8373-37b368ce59f7"
-          },
-          "mobileMoney": {
-            "description": "The mobile money details of the invoice",
-            "example": {
-              "accountName": "John Doe",
-              "phoneNumber": "+254712345678",
-              "providerNetwork": "MTN"
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/MobileMoneyDto"
-              }
-            ]
-          }
-        },
-        "required": [
-          "amount",
-          "currency",
-          "referenceId",
-          "mobileMoney"
-        ]
-      },
-      "PayInvoice": {
-        "type": "object",
-        "properties": {
-          "amount": {
-            "type": "string",
-            "description": "The amount of the invoice",
-            "example": 1000
-          },
-          "currency": {
-            "description": "The currency of the invoice",
-            "example": "KES",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
-          },
-          "status": {
-            "type": "string",
-            "description": "The status of the invoice",
-            "example": "PENDING"
-          }
-        },
-        "required": [
-          "amount",
-          "currency",
-          "status"
-        ]
-      },
-      "PayInvoiceResponseDto": {
-        "type": "object",
-        "properties": {
-          "invoice": {
-            "description": "The invoice details",
-            "example": {
-              "amount": 1000,
-              "currency": "KES",
-              "status": "PENDING"
-            },
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PayInvoice"
-              }
-            ]
-          },
-          "currency": {
-            "description": "The currency of the invoice",
-            "example": "KES",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
-          },
-          "amount": {
-            "type": "number",
-            "description": "The amount of the invoice",
-            "example": 1000
-          },
-          "referenceId": {
-            "type": "string",
-            "description": "The reference id of the invoice",
-            "example": "1e476673-0931-4eba-8373-37b368ce59f7"
-          },
-          "status": {
-            "description": "The status of the invoice",
-            "example": "PENDING",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/WithdrawStatus"
-              }
-            ]
-          }
-        },
-        "required": [
-          "invoice",
-          "currency",
-          "amount",
-          "referenceId",
-          "status"
         ]
       },
       "SendSmsDto": {
