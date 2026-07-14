@@ -4254,7 +4254,7 @@
     },
     "/api/v3/withdraw/v2/bank": {
       "post": {
-        "description": "This Api Handles payout to bank, currently only supports SA Banks",
+        "description": "This Api Handles payout to bank, currently only supports SA and KE Banks",
         "operationId": "WithdrawTransactionController_mobileMoney_api/v3",
         "parameters": [],
         "requestBody": {
@@ -4351,7 +4351,7 @@
     },
     "/api/v3/withdraw/v2/bank/status/{referenceId}": {
       "get": {
-        "description": "This Api Handles payout to bank, currently only supports SA Banks",
+        "description": "This Api Handles payout to bank, supports SA and KE Banks",
         "operationId": "WithdrawTransactionController_getWithdrawTransaction_api/v3",
         "parameters": [
           {
