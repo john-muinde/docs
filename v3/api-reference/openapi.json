@@ -5756,7 +5756,7 @@
     },
     "/api/v3/name-lookup": {
       "post": {
-        "description": "Checks the phone number and network already on file for the given customer_key against whichever provider (pawaPay or Onafriq) would actually handle a payout to them, reducing the risk of sending funds to the wrong recipient.",
+        "description": "Checks the phone number and network already on file for the given customer_key against whichever provider would actually handle a payout to them, reducing the risk of sending funds to the wrong recipient.",
         "operationId": "NameLookupController_lookup_api/v3",
         "parameters": [],
         "requestBody": {
