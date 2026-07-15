@@ -3,4 +3,4 @@ title: "Name Lookup"
 openapi: "POST /api/v3/name-lookup"
 ---
 
-Validate the mobile money account name on file for a customer before sending a payout to them, reducing the risk of sending funds to the wrong recipient. The phone number and network checked are always the ones already on file for the given `customer_key` — you cannot pass arbitrary values. Currently supported for corridors handled by pawaPay or Onafriq; unsupported corridors return `status: "UNSUPPORTED"` rather than an error.
+Validate the mobile money account name on file for a customer before sending a payout to them, reducing the risk of sending funds to the wrong recipient. The phone number and network checked are always the ones already on file for the given `customer_key` — you cannot pass arbitrary values. Currently supported for corridors handled by the assigned provider; unsupported corridors return `status: "UNSUPPORTED"` rather than an error.
