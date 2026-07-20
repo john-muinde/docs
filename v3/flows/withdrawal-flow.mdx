@@ -55,7 +55,7 @@ The flow is the same — initiate, wait for callback, poll if needed.
 
 Currently supported in Kenya and South Africa.
 
-**1. Get supported banks** for the target currency — [GET /api/v3/withdraw/v2/bank/supporting-banks/:currency](/v3/api-reference/withdrawals/supporting-banks). This gives you the bank codes to use in the request.
+**1. Get supported banks** for the target currency — [GET /api/v3/customer/support/banks](v3/api-reference/country-support/banks). This gives you the bank codes to use in the request.
 
 **2. Initiate the withdrawal** — call [POST /api/v3/withdraw/v2/bank](/v3/api-reference/withdrawals/bank-v2) with your `callbackUrl` and the recipient's bank account details.
 
