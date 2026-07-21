@@ -10692,6 +10692,22 @@
             "items": {
               "type": "string"
             }
+          },
+          "supportedLookupNetworks": {
+            "description": "Networks that support customer name/account lookup for this country",
+            "example": [
+              "MPESA",
+              "AIRTEL"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "enabledLookup": {
+            "type": "boolean",
+            "description": "Whether name/account lookup is enabled for this country as a whole (true if at least one provider supports it)",
+            "example": true
           }
         },
         "required": [
