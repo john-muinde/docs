@@ -9931,7 +9931,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-07-21T15:16:02.842Z"
+            "example": "2026-07-21T20:06:23.428Z"
           },
           "transactionCost": {
             "type": "number",
