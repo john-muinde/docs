@@ -42,15 +42,19 @@ If you have a webhook secret configured, the callback arrives in a signed envelo
 
 ## Bank Checkout Deposit
 
-Kotani Pay generates a checkout URL and the customer completes payment on the bank's hosted page.
+Call [POST /api/v3/deposit/bank/checkout](/v3/api-reference/deposits/bank-checkout) with your `callbackUrl`, a `customerRedirectUrl` (where to send the customer after they finish paying), `currency`, `amount`, and a `paymentMethod`. What happens next depends on the currency and payment method — bank checkout is not one flow, it's three:
 
-**1. Initiate the checkout** — call [POST /api/v3/deposit/bank-checkout](/v3/api-reference/deposits/bank-checkout) with your `callbackUrl` and a `redirectUrl` (where to send the customer after they finish on the bank page).
+**ZAR — `CAPITECPAY` or `CARD`.** Kotani Pay returns a hosted checkout page. Redirect the customer to `redirectUrl` in the response; they complete payment there (Capitec Pay app or card entry) and are sent back to your `customerRedirectUrl` afterward. No manual reference entry — the hosted page handles matching the payment.
 
-**2. Redirect the customer** to the `checkoutUrl` in the response. They complete payment there.
+**KES — `PAYBYBANK` (PesaLink).** There is no hosted page. The response includes a `bankPaymentDetails` object with `bankName`, `accountName`, `accountNumber`, `amount`, and `reference`. Show these to the customer so they can make a manual PesaLink transfer from their own banking app.
 
-**3. Kotani Pay notifies you** via your `callbackUrl` when the bank confirms — same event structure as mobile money.
+<Warning>
+The customer **must** enter `bankPaymentDetails.reference` as the payment narrative/description in their banking app. This reference is how Kotani Pay matches the incoming transfer to this specific deposit — without it (or with the wrong value), the payment can't be reconciled automatically.
+</Warning>
 
-**4. Poll for status** if needed — [GET /api/v3/deposit/bank-checkout/status/:reference_id](/v3/api-reference/deposits/bank-checkout-status).
+**NGN — Virtual account.** The response's `bankPaymentDetails` contains a one-time dedicated `accountNumber` (plus `bankName`, `accountName`, `amount`, `expiresInMinutes`). The customer pays the exact amount to that account from their own banking app before it expires. No narrative/reference is needed here — the account itself is unique to this transaction.
+
+**Then, for all three:** Kotani Pay notifies you via your `callbackUrl` when the bank confirms — same event structure as mobile money. Poll for status if needed — [GET /api/v3/deposit/bank/checkout/status/:reference_id](/v3/api-reference/deposits/bank-checkout-status).
 
 ---
 

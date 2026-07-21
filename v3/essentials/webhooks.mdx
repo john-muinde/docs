@@ -1041,3 +1041,20 @@ You can rotate the signing secret at any time. Update your verification logic wi
 ## Retries
 
 If your endpoint returns a non-`2xx` response or times out, Kotani Pay retries delivery with exponential backoff — up to every 2 hours for a maximum of 24 hours. Return `200 OK` as quickly as possible and handle processing asynchronously.
+
+---
+
+## Status Corrections & Delivery Order
+
+Some status changes aren't final the moment they look final. Under certain circumstances (a system issue during the transaction, a delayed confirmation from the underlying payment rail, etc.), a transaction can settle into what looks like a terminal status — `CANCELLED`, `EXPIRED` — and then later be **corrected** to `SUCCESSFUL` once the payment actually clears. This is real, expected behavior on some payment rails, not a bug on either side.
+
+Typical transition paths you may see for the same `reference_id`:
+
+- `PENDING` → `SUCCESSFUL`, `FAILED`, or `CANCELLED`
+- `CANCELLED` or `EXPIRED` → `SUCCESSFUL` (a later correction)
+
+Kotani Pay **cannot guarantee webhooks arrive in the same order the underlying status changes happened.** Retries, exponential backoff, and upstream delays can all cause a later event to reach your endpoint before an earlier one for the same transaction — so it's possible to receive a `SUCCESSFUL` webhook after having already received (and processed) a `CANCELLED` one for the same `reference_id`.
+
+<Warning>
+Don't treat the first terminal-looking status you receive as permanently final. Design your webhook handler to accept a later status update for a `reference_id` you've already processed, and prefer whichever status you received most recently rather than discarding it because an earlier webhook already looked terminal. If you need to confirm the authoritative current state at any point, poll the corresponding status endpoint (e.g. [GET /deposit/mobile-money/status/:reference_id](/v3/api-reference/deposits/mobile-money-status)) rather than relying on webhook arrival order alone.
+</Warning>

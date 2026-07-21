@@ -9669,7 +9669,48 @@
           },
           "bankPaymentDetails": {
             "type": "object",
-            "description": "Bank payment details for manual bank transfer (e.g. KES PesaLink)"
+            "description": "Present for KES (PesaLink) and NGN (virtual account) bank checkouts. Absent for ZAR (CAPITECPAY/CARD), which instead returns a redirectUrl hosted checkout page.",
+            "properties": {
+              "bankName": {
+                "type": "string",
+                "description": "Bank the customer should pay into",
+                "example": "Choice Bank"
+              },
+              "accountName": {
+                "type": "string",
+                "description": "Account name to pay into",
+                "example": "PAVILION ECOMMERCE LTD"
+              },
+              "accountNumber": {
+                "type": "string",
+                "description": "Account number to pay into. For NGN this is a one-time virtual account dedicated to this transaction; for KES it's a shared account disambiguated by reference.",
+                "example": "46013000193549"
+              },
+              "reference": {
+                "type": "string",
+                "description": "KES PesaLink only: the exact value the customer must enter as the payment narrative/description in their banking app so Kotani Pay can match the transfer to this deposit. Not present/required for NGN, since the virtual account itself is already unique to this transaction.",
+                "example": "KP-8834211"
+              },
+              "amount": {
+                "type": "number",
+                "description": "Exact amount the customer must pay",
+                "example": 1000
+              },
+              "currency": {
+                "type": "string",
+                "example": "KES"
+              },
+              "expiresInMinutes": {
+                "type": "number",
+                "description": "NGN virtual account only: minutes until the account expires",
+                "example": 30
+              },
+              "instructions": {
+                "type": "string",
+                "description": "Human-readable payment instructions, ready to display to the customer",
+                "example": "Pay KES 1000 via PesaLink to PAVILION ECOMMERCE LTD (46013000193549) using reference \"KP-8834211\" as the payment narrative."
+              }
+            }
           }
         },
         "required": [
