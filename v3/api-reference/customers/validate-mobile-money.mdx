@@ -3,28 +3,55 @@ title: "Validate Mobile Money Account"
 openapi: "POST /api/v3/customer/validate/mobile-money"
 ---
 
-Checks a mobile money recipient before you pay them: the phone number format,
-the country it belongs to, and whether that corridor is supported.
+Checks a recipient before you pay them: the number format, the country it
+belongs to, and whether that corridor is supported.
+
+## What to send
+
+Which fields are required depends on `accountType`, so the schema below marks
+them all optional. In practice there are two shapes:
+
+<CodeGroup>
+```json Phone number
+{
+  "phoneNumber": "+254712345678"
+}
+```
+
+```json Paybill or till
+{
+  "accountType": "paybill",
+  "shortCode": "247247"
+}
+```
+</CodeGroup>
+
+| Sending | Required | Also accepted |
+| --- | --- | --- |
+| A phone number (default) | `phoneNumber` | `countryCode`, `network`, `accountName` |
+| A paybill or till | `accountType`, `shortCode` | `accountReference` (paybill only), `countryCode`, `accountName` |
+
+`countryCode` is read from the phone number when you omit it, and defaults to
+`KE` for a shortcode. `network` defaults to `MPESA`.
+
+## Resolving the account holder
 
 If your account is enabled for **name lookup**, the response also carries the
-name actually registered on the number (`accountName`) and `nameLookupStatus`.
-Without that entitlement you still get the format and corridor checks, and
-`nameLookupStatus` comes back as `NOT_ENABLED` — the request is identical either
-way.
+name registered on the number (`accountName`) and `nameLookupStatus`. Without
+that entitlement you still get the format and corridor checks, and
+`nameLookupStatus` comes back as `NOT_ENABLED` — the request is identical
+either way.
 
-Send `accountName` with the name you expect on the account and the response adds
-a `nameMatch` block scoring it against the real one, so you can catch a wrong
-number before the money moves.
+Send `accountName` with the name you expect and the response adds a `nameMatch`
+block scoring it against the real one, so you can catch a wrong number before
+the money moves.
 
 ## Paybill and till
 
-Set `accountType` to `paybill` or `till` and send `shortCode` instead of
-`phoneNumber` to validate an M-PESA business shortcode. For a paybill you can
-also pass `accountReference` — the value a payer would enter as the account.
-
-Because a shortcode is just digits, there is no useful format check for it: its
-existence is exactly what the lookup answers, so these two types require the
-name lookup entitlement.
+A shortcode is just digits, so there is no useful format check for one — whether
+it exists is exactly what the lookup answers. These two types therefore need
+name lookup enabled, and `accountReference` is the value a payer would enter as
+the account number on a paybill.
 
 <Tip>
 Use the [validation test values](/v3/testing/account-validation)
