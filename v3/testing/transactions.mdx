@@ -29,19 +29,12 @@ number.
 | `+254700000020` | Never settles | — |
 | `+254700000021` | Success | ~60s |
 
-## Bank payouts
+## Bank payouts and card deposits
 
-Use as the beneficiary account number.
-
-| Account number | Settles as | After |
-| --- | --- | --- |
-| `1000000001` | Success | ~5s |
-| `1000000002` | Success | ~5s |
-| `1000000010` | Failed — account not found | ~5s |
-| `1000000011` | Failed — account frozen | ~5s |
-| `1000000012` | Failed — limit exceeded | ~5s |
-| `1000000020` | Never settles | — |
-| `1000000021` | Success | ~60s |
+These aren't simulated. Bank and card providers run their own sandbox
+environments, so those transactions dispatch for real outside production and are
+tested against the provider's own test credentials and test cards — reserved
+values here would take that away.
 
 ## Anything else succeeds
 
@@ -53,7 +46,7 @@ particular outcome.
 
 <AccordionGroup>
   <Accordion title="A payout that fails">
-    `1000000010` on a bank payout, or `+254700000010` on mobile money. Confirm
+    `+254700000010` on a mobile money deposit or payout. Confirm
     you handle the `FAILED` webhook, surface the reason, and notice that the
     wallet debit is reversed — the balance returns to what it was.
   </Accordion>
@@ -69,8 +62,8 @@ particular outcome.
     that your polling backs off sensibly.
   </Accordion>
   <Accordion title="Paying the wrong person">
-    `1000000002` succeeds but is registered to a different name than
-    `1000000001`. Pair it with
+    `+254700000002` succeeds but is registered to a different name than
+    `+254700000001`. Pair it with
     [account validation](/v3/testing/account-validation) to test catching a
     mismatched recipient before you pay.
   </Accordion>
