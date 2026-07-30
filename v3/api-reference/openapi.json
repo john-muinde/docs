@@ -7772,6 +7772,11 @@
             "type": "number",
             "description": "Fee",
             "example": "100"
+          },
+          "walletDebitAmount": {
+            "type": "number",
+            "description": "OFFRAMP only. Total amount actually debited from the integrator fiat wallet, including any fee billed to the integrator on top of the payout (BILL_ON_INTEGRATOR). Equal to fiatAmount when the fee is not charged against this wallet.",
+            "example": "106"
           }
         },
         "required": [
@@ -8917,7 +8922,8 @@
             "type": "string"
           },
           "phone_number": {
-            "type": "string"
+            "type": "string",
+            "description": "Required unless account_number is supplied (bank payee identity)."
           },
           "country_code": {
             "type": "string",
@@ -8955,6 +8961,12 @@
           "account_name": {
             "type": "string"
           },
+          "account_number": {
+            "type": "string"
+          },
+          "bank_code": {
+            "type": "string"
+          },
           "integrator": {
             "type": "string"
           },
@@ -8990,7 +9002,6 @@
           }
         },
         "required": [
-          "phone_number",
           "country_code"
         ]
       },
@@ -8998,7 +9009,8 @@
         "type": "object",
         "properties": {
           "phone_number": {
-            "type": "string"
+            "type": "string",
+            "description": "Required unless account_number is supplied (bank payee identity)."
           },
           "country_code": {
             "type": "string",
@@ -9033,6 +9045,12 @@
           "account_name": {
             "type": "string"
           },
+          "account_number": {
+            "type": "string"
+          },
+          "bank_code": {
+            "type": "string"
+          },
           "first_name": {
             "type": "string",
             "example": "John"
@@ -9065,7 +9083,6 @@
           }
         },
         "required": [
-          "phone_number",
           "country_code"
         ]
       },
@@ -9073,7 +9090,8 @@
         "type": "object",
         "properties": {
           "phone_number": {
-            "type": "string"
+            "type": "string",
+            "description": "Required unless account_number is supplied (bank payee identity)."
           },
           "country_code": {
             "type": "string",
@@ -9108,6 +9126,12 @@
           "account_name": {
             "type": "string"
           },
+          "account_number": {
+            "type": "string"
+          },
+          "bank_code": {
+            "type": "string"
+          },
           "first_name": {
             "type": "string",
             "example": "John"
@@ -9140,7 +9164,6 @@
           }
         },
         "required": [
-          "phone_number",
           "country_code"
         ]
       },
@@ -9931,7 +9954,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-07-21T20:06:23.428Z"
+            "example": "2026-07-30T08:13:26.653Z"
           },
           "transactionCost": {
             "type": "number",
@@ -11059,10 +11082,10 @@
       "NameLookupRequestDto": {
         "type": "object",
         "properties": {
-          "walletId": {
+          "currency": {
             "type": "string",
-            "description": "The fiat wallet the payout would be debited from — used to resolve which provider would actually handle it.",
-            "example": "5f9b2c7b9c9d6b0017b4e6b1"
+            "description": "Currency the payout would be made in — used to resolve which provider would actually handle it.",
+            "example": "KES"
           },
           "phoneNumber": {
             "type": "string",
@@ -11102,7 +11125,7 @@
           }
         },
         "required": [
-          "walletId",
+          "currency",
           "phoneNumber",
           "network",
           "countryCode"
@@ -11111,10 +11134,10 @@
       "BankAccountLookupRequestDto": {
         "type": "object",
         "properties": {
-          "walletId": {
+          "currency": {
             "type": "string",
-            "description": "The fiat wallet the payout would be debited from — used to resolve which provider would actually handle the bank payout.",
-            "example": "5f9b2c7b9c9d6b0017b4e6b1"
+            "description": "Currency the payout would be made in — used to resolve which provider would actually handle the bank payout.",
+            "example": "KES"
           },
           "accountNumber": {
             "type": "string",
@@ -11133,7 +11156,7 @@
           }
         },
         "required": [
-          "walletId",
+          "currency",
           "accountNumber",
           "bankCode",
           "countryCode"
