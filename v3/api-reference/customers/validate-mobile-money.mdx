@@ -18,6 +18,13 @@ them all optional. In practice there are two shapes:
 }
 ```
 
+```json Local number
+{
+  "phoneNumber": "0712345678",
+  "countryCode": "KE"
+}
+```
+
 ```json Paybill or till
 {
   "accountType": "paybill",
@@ -28,11 +35,14 @@ them all optional. In practice there are two shapes:
 
 | Sending | Required | Also accepted |
 | --- | --- | --- |
-| A phone number (default) | `phoneNumber` | `countryCode`, `network`, `accountName` |
+| A phone number (default) | `phoneNumber` in international format, **or** `phoneNumber` + `countryCode` | `network`, `accountName` |
 | A paybill or till | `accountType`, `shortCode` | `accountReference` (paybill only), `countryCode`, `accountName` |
 
-`countryCode` is read from the phone number when you omit it, and defaults to
-`KE` for a shortcode. `network` defaults to `MPESA`.
+Send the number in international format (`+254712345678`) or supply
+`countryCode` alongside a local one. A local number on its own is genuinely
+ambiguous — `0712345678` is a real number in seven of the countries we support
+— so rather than guess, the response asks you which country you mean.
+`countryCode` defaults to `KE` for a shortcode, and `network` to `MPESA`.
 
 ## Resolving the account holder
 
