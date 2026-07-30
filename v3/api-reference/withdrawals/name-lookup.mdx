@@ -3,4 +3,17 @@ title: "Name Lookup"
 openapi: "POST /api/v3/name-lookup"
 ---
 
-Validate the mobile money account name for a phone number before sending a payout to it, reducing the risk of sending funds to the wrong recipient. Pass the phone number, network, and country directly — no prior customer record is required. This endpoint is only available to integrators approved for name-lookup. Currently supported for corridors handled by the assigned provider; unsupported corridors return `status: "UNSUPPORTED"` rather than an error.
+<Warning>
+Superseded by [Account Validation](/v3/essentials/account-validation). This
+endpoint still works and is not scheduled for removal, but new integrations
+should use `/customer/validate/mobile-money` and `/customer/validate/bank`
+instead — same name resolution, plus format and corridor checks, paybill and
+till support, and an optional name match.
+</Warning>
+
+Resolves the account holder name for a phone number before you pay it. Pass the
+phone number, network and country directly — no prior customer record is
+required.
+
+Only available to accounts enabled for name lookup. Corridors that can't resolve
+a name return `status: "UNSUPPORTED"` rather than an error.

@@ -1,0 +1,53 @@
+---
+title: "Sandbox Overview"
+description: "How to test against Kotani Pay sandbox, and the reserved values that force a specific outcome."
+---
+
+Sandbox behaves like production — same endpoints, same request and response
+shapes, same webhooks — but no real money moves.
+
+The difference is that sandbox gives you **reserved test values**. Pointing at a
+real provider only ever tells you what that provider happens to know about; you
+can't reliably reproduce a frozen account, a failed payout or a timeout on
+demand. Send one of the reserved values instead and you get that exact outcome,
+every time.
+
+<CardGroup cols={2}>
+  <Card title="Account Validation" icon="user-check" href="/v3/testing/account-validation">
+    Phone numbers, account numbers and shortcodes that resolve to a fixed
+    validation result — including frozen and unresolvable accounts.
+  </Card>
+</CardGroup>
+
+## How reserved values work
+
+Reserved values are recognised **only in sandbox**. In production they carry no
+special meaning and are treated like any other number, so nothing you build
+against them changes behaviour when you go live.
+
+Where a value simulates a failure, the failure arrives the same way a real one
+would — same status, same error shape, same webhook. That is the point: the
+paths worth testing are the ones you can't easily trigger by hand.
+
+## Getting set up
+
+<Steps>
+  <Step title="Get sandbox credentials">
+    Generate an API key from the sandbox dashboard. Sandbox and production keys
+    are separate and not interchangeable.
+  </Step>
+  <Step title="Point at the sandbox host">
+    Use `https://sandbox-api.kotanipay.com` in place of the production host.
+  </Step>
+  <Step title="Set a webhook URL you can reach">
+    Most flows resolve asynchronously. If your webhook endpoint isn't reachable
+    from the internet you'll see the transaction created but never see it
+    settle.
+  </Step>
+</Steps>
+
+<Note>
+Some responses are only returned to accounts with the matching entitlement — for
+example resolved account holder names require name lookup to be enabled. Ask
+your account manager to enable it on your sandbox account.
+</Note>

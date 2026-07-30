@@ -7775,7 +7775,7 @@
           },
           "walletDebitAmount": {
             "type": "number",
-            "description": "OFFRAMP only. Total amount actually debited from the integrator fiat wallet, including any fee billed to the integrator on top of the payout (BILL_ON_INTEGRATOR). Equal to fiatAmount when the fee is not charged against this wallet.",
+            "description": "OFFRAMP only. Total debited from your wallet, including any fee billed on top.",
             "example": "106"
           }
         },
@@ -7810,7 +7810,7 @@
           "fiat",
           "crypto"
         ],
-        "description": "Which currency the amount field represents. Defaults to 'fiat' (current behavior — fiatAmount holds a fiat value). Set to 'crypto' to instead pass the desired crypto amount in fiatAmount and get back the equivalent fiat cost."
+        "description": "Which currency fiatAmount holds. Defaults to fiat, set crypto to pass a crypto amount."
       },
       "OnrampRateRequest": {
         "type": "object",
@@ -7835,7 +7835,7 @@
             "example": "0.85"
           },
           "source": {
-            "description": "Which currency the amount field represents. Defaults to 'fiat' (current behavior — fiatAmount holds a fiat value). Set to 'crypto' to instead pass the desired crypto amount in fiatAmount and get back the equivalent fiat cost.",
+            "description": "Which currency fiatAmount holds. Defaults to fiat, set crypto to pass a crypto amount.",
             "example": "fiat",
             "allOf": [
               {
@@ -7873,7 +7873,7 @@
             "example": "0.85"
           },
           "source": {
-            "description": "Which currency the amount field represents. Defaults to 'crypto' (cryptoAmount holds the crypto amount being sold). Set to 'fiat' to instead pass the desired NET fiat payout in cryptoAmount — the response's transactionAmount will match this amount, and cryptoAmount/fiatAmount in the response are grossed up to cover the fee.",
+            "description": "Which currency cryptoAmount holds. Defaults to crypto, set fiat to pass the net payout.",
             "example": "crypto",
             "allOf": [
               {
@@ -9236,7 +9236,7 @@
           },
           "currency": {
             "type": "string",
-            "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
+            "description": "Override the transaction currency. Skips phone-country validation when it matches the wallet.",
             "example": "USD"
           }
         },
@@ -9286,7 +9286,7 @@
           },
           "currency": {
             "type": "string",
-            "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
+            "description": "Override the transaction currency. Skips phone-country validation when it matches the wallet.",
             "example": "USD"
           },
           "provider": {
@@ -9636,7 +9636,7 @@
           },
           "forceDefaultMethod": {
             "type": "boolean",
-            "description": "When true, force the payment method specified in paymentMethod to be the only option presented to the customer (no switching allowed). Passed to the provider as forceDefaultMethod where supported.",
+            "description": "Show only the chosen paymentMethod to the customer, where the provider supports it.",
             "example": false
           }
         },
@@ -9846,7 +9846,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-07-30T16:52:53.948Z"
+            "example": "2026-07-30T17:06:05.622Z"
           },
           "transactionCost": {
             "type": "number",
@@ -9939,7 +9939,7 @@
           },
           "currency": {
             "type": "string",
-            "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
+            "description": "Override the transaction currency. Skips phone-country validation when it matches the wallet.",
             "example": "USD"
           },
           "network": {
@@ -10124,7 +10124,7 @@
           },
           "currency": {
             "type": "string",
-            "description": "Override transaction currency (e.g. USD for USD mobile money in Congo/Zambia). When provided and matches the wallet currency, phone-country currency validation is skipped.",
+            "description": "Override the transaction currency. Skips phone-country validation when it matches the wallet.",
             "example": "USD"
           },
           "network": {
@@ -10537,12 +10537,12 @@
           },
           "score": {
             "type": "number",
-            "description": "How closely the supplied name matches the one registered on the account, 0-100.",
+            "description": "How closely the names match, 0-100.",
             "example": 100
           },
           "matched": {
             "type": "boolean",
-            "description": "Whether the score met the match threshold configured for your account.",
+            "description": "Whether the score met your account threshold.",
             "example": true
           },
           "threshold": {
@@ -10552,7 +10552,7 @@
           },
           "masked": {
             "type": "boolean",
-            "description": "True when the provider only returned a partially masked name. The match is then based on the visible portion alone, so treat it as weaker evidence.",
+            "description": "True when the provider masked part of the name — weaker evidence.",
             "example": false
           }
         },
@@ -10631,21 +10631,21 @@
           },
           "accountName": {
             "type": "string",
-            "description": "Name registered on the account, resolved from the payment provider. Only present for integrators enabled for name lookup, and only when the lookup succeeded. May be partially masked depending on the provider.",
+            "description": "Name registered on the account. Requires name lookup to be enabled.",
             "example": "JANE MARY DOE"
           },
           "nameLookupStatus": {
             "type": "string",
-            "description": "Outcome of the name resolution: MATCHED (name returned), NOT_FOUND (account not resolvable), UNSUPPORTED (not available for this corridor), TIMEOUT, ERROR, or NOT_ENABLED (integrator is not enabled for name lookup). Absent when name lookup was not attempted.",
+            "description": "MATCHED, NOT_FOUND, UNSUPPORTED, TIMEOUT, ERROR or NOT_ENABLED.",
             "example": "MATCHED"
           },
           "accountStatus": {
             "type": "string",
-            "description": "The account's status as reported by the provider (e.g. ACTIVE, FROZEN, RESTRICTED). Only present alongside a resolved accountName.",
+            "description": "Account status: ACTIVE, FROZEN or RESTRICTED.",
             "example": "ACTIVE"
           },
           "nameMatch": {
-            "description": "Comparison of the accountName you supplied on the request against the one registered on the account. Only present when you supplied a name and the lookup resolved one.",
+            "description": "Comparison of the accountName you sent against the name on the account.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/NameMatchDto"
@@ -10664,7 +10664,7 @@
         "properties": {
           "accountType": {
             "type": "string",
-            "description": "What is being validated. Defaults to mobile_money (a subscriber phone number). Use paybill or till to validate an M-PESA business shortcode instead — those require shortCode rather than phoneNumber.",
+            "description": "What to validate. Defaults to mobile_money; paybill and till take shortCode instead of phoneNumber.",
             "enum": [
               "mobile_money",
               "paybill",
@@ -10674,27 +10674,27 @@
           },
           "phoneNumber": {
             "type": "string",
-            "description": "Phone number to validate (with or without country code). Required unless accountType is paybill or till. Examples: 0712345678, +254712345678, +27123456789",
+            "description": "Phone number, any format. Required unless accountType is paybill or till.",
             "example": "+254712345678"
           },
           "shortCode": {
             "type": "string",
-            "description": "M-PESA business shortcode (paybill number or till/buygoods number). Required when accountType is paybill or till.",
+            "description": "M-PESA paybill or till number. Required when accountType is paybill or till.",
             "example": "247247"
           },
           "accountReference": {
             "type": "string",
-            "description": "Account/reference number on a paybill (the value a payer would enter as the account). Only meaningful when accountType is paybill.",
+            "description": "Account number on a paybill — what a payer would enter. Paybill only.",
             "example": "0670179741746"
           },
           "countryCode": {
             "type": "string",
-            "description": "Country code (ISO2). Optional for mobile_money — it is derived from the phone number's country code when omitted. Recommended for paybill/till, which carry no country of their own (defaults to KE).",
+            "description": "Country code (ISO2). Derived from the phone number when omitted; defaults to KE for paybill/till.",
             "example": "KE"
           },
           "network": {
             "type": "string",
-            "description": "Mobile network the number is on. Only used when the integrator is enabled for name lookup, to pick the right provider for the corridor. Defaults to MPESA.",
+            "description": "Mobile network, used to route the name lookup. Defaults to MPESA.",
             "enum": [
               "MTN",
               "AIRTEL",
@@ -10720,7 +10720,7 @@
           },
           "accountName": {
             "type": "string",
-            "description": "Name you expect to be registered on this account. When supplied (and the integrator is enabled for name lookup), the response includes a nameMatch block scoring it against the name the provider returns — so you can check a recipient before paying them. Compared token by token, so middle names, initials, ordering and minor typos still match.",
+            "description": "Name you expect on this account. Returns a nameMatch score against the real one.",
             "example": "Jane Doe"
           }
         }
@@ -10745,7 +10745,7 @@
           },
           "accountName": {
             "type": "string",
-            "description": "Name you expect to be registered on this account. When supplied (and the integrator is enabled for name lookup), the response includes a nameMatch block scoring it against the name the bank returns — so you can check a recipient before paying them. Compared token by token, so middle names, initials, ordering and minor typos still match.",
+            "description": "Name you expect on this account. Returns a nameMatch score against the real one.",
             "example": "Jane Doe"
           }
         },
@@ -11169,7 +11169,7 @@
           },
           "overrideUsdRate": {
             "type": "number",
-            "description": "Admin-supplied exchange rate as \"1 USD = X local currency\". Overrides the auto-fetched rate for USD snapshot computation. Only meaningful for non-USD wallets.",
+            "description": "Exchange rate as 1 USD = X local currency. Overrides the auto-fetched rate. Non-USD wallets only.",
             "example": 129.5
           }
         },
@@ -11421,7 +11421,7 @@
           },
           "bankCode": {
             "type": "string",
-            "description": "Bank code (required for Kenya; use 0 for South Africa). May be a number or a string — use a zero-padded string for Nigeria."
+            "description": "Bank code. Required for Kenya, use 0 for South Africa. Zero-pad as a string for Nigeria."
           },
           "bankName": {
             "type": "string",
@@ -11495,7 +11495,7 @@
         "properties": {
           "bolt11": {
             "type": "string",
-            "description": "Pre-generated Lightning bolt11 refund invoice. If provided and valid when a refund is triggered, Kotani pays this invoice directly without waiting for you to submit one manually. Lightning invoices expire — provide generate_invoice_url so Kotani can fetch a fresh one if this expires.",
+            "description": "Pre-generated bolt11 refund invoice, paid directly if a refund is triggered.",
             "example": "lnbc1500n1p0xyz..."
           },
           "payment_hash": {
@@ -11505,22 +11505,22 @@
           },
           "amount_msat": {
             "type": "number",
-            "description": "Amount of the bolt11 invoice in millisatoshis. Must exactly match the crypto amount to be refunded. Kotani validates this before paying.",
+            "description": "Invoice amount in millisatoshis. Must exactly match the crypto amount refunded.",
             "example": 150000000
           },
           "expires_at": {
             "type": "string",
-            "description": "ISO 8601 expiry timestamp of the bolt11 invoice. If expires_at is in the past when a refund is triggered, Kotani calls generate_invoice_url for a fresh invoice. Lightning invoices typically expire in 1–24 hours depending on your node settings.",
+            "description": "ISO 8601 expiry of the bolt11 invoice. Kotani refreshes it via generate_invoice_url once past.",
             "example": "2024-11-22T13:00:00Z"
           },
           "generate_invoice_url": {
             "type": "string",
-            "description": "URL Kotani calls (POST) to request a fresh bolt11 invoice when the stored one has expired. Kotani sends { amount_msat, reference_id } in the request body and expects { bolt11, payment_hash, amount_msat, expires_at } in the response. If not provided and the invoice expires, Kotani falls back to webhook notification asking you to submit via POST /offramp/submit-refund-invoice/:referenceId.",
+            "description": "URL Kotani POSTs to for a fresh bolt11 when the stored one expires. See the refunds guide.",
             "example": "https://api.yourapp.com/lightning/generate-refund-invoice"
           },
           "address": {
             "type": "string",
-            "description": "Fallback on-chain address for non-Lightning chains (EVM, Solana, Stellar, Cardano etc.). Kotani sends refunded crypto here if the fiat disbursement fails. Must be a valid address for the same chain as the offramp transaction.",
+            "description": "Fallback on-chain refund address for non-Lightning chains. Must match the transaction chain.",
             "example": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb"
           }
         }
@@ -11601,7 +11601,7 @@
             "description": "Rate ID obtained from the /offramp/rate endpoint"
           },
           "refund_config": {
-            "description": "Optional refund destination for this transaction. For Lightning: provide a bolt11 invoice so Kotani can refund immediately if fiat disbursement fails, without waiting for you to submit one manually. Include generate_invoice_url so Kotani can refresh the invoice if it expires. For on-chain chains: provide address as the fallback refund destination. If omitted, Kotani notifies you via webhook and email when a refund is needed and you submit via POST /offramp/submit-refund-invoice/:referenceId.",
+            "description": "Where to send a refund if the fiat disbursement fails. See the refunds guide.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/OfframpRefundConfigDto"
@@ -11917,7 +11917,7 @@
           },
           "callbackUrl": {
             "type": "string",
-            "description": "Webhook URL to notify when the onramp transaction reaches a terminal state. Falls back to your integrator-level default webhook URL if omitted."
+            "description": "Webhook URL for the terminal status. Falls back to your default webhook URL."
           },
           "rateId": {
             "type": "string",
@@ -11925,7 +11925,7 @@
           },
           "fiatWalletId": {
             "type": "string",
-            "description": "Optional. Links this transaction to a specific fiat wallet for currency resolution and audit. No fiat is debited — crypto is sent directly from your pre-loaded crypto wallet. If omitted, a wallet is auto-selected by currency."
+            "description": "Links this transaction to a fiat wallet for currency resolution. No fiat is debited."
           }
         },
         "required": [

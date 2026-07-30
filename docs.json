@@ -37,7 +37,8 @@
                 "group": "Testing",
                 "pages": [
                   "v3/run-in-postman",
-              "v3/api-reference/customers/sandbox-test-accounts"
+              "v3/testing/overview",
+              "v3/testing/account-validation"
                 ]
               },
               {
@@ -58,6 +59,7 @@
                   "v3/essentials/request-signing",
                   "v3/essentials/offramp-refunds",
                   "v3/essentials/transaction-statuses",
+              "v3/essentials/account-validation",
                   "v3/essentials/error-handling",
                   "v3/essentials/rate-limits"
                 ]
@@ -147,8 +149,7 @@
                 "pages": [
                   "v3/api-reference/withdrawals/mobile-money",
                   "v3/api-reference/withdrawals/mobile-money-status",
-                  "v3/api-reference/withdrawals/list-transactions",
-                  "v3/api-reference/withdrawals/name-lookup"
+                  "v3/api-reference/withdrawals/list-transactions"
                 ]
               },
               {

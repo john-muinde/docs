@@ -1,0 +1,129 @@
+---
+title: "Account Validation"
+description: "Check a recipient exists — and that it belongs to who you think — before you send them money."
+---
+
+Paying the wrong account is expensive and usually irreversible. Account
+validation lets you check a destination before you commit to it.
+
+There are two levels, and which you get depends on your account:
+
+| | Available to | Tells you |
+| --- | --- | --- |
+| **Format & corridor check** | Everyone | Whether the number is well formed and the corridor is supported |
+| **Name resolution** | Accounts enabled for name lookup | Who the account actually belongs to, and whether that matches who you expected |
+
+Both come from the same endpoints, with the same request shape. Without the
+entitlement you get the format check and `nameLookupStatus: "NOT_ENABLED"`;
+with it, the response gains `accountName`, `accountStatus` and — if you asked
+for it — `nameMatch`.
+
+## Validating a phone number
+
+<CodeGroup>
+```bash Request
+curl -X POST https://api.kotanipay.com/api/v3/customer/validate/mobile-money \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "phoneNumber": "+254712345678" }'
+```
+
+```json Response
+{
+  "isValid": true,
+  "isSupported": true,
+  "countryCode": "KE",
+  "currency": "KES",
+  "internationalNumber": "+254712345678",
+  "accountName": "JANE MARY DOE",
+  "nameLookupStatus": "MATCHED"
+}
+```
+</CodeGroup>
+
+## Validating a bank account
+
+Send the account number, the bank code and the country.
+
+```json
+{
+  "accountNumber": "1234567890",
+  "bankCode": "68",
+  "countryCode": "KE"
+}
+```
+
+Alongside the name, bank responses carry `accountStatus` — `ACTIVE`, `FROZEN`
+or `RESTRICTED`. A frozen or restricted account will usually reject an incoming
+payment, so it's worth checking before you send.
+
+## Paybill and till
+
+Set `accountType` to `paybill` or `till` and send `shortCode` instead of
+`phoneNumber`. For a paybill you can also pass `accountReference` — the value a
+payer would enter as the account number.
+
+```json
+{
+  "accountType": "paybill",
+  "shortCode": "247247",
+  "accountReference": "0123456789"
+}
+```
+
+A shortcode is just digits, so there's no useful format check for one — whether
+it exists is exactly what the lookup answers. These two types therefore need
+name lookup enabled.
+
+## Confirming the recipient is who you expect
+
+Send `accountName` with the name you're expecting and the response adds a
+`nameMatch` block.
+
+```json
+{
+  "accountNumber": "1234567890",
+  "bankCode": "68",
+  "countryCode": "KE",
+  "accountName": "Jane Doe"
+}
+```
+
+```json
+{
+  "accountName": "JANE MARY DOE",
+  "nameMatch": {
+    "provided": "Jane Doe",
+    "score": 100,
+    "matched": true,
+    "threshold": 70,
+    "masked": false
+  }
+}
+```
+
+Names are compared token by token rather than as exact strings, because real
+account names rarely come back in the format you sent them. `Jane M Doe`,
+`Doe Jane Mary` and `Jane Mary Doe` all match `JANE MARY DOE`; `Robert Doe`
+does not.
+
+<Warning>
+When `masked` is `true` the provider only returned part of the name, so the
+match is based on the visible portion alone. Treat that as "not contradicted"
+rather than confirmed.
+</Warning>
+
+## Blocking payouts on a name mismatch
+
+If you'd rather not check every recipient yourself, we can enforce it for you:
+your bank payouts get name-checked before dispatch, and any payout whose
+recipient name doesn't match is failed instead of sent.
+
+This is off by default and configured per account, including how close the match
+has to be. Talk to your account manager if you want it enabled.
+
+## Trying it out
+
+Sandbox has [reserved values](/v3/testing/account-validation) that resolve to
+frozen accounts, unresolvable accounts, mismatched names and provider timeouts,
+so you can build against the failure cases directly.
