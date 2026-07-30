@@ -1,0 +1,104 @@
+---
+title: "Sandbox Test Accounts"
+description: "Reserved phone numbers, account numbers and shortcodes that return a fixed account-validation result in sandbox."
+---
+
+Pointing sandbox at a real payment provider only ever tells you what that
+provider happens to know about. You can't reliably reproduce a frozen account,
+an unresolvable one, or a provider timeout — which are exactly the cases your
+integration needs to handle.
+
+The values below return a **fixed result** in sandbox, without contacting a
+provider. Use them to build and test your error handling.
+
+<Note>
+These are sandbox only. In production every request goes to the real provider,
+and these values carry no special meaning.
+</Note>
+
+## Mobile money
+
+Use with [Validate Mobile Money](/v3/api-reference/customers/validate-mobile-money).
+Any format works — `+254700000001`, `254700000001` and `0700000001` all resolve
+to the same result.
+
+| Phone number | Result | Use it to test |
+| --- | --- | --- |
+| `+254700000001` | `MATCHED` — JANE MARY DOE | The happy path |
+| `+254700000002` | `MATCHED` — ROBERT JAMES SMITH | A name that *doesn't* match the one you expected |
+| `+254700000003` | `NOT_FOUND` | A number that can't be resolved |
+| `+254700000004` | `UNSUPPORTED` | A corridor where name lookup isn't available |
+| `+254700000005` | `TIMEOUT` | A slow provider (responds after ~1.5s) |
+| `+254700000006` | `ERROR` | A provider failure |
+| `+254700000007` | `MATCHED` — partially masked | A provider that only returns part of the name |
+
+## Bank accounts
+
+Use with [Validate Bank Account](/v3/api-reference/customers/validate-bank).
+
+| Account number | Result | Use it to test |
+| --- | --- | --- |
+| `1000000001` | `MATCHED` — JANE MARY DOE, `ACTIVE` | The happy path |
+| `1000000002` | `MATCHED` — ROBERT JAMES SMITH, `ACTIVE` | A name that *doesn't* match the one you expected |
+| `1000000003` | `MATCHED` — `FROZEN` | A frozen account |
+| `1000000004` | `MATCHED` — `RESTRICTED` | A restricted account |
+| `1000000005` | `NOT_FOUND` | An account that can't be resolved |
+| `1000000006` | `UNSUPPORTED` | A corridor where validation isn't available |
+| `1000000007` | `ERROR` | A provider failure |
+
+## Paybill and till
+
+Use with [Validate Mobile Money](/v3/api-reference/customers/validate-mobile-money)
+and `accountType` set to `paybill` or `till`.
+
+| Shortcode | Result |
+| --- | --- |
+| `100001` | `MATCHED` — ACME TRADING LIMITED |
+| `100002` | `NOT_FOUND` |
+| `100003` | `ERROR` |
+
+## Checking a name before you pay
+
+Send `accountName` with the name you expect on the account and the response
+adds a `nameMatch` block scoring it against the real one. Names are compared
+token by token, so middle names, initials, ordering and small typos still
+match — `Jane M Doe` matches `JANE MARY DOE`.
+
+```json
+{
+  "accountNumber": "1000000001",
+  "bankCode": "68",
+  "countryCode": "KE",
+  "accountName": "Jane Doe"
+}
+```
+
+```json
+{
+  "accountName": "JANE MARY DOE",
+  "accountStatus": "ACTIVE",
+  "nameLookupStatus": "MATCHED",
+  "nameMatch": {
+    "provided": "Jane Doe",
+    "score": 100,
+    "matched": true,
+    "threshold": 70,
+    "masked": false
+  }
+}
+```
+
+Pair `1000000002` with `"accountName": "Jane Doe"` to see a failed match.
+
+<Warning>
+When `masked` is `true` the provider only returned part of the name, so the
+match is based on the visible portion alone. Treat it as "not contradicted"
+rather than confirmed.
+</Warning>
+
+## Name resolution requires an entitlement
+
+`accountName`, `accountStatus` and `nameMatch` are only returned if your account
+is enabled for name lookup. Without it you still get the format and corridor
+validation, and `nameLookupStatus` comes back as `NOT_ENABLED`. Talk to your
+account manager to have it turned on.

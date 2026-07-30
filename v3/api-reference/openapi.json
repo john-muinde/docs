@@ -2736,200 +2736,6 @@
         ]
       }
     },
-    "/api/v3/customer/validate/mobile-money": {
-      "post": {
-        "description": "Validates a phone number in any format (with or without country code). Returns validation status, country information, formatted number, and whether the country is supported for mobile money.",
-        "operationId": "AccountValidationController_validateMobileMoneyAccount_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ValidateMobileMoneyAccountDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Phone number validated successfully."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/ValidateAccountResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Validate phone number",
-        "tags": [
-          "CUSTOMER - VALIDATION"
-        ]
-      }
-    },
-    "/api/v3/customer/validate/bank": {
-      "post": {
-        "description": "Validates a bank account number format for a given country and bank code, and whether the country is supported.",
-        "operationId": "AccountValidationController_validateBankAccount_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ValidateBankAccountDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bank account validated successfully."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/ValidateAccountResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Unauthorized"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Validate bank account",
-        "tags": [
-          "CUSTOMER - VALIDATION"
-        ]
-      }
-    },
     "/api/v3/deposit/mobile-money": {
       "post": {
         "description": "An integrator’s customers can initiate a deposit from their respective mobile money wallets.     An STK push will be sent to the customer and the respective amount will be deducted from their mobile money wallets and deposited into the integrator’s fiat wallet",
@@ -4389,6 +4195,394 @@
         ]
       }
     },
+    "/api/v3/name-lookup": {
+      "post": {
+        "description": "Checks a phone number and network directly against whichever provider would actually handle a payout to them, reducing the risk of sending funds to the wrong recipient. No prior customer record is required — only integrators approved for name-lookup can call this endpoint.",
+        "operationId": "NameLookupController_lookup_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NameLookupRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Name lookup completed."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/NameLookupResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bad Request"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid API Key"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Resolve the account holder name for a phone number",
+        "tags": [
+          "NAME LOOKUP"
+        ]
+      }
+    },
+    "/api/v3/name-lookup/bank": {
+      "post": {
+        "description": "Returns the account holder name registered on the given account number/bank code, so you can confirm the recipient before a payout. No prior customer record is required — only integrators approved for name-lookup can call this endpoint.",
+        "operationId": "NameLookupController_validateBankAccount_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankAccountLookupRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Account validation completed."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/BankAccountLookupResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bad Request"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid API Key"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Resolve a bank account holder name",
+        "tags": [
+          "NAME LOOKUP"
+        ]
+      }
+    },
+    "/api/v3/customer/validate/mobile-money": {
+      "post": {
+        "description": "Validates a phone number in any format (with or without country code). Returns validation status, country information, formatted number, and whether the country is supported for mobile money.",
+        "operationId": "AccountValidationController_validateMobileMoneyAccount_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateMobileMoneyAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Phone number validated successfully."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ValidateAccountResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid request"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Validate phone number",
+        "tags": [
+          "CUSTOMER - VALIDATION"
+        ]
+      }
+    },
+    "/api/v3/customer/validate/bank": {
+      "post": {
+        "description": "Validates a bank account number format for a given country and bank code, and whether the country is supported.",
+        "operationId": "AccountValidationController_validateBankAccount_api/v3",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateBankAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Bank account validated successfully."
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ValidateAccountResponseDto"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid request"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": false
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    },
+                    "data": {
+                      "type": "object",
+                      "example": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ],
+        "summary": "Validate bank account",
+        "tags": [
+          "CUSTOMER - VALIDATION"
+        ]
+      }
+    },
     "/api/v3/kyc": {
       "post": {
         "description": "This api will create a new kyc basic details",
@@ -5752,200 +5946,6 @@
         "summary": "Check for the application health",
         "tags": [
           "HEALTH"
-        ]
-      }
-    },
-    "/api/v3/name-lookup": {
-      "post": {
-        "description": "Checks a phone number and network directly against whichever provider would actually handle a payout to them, reducing the risk of sending funds to the wrong recipient. No prior customer record is required — only integrators approved for name-lookup can call this endpoint.",
-        "operationId": "NameLookupController_lookup_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NameLookupRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Name lookup completed."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/NameLookupResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid API Key"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Resolve the account holder name for a phone number",
-        "tags": [
-          "NAME LOOKUP"
-        ]
-      }
-    },
-    "/api/v3/name-lookup/bank": {
-      "post": {
-        "description": "Returns the account holder name registered on the given account number/bank code, so you can confirm the recipient before a payout. No prior customer record is required — only integrators approved for name-lookup can call this endpoint.",
-        "operationId": "NameLookupController_validateBankAccount_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BankAccountLookupRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Account validation completed."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/BankAccountLookupResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid API Key"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Resolve a bank account holder name",
-        "tags": [
-          "NAME LOOKUP"
         ]
       }
     },
@@ -9167,114 +9167,6 @@
           "country_code"
         ]
       },
-      "ValidateAccountResponseDto": {
-        "type": "object",
-        "properties": {
-          "isValid": {
-            "type": "boolean",
-            "description": "Whether the phone number or account is valid",
-            "example": true
-          },
-          "isSupported": {
-            "type": "boolean",
-            "description": "Whether the country/service is supported",
-            "example": true
-          },
-          "requiresInternationalization": {
-            "type": "boolean",
-            "description": "Whether the phone number needs internationalization (missing country code)",
-            "example": false
-          },
-          "countryCode": {
-            "type": "string",
-            "description": "Country code (ISO2)",
-            "example": "KE"
-          },
-          "countryName": {
-            "type": "string",
-            "description": "Country name",
-            "example": "Kenya"
-          },
-          "callingCode": {
-            "type": "string",
-            "description": "Phone number calling code (e.g., +254)"
-          },
-          "internationalNumber": {
-            "type": "string",
-            "description": "Phone number in international format without spaces (e.g., +254719399210)",
-            "example": "+254719399210"
-          },
-          "nationalNumber": {
-            "type": "string",
-            "description": "Phone number in national format without spaces (e.g., 0719399210)",
-            "example": "0719399210"
-          },
-          "accountType": {
-            "type": "string",
-            "description": "Account type",
-            "enum": [
-              "mobile_money",
-              "bank"
-            ]
-          },
-          "bankName": {
-            "type": "string",
-            "description": "Bank name (for bank accounts)"
-          },
-          "currency": {
-            "type": "string",
-            "description": "Currency for the country",
-            "example": "KES"
-          },
-          "message": {
-            "type": "string",
-            "description": "Validation error message (if invalid)"
-          }
-        },
-        "required": [
-          "isValid",
-          "isSupported",
-          "accountType"
-        ]
-      },
-      "ValidateMobileMoneyAccountDto": {
-        "type": "object",
-        "properties": {
-          "phoneNumber": {
-            "type": "string",
-            "description": "Phone number to validate (with or without country code). Examples: 0719399210, +254719399210, +27123456789",
-            "example": "+254719399210"
-          }
-        },
-        "required": [
-          "phoneNumber"
-        ]
-      },
-      "ValidateBankAccountDto": {
-        "type": "object",
-        "properties": {
-          "accountNumber": {
-            "type": "string",
-            "description": "Bank account number",
-            "example": "1234567890"
-          },
-          "bankCode": {
-            "type": "string",
-            "description": "Bank code or name",
-            "example": "KCB"
-          },
-          "countryCode": {
-            "type": "string",
-            "description": "Country code",
-            "example": "KE"
-          }
-        },
-        "required": [
-          "accountNumber",
-          "bankCode",
-          "countryCode"
-        ]
-      },
       "DepositResponseDto": {
         "type": "object",
         "properties": {
@@ -9954,7 +9846,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-07-30T08:13:26.653Z"
+            "example": "2026-07-30T16:52:53.948Z"
           },
           "transactionCost": {
             "type": "number",
@@ -10552,6 +10444,317 @@
           "referenceId"
         ]
       },
+      "NameLookupRequestDto": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "Currency the payout would be made in — used to resolve which provider would actually handle it.",
+            "example": "KES"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number to validate, in international format.",
+            "example": "+254712345678"
+          },
+          "network": {
+            "type": "string",
+            "enum": [
+              "MTN",
+              "AIRTEL",
+              "VODAFONE",
+              "TIGO",
+              "YAS",
+              "ORANGE",
+              "NOT_SUPPORTED",
+              "ZAMTEL",
+              "MPESA",
+              "CHECKOUT",
+              "BKTRX",
+              "CRDTRX",
+              "MOOV",
+              "TMONEY",
+              "FREE",
+              "EXPRESSO",
+              "HALOPESA",
+              "VODACOM",
+              "WAVE"
+            ],
+            "description": "Mobile network the phone number is on (check the Payment Providers API for what is available per corridor).",
+            "example": "MPESA"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Country code (ISO-2 like KE, or ISO-3 like KEN).",
+            "example": "KE"
+          }
+        },
+        "required": [
+          "currency",
+          "phoneNumber",
+          "network",
+          "countryCode"
+        ]
+      },
+      "BankAccountLookupRequestDto": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "Currency the payout would be made in — used to resolve which provider would actually handle the bank payout.",
+            "example": "KES"
+          },
+          "accountNumber": {
+            "type": "string",
+            "description": "Bank account number to resolve.",
+            "example": "1234567890"
+          },
+          "bankCode": {
+            "type": "string",
+            "description": "Bank code the account is held with. May be a number or a string — use a zero-padded string for Nigeria.",
+            "example": "058"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Country code (ISO-2 like NG, or ISO-3 like NGA).",
+            "example": "NG"
+          }
+        },
+        "required": [
+          "currency",
+          "accountNumber",
+          "bankCode",
+          "countryCode"
+        ]
+      },
+      "NameMatchDto": {
+        "type": "object",
+        "properties": {
+          "provided": {
+            "type": "string",
+            "description": "The name you supplied on the request.",
+            "example": "Jane Doe"
+          },
+          "score": {
+            "type": "number",
+            "description": "How closely the supplied name matches the one registered on the account, 0-100.",
+            "example": 100
+          },
+          "matched": {
+            "type": "boolean",
+            "description": "Whether the score met the match threshold configured for your account.",
+            "example": true
+          },
+          "threshold": {
+            "type": "number",
+            "description": "The threshold the score was compared against.",
+            "example": 70
+          },
+          "masked": {
+            "type": "boolean",
+            "description": "True when the provider only returned a partially masked name. The match is then based on the visible portion alone, so treat it as weaker evidence.",
+            "example": false
+          }
+        },
+        "required": [
+          "provided",
+          "score",
+          "matched",
+          "threshold",
+          "masked"
+        ]
+      },
+      "ValidateAccountResponseDto": {
+        "type": "object",
+        "properties": {
+          "isValid": {
+            "type": "boolean",
+            "description": "Whether the phone number or account is valid",
+            "example": true
+          },
+          "isSupported": {
+            "type": "boolean",
+            "description": "Whether the country/service is supported",
+            "example": true
+          },
+          "requiresInternationalization": {
+            "type": "boolean",
+            "description": "Whether the phone number needs internationalization (missing country code)",
+            "example": false
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Country code (ISO2)",
+            "example": "KE"
+          },
+          "countryName": {
+            "type": "string",
+            "description": "Country name",
+            "example": "Kenya"
+          },
+          "callingCode": {
+            "type": "string",
+            "description": "Phone number calling code (e.g., +254)"
+          },
+          "internationalNumber": {
+            "type": "string",
+            "description": "Phone number in international format without spaces (e.g., +254712345678)",
+            "example": "+254712345678"
+          },
+          "nationalNumber": {
+            "type": "string",
+            "description": "Phone number in national format without spaces (e.g., 0712345678)",
+            "example": "0712345678"
+          },
+          "accountType": {
+            "type": "string",
+            "description": "Account type",
+            "enum": [
+              "mobile_money",
+              "bank",
+              "paybill",
+              "till"
+            ]
+          },
+          "bankName": {
+            "type": "string",
+            "description": "Bank name (for bank accounts)"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency for the country",
+            "example": "KES"
+          },
+          "message": {
+            "type": "string",
+            "description": "Validation error message (if invalid)"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "Name registered on the account, resolved from the payment provider. Only present for integrators enabled for name lookup, and only when the lookup succeeded. May be partially masked depending on the provider.",
+            "example": "JANE MARY DOE"
+          },
+          "nameLookupStatus": {
+            "type": "string",
+            "description": "Outcome of the name resolution: MATCHED (name returned), NOT_FOUND (account not resolvable), UNSUPPORTED (not available for this corridor), TIMEOUT, ERROR, or NOT_ENABLED (integrator is not enabled for name lookup). Absent when name lookup was not attempted.",
+            "example": "MATCHED"
+          },
+          "accountStatus": {
+            "type": "string",
+            "description": "The account's status as reported by the provider (e.g. ACTIVE, FROZEN, RESTRICTED). Only present alongside a resolved accountName.",
+            "example": "ACTIVE"
+          },
+          "nameMatch": {
+            "description": "Comparison of the accountName you supplied on the request against the one registered on the account. Only present when you supplied a name and the lookup resolved one.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/NameMatchDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "isValid",
+          "isSupported",
+          "accountType"
+        ]
+      },
+      "ValidateMobileMoneyAccountDto": {
+        "type": "object",
+        "properties": {
+          "accountType": {
+            "type": "string",
+            "description": "What is being validated. Defaults to mobile_money (a subscriber phone number). Use paybill or till to validate an M-PESA business shortcode instead — those require shortCode rather than phoneNumber.",
+            "enum": [
+              "mobile_money",
+              "paybill",
+              "till"
+            ],
+            "default": "mobile_money"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number to validate (with or without country code). Required unless accountType is paybill or till. Examples: 0712345678, +254712345678, +27123456789",
+            "example": "+254712345678"
+          },
+          "shortCode": {
+            "type": "string",
+            "description": "M-PESA business shortcode (paybill number or till/buygoods number). Required when accountType is paybill or till.",
+            "example": "247247"
+          },
+          "accountReference": {
+            "type": "string",
+            "description": "Account/reference number on a paybill (the value a payer would enter as the account). Only meaningful when accountType is paybill.",
+            "example": "0670179741746"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Country code (ISO2). Optional for mobile_money — it is derived from the phone number's country code when omitted. Recommended for paybill/till, which carry no country of their own (defaults to KE).",
+            "example": "KE"
+          },
+          "network": {
+            "type": "string",
+            "description": "Mobile network the number is on. Only used when the integrator is enabled for name lookup, to pick the right provider for the corridor. Defaults to MPESA.",
+            "enum": [
+              "MTN",
+              "AIRTEL",
+              "VODAFONE",
+              "TIGO",
+              "YAS",
+              "ORANGE",
+              "NOT_SUPPORTED",
+              "ZAMTEL",
+              "MPESA",
+              "CHECKOUT",
+              "BKTRX",
+              "CRDTRX",
+              "MOOV",
+              "TMONEY",
+              "FREE",
+              "EXPRESSO",
+              "HALOPESA",
+              "VODACOM",
+              "WAVE"
+            ],
+            "example": "MPESA"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "Name you expect to be registered on this account. When supplied (and the integrator is enabled for name lookup), the response includes a nameMatch block scoring it against the name the provider returns — so you can check a recipient before paying them. Compared token by token, so middle names, initials, ordering and minor typos still match.",
+            "example": "Jane Doe"
+          }
+        }
+      },
+      "ValidateBankAccountDto": {
+        "type": "object",
+        "properties": {
+          "accountNumber": {
+            "type": "string",
+            "description": "Bank account number",
+            "example": "1234567890"
+          },
+          "bankCode": {
+            "type": "string",
+            "description": "Bank code or name",
+            "example": "KCB"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Country code",
+            "example": "KE"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "Name you expect to be registered on this account. When supplied (and the integrator is enabled for name lookup), the response includes a nameMatch block scoring it against the name the bank returns — so you can check a recipient before paying them. Compared token by token, so middle names, initials, ordering and minor typos still match.",
+            "example": "Jane Doe"
+          }
+        },
+        "required": [
+          "accountNumber",
+          "bankCode",
+          "countryCode"
+        ]
+      },
       "KycResponseDto": {
         "type": "object",
         "properties": {
@@ -11078,89 +11281,6 @@
             "type": "boolean"
           }
         }
-      },
-      "NameLookupRequestDto": {
-        "type": "object",
-        "properties": {
-          "currency": {
-            "type": "string",
-            "description": "Currency the payout would be made in — used to resolve which provider would actually handle it.",
-            "example": "KES"
-          },
-          "phoneNumber": {
-            "type": "string",
-            "description": "Phone number to validate, in international format.",
-            "example": "+254719399210"
-          },
-          "network": {
-            "type": "string",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "YAS",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "VODACOM",
-              "WAVE"
-            ],
-            "description": "Mobile network the phone number is on (check the Payment Providers API for what is available per corridor).",
-            "example": "MPESA"
-          },
-          "countryCode": {
-            "type": "string",
-            "description": "Country code (ISO-2 like KE, or ISO-3 like KEN).",
-            "example": "KE"
-          }
-        },
-        "required": [
-          "currency",
-          "phoneNumber",
-          "network",
-          "countryCode"
-        ]
-      },
-      "BankAccountLookupRequestDto": {
-        "type": "object",
-        "properties": {
-          "currency": {
-            "type": "string",
-            "description": "Currency the payout would be made in — used to resolve which provider would actually handle the bank payout.",
-            "example": "KES"
-          },
-          "accountNumber": {
-            "type": "string",
-            "description": "Bank account number to resolve.",
-            "example": "1234567890"
-          },
-          "bankCode": {
-            "type": "string",
-            "description": "Bank code the account is held with. May be a number or a string — use a zero-padded string for Nigeria.",
-            "example": "058"
-          },
-          "countryCode": {
-            "type": "string",
-            "description": "Country code (ISO-2 like NG, or ISO-3 like NGA).",
-            "example": "NG"
-          }
-        },
-        "required": [
-          "currency",
-          "accountNumber",
-          "bankCode",
-          "countryCode"
-        ]
       },
       "OfframpResponseDto": {
         "type": "object",

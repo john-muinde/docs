@@ -3,4 +3,21 @@ title: "Validate Bank Account"
 openapi: "POST /api/v3/customer/validate/bank"
 ---
 
-Validates a bank account by checking the account number format, bank code, and country support. Returns validation status and bank information.
+Checks a bank account before you pay it: the account number format, the bank
+code, and whether the country is supported.
+
+If your account is enabled for **name lookup**, the response also carries the
+name actually registered on the account (`accountName`), its status
+(`accountStatus` — `ACTIVE`, `FROZEN` or `RESTRICTED`), and `nameLookupStatus`.
+Without that entitlement you still get the format and corridor checks, and
+`nameLookupStatus` comes back as `NOT_ENABLED` — the request is identical either
+way.
+
+Send `accountName` with the name you expect on the account and the response adds
+a `nameMatch` block scoring it against the real one, so you can catch a wrong
+account number before the money moves.
+
+<Tip>
+Use the [sandbox test accounts](/v3/api-reference/customers/sandbox-test-accounts)
+to reproduce frozen, unresolvable and mismatched-name accounts on demand.
+</Tip>

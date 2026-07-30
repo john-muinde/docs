@@ -36,7 +36,8 @@
               {
                 "group": "Testing",
                 "pages": [
-                  "v3/run-in-postman"
+                  "v3/run-in-postman",
+              "v3/api-reference/customers/sandbox-test-accounts"
                 ]
               },
               {
