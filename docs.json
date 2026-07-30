@@ -38,6 +38,7 @@
                 "pages": [
                   "v3/run-in-postman",
               "v3/testing/overview",
+              "v3/testing/transactions",
               "v3/testing/account-validation"
                 ]
               },
