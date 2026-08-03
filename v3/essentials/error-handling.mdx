@@ -1,6 +1,6 @@
 ---
-title: "Errors & Limits"
-description: "How to read an error response, and the request limits you need to design around."
+title: "Errors & Rate Limits"
+description: "How to read an error response, and the rate limits you need to design around."
 ---
 
 The API uses standard HTTP status codes. `2xx` succeeded, `4xx` means your request
@@ -58,7 +58,7 @@ Successful responses are consistent:
 | `401` | Unauthorized — API key or JWT is missing or invalid |
 | `403` | Forbidden — valid key without permission, or a suspended customer |
 | `404` | Resource not found |
-| `429` | Too many requests — see [limits](#request-limits) below |
+| `429` | Too many requests — see [rate limits](#rate-limits) below |
 | `500` | Something failed on our side — contact support if it persists |
 
 ## Validation errors
@@ -93,7 +93,7 @@ the date the suspension lifts:
 }
 ```
 
-## Request limits
+## Rate limits
 
 Limits are counted **per endpoint, per API key** — a busy status-check loop won't
 eat into your ability to create transactions.
@@ -128,7 +128,7 @@ support through your usual channel, if you're designing something that needs it.
 `data.retryAfter` tells you how many seconds to wait. Wait at least that long, then
 retry — don't retry immediately, and don't retry in a tight loop.
 
-## Staying under the limits
+## Staying under the rate limits
 
 - **Use webhooks instead of polling.** Polling for transaction status is the single
   most common cause of hitting these limits. See [Webhooks](/v3/essentials/webhooks).
