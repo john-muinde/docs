@@ -10666,10 +10666,11 @@
           },
           "nameLookupStatus": {
             "type": "string",
-            "description": "MATCHED, NOT_FOUND, UNSUPPORTED, TIMEOUT, ERROR or NOT_ENABLED.",
+            "description": "MATCHED, NOT_FOUND, ACCOUNT_UNAVAILABLE, UNSUPPORTED, TIMEOUT, ERROR or NOT_ENABLED. NOT_FOUND means nothing is there; ACCOUNT_UNAVAILABLE means the account exists but cannot receive money.",
             "enum": [
               "MATCHED",
               "NOT_FOUND",
+              "ACCOUNT_UNAVAILABLE",
               "UNSUPPORTED",
               "TIMEOUT",
               "ERROR",
@@ -12699,6 +12700,78 @@
         },
         "required": [
           "webhookUrl"
+        ]
+      },
+      "NameLookupResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "MATCHED",
+              "NOT_FOUND",
+              "ACCOUNT_UNAVAILABLE",
+              "UNSUPPORTED",
+              "TIMEOUT",
+              "ERROR",
+              "NOT_ENABLED"
+            ],
+            "example": "MATCHED"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Name on file with the mobile money provider, if resolved.",
+            "example": "JANE MARY DOE"
+          },
+          "matchScore": {
+            "type": "number",
+            "description": "Name match score, 0-100. Only returned where the corridor supports scoring.",
+            "example": 95
+          },
+          "reason": {
+            "type": "string",
+            "description": "Human-readable explanation, populated for every outcome other than MATCHED.",
+            "example": "Account does not exist."
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "BankAccountLookupResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "MATCHED",
+              "NOT_FOUND",
+              "ACCOUNT_UNAVAILABLE",
+              "UNSUPPORTED",
+              "TIMEOUT",
+              "ERROR",
+              "NOT_ENABLED"
+            ],
+            "example": "MATCHED"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "Name registered on the bank account, if resolved (MATCHED outcomes).",
+            "example": "JANE MARY DOE"
+          },
+          "accountStatus": {
+            "type": "string",
+            "description": "The bank account's status (e.g. ACTIVE) — the validation signal returned alongside the resolved name.",
+            "example": "ACTIVE"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Human-readable explanation, populated for every outcome other than MATCHED.",
+            "example": "Account does not exist."
+          }
+        },
+        "required": [
+          "status"
         ]
       }
     }

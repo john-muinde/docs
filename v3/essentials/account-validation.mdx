@@ -60,11 +60,12 @@ Three fields look similar and answer different questions. Read them together:
 | `nameMatch.matched` | Is the holder the person you named in `accountName`? |
 
 `isValid` starts from the account number or phone number format, and is
-**overridden to `false`** when a lookup comes back `NOT_FOUND` — at that point we
-have asked and the account does not exist, which is stronger evidence than any
-format check. For every other status (`ERROR`, `TIMEOUT`, `UNSUPPORTED`,
-`NOT_ENABLED`) we could not find out, so `isValid` keeps reporting the format
-result and you should read `nameLookupStatus` to see why.
+**overridden to `false`** on `NOT_FOUND` or `ACCOUNT_UNAVAILABLE` — at that point
+we have asked, and the destination either isn't there or can't receive money,
+which is stronger evidence than any format check. For every other status
+(`ERROR`, `TIMEOUT`, `UNSUPPORTED`, `NOT_ENABLED`) we could not find out, so
+`isValid` keeps reporting the format result and you should read
+`nameLookupStatus` to see why.
 
 <Warning>
 A name mismatch does **not** make `isValid` false. `isValid: true` with
@@ -82,16 +83,30 @@ you can tell the cases apart rather than retrying blindly:
 | --- | --- | --- |
 | `MATCHED` | Name resolved | — |
 | `NOT_FOUND` | The network or bank confirmed there is no such account, shortcode or subscriber. Also sets `isValid` to `false` | No — check the number |
+| `ACCOUNT_UNAVAILABLE` | The account exists but can't receive money — locked, closed, or otherwise flagged. Also sets `isValid` to `false` | No — the holder has to resolve it |
 | `UNSUPPORTED` | This corridor can't resolve names, or we couldn't determine the network | No |
 | `TIMEOUT` | The network didn't answer in time | Yes |
 | `ERROR` | The check didn't complete. Usually the network being busy or briefly unavailable rather than anything wrong with the account — `nameLookupReason` has the specifics | Yes, after a short wait |
 | `NOT_ENABLED` | Your account isn't enabled for name lookup | No |
 
-The distinction that matters is `NOT_FOUND` versus `ERROR`. `NOT_FOUND` is an
-answer — the account isn't there, and asking again won't change that. `ERROR`
-means we never got an answer, so the account may well be fine. Read
-`nameLookupReason` rather than the status alone; it carries the network's own
-wording, such as `"System is busy, please retry later"`.
+Three of these look alike and mean different things:
+
+- **`NOT_FOUND`** — nothing is there. Check the number for a typo.
+- **`ACCOUNT_UNAVAILABLE`** — something is there, but it's shut. There's no typo
+  to find; the account holder has to sort it out with their bank or network.
+  Don't send your customer back to re-enter a number that was correct.
+- **`ERROR`** — we never got an answer, so the account may well be fine. Retry.
+
+Read `nameLookupReason` rather than the status alone; it carries the network's
+own wording, such as `"System is busy, please retry later"` or
+`"The user account has been closed."`
+
+<Note>
+`ACCOUNT_UNAVAILABLE` is for when we couldn't resolve a name at all. If we *did*
+resolve one and the account is merely restricted, you get `MATCHED` plus
+`accountStatus` — `FROZEN` or `RESTRICTED` — which carries the same warning with
+the name attached.
+</Note>
 
 ## Validating a bank account
 
