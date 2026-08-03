@@ -6,6 +6,21 @@ description: "Check a recipient exists — and that it belongs to who you think 
 Paying the wrong account is expensive and usually irreversible. Account
 validation lets you check a destination before you commit to it.
 
+This page covers how to read a result and what to do about it. For request and
+response fields, use the endpoint references, which are generated from the API
+itself and always current:
+
+<CardGroup cols={2}>
+  <Card title="Validate mobile money" icon="mobile" href="/v3/api-reference/customers/validate-mobile-money">
+    Phone numbers, paybills and tills
+  </Card>
+  <Card title="Validate bank account" icon="building-columns" href="/v3/api-reference/customers/validate-bank">
+    Account number and bank code
+  </Card>
+</CardGroup>
+
+## Two levels
+
 There are two levels, and which you get depends on your account:
 
 | | Available to | Tells you |
@@ -14,170 +29,88 @@ There are two levels, and which you get depends on your account:
 | **Name resolution** | Accounts enabled for name lookup | Who the account actually belongs to, and whether that matches who you expected |
 
 Both come from the same endpoints, with the same request shape. Without the
-entitlement you get the format check and `nameLookupStatus: "NOT_ENABLED"`;
-with it, the response gains `accountName`, `accountStatus` and — if you asked
-for it — `nameMatch`.
+entitlement you get the format check and `nameLookupStatus: "NOT_ENABLED"`; with
+it, the response also carries the resolved name. The request is identical either
+way, so you don't need to change your integration when it's switched on.
 
-## Validating a phone number
+Name resolution is enabled per account from our side — talk to your account
+manager. Paybill and till validation depends on it, because a shortcode is just
+digits: whether it exists is exactly what the lookup answers, and there is no
+useful format check for one.
 
-<CodeGroup>
-```bash Request
-curl -X POST https://api.kotanipay.com/api/v3/customer/validate/mobile-money \
-  -H "Authorization: Bearer $API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{ "phoneNumber": "+254712345678" }'
-```
+## You don't need to send the network
 
-```json Response
-{
-  "isValid": true,
-  "isSupported": true,
-  "countryCode": "KE",
-  "currency": "KES",
-  "internationalNumber": "+254712345678",
-  "network": "MPESA",
-  "mno": "SAFARICOM KENYA",
-  "accountName": "JANE MARY DOE",
-  "nameLookupStatus": "MATCHED"
-}
-```
-</CodeGroup>
-
-You don't need to tell us the mobile network — it's resolved from the number's
-prefix, and returned as `network` (the rail the lookup used) and `mno` (the
-operator the number belongs to). Send `network` yourself only if the number has
-been ported, or if a response says the network couldn't be determined.
+For mobile money, the network is resolved from the phone number's own prefix. The
+response tells you which rail the lookup used and which operator the number
+belongs to. Send it yourself only if the number has been ported, or if a response
+tells you the network couldn't be determined.
 
 ## Which field answers which question
 
-Three fields look similar and answer different questions. Read them together:
+Four fields look similar and answer different questions. The reference describes
+each one; what matters is how they relate:
 
 | Field | Question it answers |
 | --- | --- |
 | `isSupported` | Do we serve this country and rail at all? |
 | `isValid` | Is this a usable destination? |
-| `nameLookupStatus` | Did we manage to resolve the name on it, and what came back? |
-| `nameMatch.matched` | Is the holder the person you named in `accountName`? |
+| `nameLookupStatus` | Did we manage to resolve the name, and what came back? |
+| `nameMatch.matched` | Is the holder the person you named? |
 
-`isValid` starts from the account number or phone number format, and is
-**overridden to `false`** on `NOT_FOUND` or `ACCOUNT_UNAVAILABLE` — at that point
-we have asked, and the destination either isn't there or can't receive money,
-which is stronger evidence than any format check. For every other status
-(`ERROR`, `TIMEOUT`, `UNSUPPORTED`, `NOT_ENABLED`) we could not find out, so
-`isValid` keeps reporting the format result and you should read
+`isValid` starts from the number format, and is **overridden to `false`** when a
+lookup proves the destination unusable — either nothing is there, or what's there
+can't receive money. That's stronger evidence than any format check. When the
+lookup couldn't complete, `isValid` keeps reporting the format result, so read
 `nameLookupStatus` to see why.
 
 <Warning>
-A name mismatch does **not** make `isValid` false. `isValid: true` with
-`nameMatch.matched: false` means the account is real but belongs to somebody
-other than the name you sent — which is usually the more urgent problem. Check
-both before paying out.
+A name mismatch does **not** make `isValid` false. A real account that belongs to
+someone other than the name you sent is still a valid account — and usually the
+more urgent problem. Check `nameMatch.matched` as well as `isValid` before paying
+out.
 </Warning>
 
-## When a lookup doesn't return a name
+## What to do about each outcome
 
-`nameLookupStatus` is always accompanied by `nameLookupReason` explaining it, so
-you can tell the cases apart rather than retrying blindly:
+Every non-matching `nameLookupStatus` comes with a `nameLookupReason` carrying the
+network's own wording. Read the reason, not just the status — it's the difference
+between "the account is closed" and "the system is busy".
 
-| Status | What it means | Retrying helps? |
+| Status | Retry? | What to do |
 | --- | --- | --- |
-| `MATCHED` | Name resolved | — |
-| `NOT_FOUND` | The network or bank confirmed there is no such account, shortcode or subscriber. Also sets `isValid` to `false` | No — check the number |
-| `ACCOUNT_UNAVAILABLE` | The account exists but can't receive money — locked, closed, or otherwise flagged. Also sets `isValid` to `false` | No — the holder has to resolve it |
-| `UNSUPPORTED` | This corridor can't resolve names, or we couldn't determine the network | No |
-| `TIMEOUT` | The network didn't answer in time | Yes |
-| `ERROR` | The check didn't complete. Usually the network being busy or briefly unavailable rather than anything wrong with the account — `nameLookupReason` has the specifics | Yes, after a short wait |
-| `NOT_ENABLED` | Your account isn't enabled for name lookup | No |
+| `MATCHED` | — | Proceed, checking `nameMatch` if you sent a name |
+| `NOT_FOUND` | No | Nothing is there — have the customer check the number |
+| `ACCOUNT_UNAVAILABLE` | No | It exists but is shut. **No typo to find** — the holder must resolve it with their bank or network |
+| `UNSUPPORTED` | No | We can't resolve names on this corridor. Fall back to your own checks |
+| `TIMEOUT` | Yes | Try again shortly |
+| `ERROR` | Yes | The check didn't complete, so the account may be fine. Try again shortly |
+| `NOT_ENABLED` | No | Name resolution isn't switched on for your account |
 
-Three of these look alike and mean different things:
-
-- **`NOT_FOUND`** — nothing is there. Check the number for a typo.
-- **`ACCOUNT_UNAVAILABLE`** — something is there, but it's shut. There's no typo
-  to find; the account holder has to sort it out with their bank or network.
-  Don't send your customer back to re-enter a number that was correct.
-- **`ERROR`** — we never got an answer, so the account may well be fine. Retry.
-
-Read `nameLookupReason` rather than the status alone; it carries the network's
-own wording, such as `"System is busy, please retry later"` or
-`"The user account has been closed."`
+The three that get confused are `NOT_FOUND`, `ACCOUNT_UNAVAILABLE` and `ERROR`.
+`NOT_FOUND` is an answer — the account isn't there. `ACCOUNT_UNAVAILABLE` is also
+an answer, but a different one: sending your customer back to re-type a number
+that was correct all along just wastes their time. `ERROR` is not an answer at
+all, so treating it as a bad account turns a momentary outage into a lost payment.
 
 <Note>
-`ACCOUNT_UNAVAILABLE` is for when we couldn't resolve a name at all. If we *did*
-resolve one and the account is merely restricted, you get `MATCHED` plus
-`accountStatus` — `FROZEN` or `RESTRICTED` — which carries the same warning with
-the name attached.
+`ACCOUNT_UNAVAILABLE` means we couldn't resolve a name at all. If we *did* resolve
+one and the account is merely restricted, you get `MATCHED` plus an
+`accountStatus` — the same warning, with the name attached.
 </Note>
-
-## Validating a bank account
-
-Send the account number, the bank code and the country.
-
-```json
-{
-  "accountNumber": "1234567890",
-  "bankCode": "68",
-  "countryCode": "KE"
-}
-```
-
-Alongside the name, bank responses carry `accountStatus` — `ACTIVE`, `FROZEN`
-or `RESTRICTED`. A frozen or restricted account will usually reject an incoming
-payment, so it's worth checking before you send.
-
-## Paybill and till
-
-Set `accountType` to `paybill` or `till` and send `shortCode` instead of
-`phoneNumber`. For a paybill you can also pass `accountReference` — the value a
-payer would enter as the account number.
-
-```json
-{
-  "accountType": "paybill",
-  "shortCode": "247247",
-  "accountReference": "0123456789"
-}
-```
-
-A shortcode is just digits, so there's no useful format check for one — whether
-it exists is exactly what the lookup answers. These two types therefore need
-name lookup enabled.
 
 ## Confirming the recipient is who you expect
 
-Send `accountName` with the name you're expecting and the response adds a
-`nameMatch` block.
-
-```json
-{
-  "accountNumber": "1234567890",
-  "bankCode": "68",
-  "countryCode": "KE",
-  "accountName": "Jane Doe"
-}
-```
-
-```json
-{
-  "accountName": "JANE MARY DOE",
-  "nameMatch": {
-    "provided": "Jane Doe",
-    "score": 100,
-    "matched": true,
-    "threshold": 70,
-    "masked": false
-  }
-}
-```
+Send the name you're expecting and the response scores it against the real one.
 
 Names are compared token by token rather than as exact strings, because real
 account names rarely come back in the format you sent them. `Jane M Doe`,
-`Doe Jane Mary` and `Jane Mary Doe` all match `JANE MARY DOE`; `Robert Doe`
-does not.
+`Doe Jane Mary` and `Jane Mary Doe` all match `JANE MARY DOE`; `Robert Doe` does
+not. The score is compared against a threshold configured for your account.
 
 <Warning>
-When `masked` is `true` the provider only returned part of the name, so the
-match is based on the visible portion alone. Treat that as "not contradicted"
-rather than confirmed.
+When the response marks the name as masked, the provider returned only part of it,
+so the match is based on the visible portion alone. Treat that as "not
+contradicted" rather than confirmed.
 </Warning>
 
 ## Blocking payouts on a name mismatch
@@ -192,5 +125,5 @@ has to be. Talk to your account manager if you want it enabled.
 ## Trying it out
 
 Sandbox has [reserved test values](/v3/testing/account-validation) that resolve to
-frozen accounts, unresolvable accounts, mismatched names and provider timeouts,
-so you can build against the failure cases directly.
+frozen accounts, unresolvable accounts, mismatched names and provider timeouts, so
+you can build against the failure cases directly.
