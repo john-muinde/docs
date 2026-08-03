@@ -42,7 +42,12 @@ Send the number in international format (`+254712345678`) or supply
 `countryCode` alongside a local one. A local number on its own is genuinely
 ambiguous — `0712345678` is a real number in seven of the countries we support
 — so rather than guess, the response asks you which country you mean.
-`countryCode` defaults to `KE` for a shortcode, and `network` to `MPESA`.
+`countryCode` defaults to `KE` for a shortcode.
+
+You do not need to send `network`. It is resolved from the number's own prefix,
+and the response tells you which network was used (`network`) and which operator
+the number belongs to (`mno`). Send it only if the number has been ported, or if
+a response tells you the network could not be determined.
 
 ## Resolving the account holder
 
@@ -51,6 +56,12 @@ name registered on the number (`accountName`) and `nameLookupStatus`. Without
 that entitlement you still get the format and corridor checks, and
 `nameLookupStatus` comes back as `NOT_ENABLED` — the request is identical
 either way.
+
+Whenever a lookup does not return a name, `nameLookupReason` says why, so you
+can tell a number that does not exist (`NOT_FOUND`) from a corridor that cannot
+resolve names at all (`UNSUPPORTED`) from something that needs a retry
+(`ERROR`, `TIMEOUT`). Check `nameLookupReason` before retrying — `UNSUPPORTED`
+will not resolve on a second attempt.
 
 Send `accountName` with the name you expect and the response adds a `nameMatch`
 block scoring it against the real one, so you can catch a wrong number before

@@ -13,6 +13,11 @@ Without that entitlement you still get the format and corridor checks, and
 `nameLookupStatus` comes back as `NOT_ENABLED` — the request is identical either
 way.
 
+Whenever a lookup does not return a name, `nameLookupReason` says why, so you can
+tell an account that does not exist (`NOT_FOUND`) from a corridor that cannot
+resolve names at all (`UNSUPPORTED`) from something worth retrying (`ERROR`,
+`TIMEOUT`).
+
 Send `accountName` with the name you expect on the account and the response adds
 a `nameMatch` block scoring it against the real one, so you can catch a wrong
 account number before the money moves.

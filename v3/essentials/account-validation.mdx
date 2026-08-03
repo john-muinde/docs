@@ -35,11 +35,32 @@ curl -X POST https://api.kotanipay.com/api/v3/customer/validate/mobile-money \
   "countryCode": "KE",
   "currency": "KES",
   "internationalNumber": "+254712345678",
+  "network": "MPESA",
+  "mno": "SAFARICOM KENYA",
   "accountName": "JANE MARY DOE",
   "nameLookupStatus": "MATCHED"
 }
 ```
 </CodeGroup>
+
+You don't need to tell us the mobile network — it's resolved from the number's
+prefix, and returned as `network` (the rail the lookup used) and `mno` (the
+operator the number belongs to). Send `network` yourself only if the number has
+been ported, or if a response says the network couldn't be determined.
+
+## When a lookup doesn't return a name
+
+`nameLookupStatus` is always accompanied by `nameLookupReason` explaining it, so
+you can tell the cases apart rather than retrying blindly:
+
+| Status | What it means | Retrying helps? |
+| --- | --- | --- |
+| `MATCHED` | Name resolved | — |
+| `NOT_FOUND` | The account doesn't exist on that network | No — check the number |
+| `UNSUPPORTED` | This corridor can't resolve names, or we couldn't determine the network | No |
+| `TIMEOUT` | The network didn't answer in time | Yes |
+| `ERROR` | The lookup failed | Yes |
+| `NOT_ENABLED` | Your account isn't enabled for name lookup | No |
 
 ## Validating a bank account
 

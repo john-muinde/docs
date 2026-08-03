@@ -10625,6 +10625,36 @@
             "description": "Currency for the country",
             "example": "KES"
           },
+          "network": {
+            "type": "string",
+            "description": "The mobile network the lookup was routed on — either the one you sent, or the one resolved from the number's prefix. Mobile money only.",
+            "enum": [
+              "MTN",
+              "AIRTEL",
+              "VODAFONE",
+              "TIGO",
+              "YAS",
+              "ORANGE",
+              "NOT_SUPPORTED",
+              "ZAMTEL",
+              "MPESA",
+              "CHECKOUT",
+              "BKTRX",
+              "CRDTRX",
+              "MOOV",
+              "TMONEY",
+              "FREE",
+              "EXPRESSO",
+              "HALOPESA",
+              "VODACOM",
+              "WAVE"
+            ]
+          },
+          "mno": {
+            "type": "string",
+            "description": "The mobile network operator the number belongs to, resolved from its prefix. Mobile money only.",
+            "example": "SAFARICOM KENYA"
+          },
           "message": {
             "type": "string",
             "description": "Validation error message (if invalid)"
@@ -10637,7 +10667,25 @@
           "nameLookupStatus": {
             "type": "string",
             "description": "MATCHED, NOT_FOUND, UNSUPPORTED, TIMEOUT, ERROR or NOT_ENABLED.",
+            "enum": [
+              "MATCHED",
+              "NOT_FOUND",
+              "UNSUPPORTED",
+              "TIMEOUT",
+              "ERROR",
+              "NOT_ENABLED"
+            ],
             "example": "MATCHED"
+          },
+          "nameLookupReason": {
+            "type": "string",
+            "description": "Why the name lookup ended in that status. Populated for every outcome other than MATCHED and NOT_ENABLED, so a failed lookup is always actionable rather than a bare status code.",
+            "example": "Name lookup is not available for this payout corridor."
+          },
+          "matchScore": {
+            "type": "number",
+            "description": "Confidence the resolved name is the right one, 0-100. Only returned where the corridor scores its own match.",
+            "example": 95
           },
           "accountStatus": {
             "type": "string",
@@ -10694,7 +10742,7 @@
           },
           "network": {
             "type": "string",
-            "description": "Mobile network, used to route the name lookup. Defaults to MPESA.",
+            "description": "Mobile network, used to route the name lookup. Optional — it is resolved from the phone number prefix when omitted. Supply it only if the number has been ported, or if the response tells you the network could not be determined.",
             "enum": [
               "MTN",
               "AIRTEL",
