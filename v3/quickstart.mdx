@@ -1,118 +1,82 @@
 ---
 title: "Quickstart Guide"
+description: "Get a key, prove it works, and pick the product you're building."
 ---
 
-## Prerequisites
-
-You need a Kotani Pay integrator account. **Sandbox accounts are self-service** — <a href="https://backoffice.kotanipay.com/register?env=sandbox" target="_blank">register now on the Kotani Pay backoffice</a>. Production accounts require a provisioned account from the Kotani Pay team.
-
----
-
-## 1. Get Your API Key
-
-The fastest way is from the dashboard — no code required.
-
-1. Log in to [backoffice.kotanipay.com](https://backoffice.kotanipay.com)
-2. Navigate to **API Keys** in the left sidebar
-3. Click **Generate New Key**
-4. Copy and store the key securely — it won't be shown again
+Three steps to your first authenticated call. Everything else has its own page —
+this one just gets you moving.
 
 <Note>
-If you need a key with a signing secret (for webhook payload verification), use **Generate Secure Key** instead. This returns both a `key` and a `secret`. See [API Keys](/v3/getting-started/api-keys) for the difference.
+**Sandbox accounts are self-service.** <a href="https://backoffice.kotanipay.com/register?env=sandbox" target="_blank">Register on the backoffice</a> and you can start immediately. Production accounts are provisioned by our team.
 </Note>
 
-**Prefer the API?** You can also generate a key programmatically via a magic link flow — see [API Keys](/v3/getting-started/api-keys) for that method.
+## 1. Generate an API key
 
----
+In the dashboard: **API Keys → Generate New Key**. Copy it straight away — it isn't
+shown again.
 
-## 2. Make Your First Call
+If you also want to verify webhook signatures, generate a **secure** key instead,
+which returns a `secret` alongside the key.
 
-Use the API key in the `Authorization: Bearer` header:
+[Creating API keys →](/v3/getting-started/api-keys) — both the dashboard and API
+methods, and the difference between key types.
+
+## 2. Prove the key works
+
+List your fiat wallets. It's read-only, it changes nothing, and it only succeeds
+with a valid key:
 
 ```bash
-curl -X GET https://sandbox-api.kotanipay.com/health \
+curl -X GET https://sandbox-api.kotanipay.com/api/v3/wallet/fiat \
   -H "Authorization: Bearer <your-api-key>"
 ```
 
-A successful response confirms your key is valid:
+You'll get your wallets back, or an empty list if you haven't created one yet —
+either way, the key is good.
 
-```json
-{
-  "success": true,
-  "message": "Health check",
-  "data": {
-    "status": "ok"
-  }
-}
-```
+<Warning>
+Don't use `GET /health` as your first call. It's unauthenticated, so it returns
+`200` whether your key is right, wrong, or missing entirely.
+</Warning>
 
----
+A `401` here means the key is wrong or the environment doesn't match — sandbox keys
+don't work against production, or the reverse.
 
-## 3. Pick Your Flow
-
-Now that you have a key, choose what you're building:
+## 3. Pick what you're building
 
 <CardGroup cols={2}>
   <Card title="Collect payments" icon="arrow-down" href="/v3/flows/deposit-flow">
-    Customer pays you via mobile money, bank checkout, or card. Funds land in your deposit balance.
+    Your customer pays you by mobile money, bank, or card
   </Card>
-  <Card title="Disburse funds" icon="arrow-up" href="/v3/flows/withdrawal-flow">
-    Send money to a customer's mobile money wallet or bank account from your payout balance.
+  <Card title="Pay people out" icon="arrow-up" href="/v3/flows/withdrawal-flow">
+    Send money to a mobile money wallet or bank account
   </Card>
-  <Card title="Buy crypto (Onramp)" icon="coins" href="/v3/flows/onramp-flow">
-    Customer pays fiat via mobile money or bank; Kotani Pay sends crypto to their wallet.
+  <Card title="Buy crypto" icon="coins" href="/v3/flows/onramp-flow">
+    Take local currency, deliver crypto to a wallet
   </Card>
-  <Card title="Sell crypto (Offramp)" icon="arrow-right-arrow-left" href="/v3/flows/offramp-flow">
-    Customer sends crypto to an escrow address; Kotani Pay disburses fiat to their mobile money or bank.
+  <Card title="Sell crypto" icon="arrow-right-arrow-left" href="/v3/flows/offramp-flow">
+    Take crypto, pay out local currency
   </Card>
-  <Card title="Payment links" icon="link" href="/v3/flows/payment-links-flow">
-    Generate a hosted checkout page — no frontend required. Share the URL and start collecting.
+  <Card title="Payment links" icon="link" href="/v3/essentials/payment-links">
+    A hosted checkout page — no frontend to build
   </Card>
   <Card title="Bulk payments" icon="list" href="/v3/flows/bulk-payments-flow">
-    Disburse to hundreds of recipients at once via CSV upload — payroll, commissions, refunds.
+    Pay hundreds of recipients from one CSV
   </Card>
 </CardGroup>
 
----
+## Before you send money out
 
-## 4. Fund Your Payout Balance
+Your **deposit balance** and **payout balance** are separate. Collections credit the
+first; payouts draw from the second, so you need to move funds between them before
+you can disburse — in the dashboard under **Wallets → Transfer Deposit Balance**.
 
-<Note>
-Only needed if you're sending money out — withdrawals, offramp, or bulk payments.
-</Note>
+[Balances & Settlement →](/v3/essentials/balances-and-settlement)
 
-Deposits credit your **deposit balance**. Withdrawals draw from your **payout balance**. These are separate — you need to transfer between them before you can disburse.
+## Then
 
-In the dashboard: **Wallets → Transfer Deposit Balance**
-
-See [Balances & Settlement](/v3/essentials/balances-and-settlement) for the full explanation.
-
----
-
-## 5. Set Up Webhooks
-
-Every transaction request accepts a `callbackUrl` — Kotani Pay posts the result directly to that URL when the transaction settles. No extra configuration needed for this.
-
-If you want callbacks to arrive with a signature you can verify, configure a webhook secret:
-
-1. Log in to the dashboard → **Settings**
-2. Copy the generated signing secret and store it as an environment variable
-
-With a secret configured, every callback includes `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. See [Webhooks](/v3/essentials/webhooks) for both delivery modes, payload structures, and signature verification.
-
----
-
-## 6. Go Live
-
-1. **Contact Kotani Pay** via your usual communication channel to request a production account
-2. Once provisioned, log in to [backoffice.kotanipay.com](https://backoffice.kotanipay.com) and switch to **Production** using the environment selector in the top right
-3. Generate a production API key from **API Keys** in the sidebar
-4. Switch your base URL to `https://api.kotanipay.com`
-
-<Note>
-  See [Accessing the Dashboard](/v3/getting-started/dashboard-login) for how the environment gate and selector work.
-</Note>
-
-<Warning>
-  Sandbox credentials do not work in production and vice versa. Always confirm the environment is set correctly before going live.
-</Warning>
+- [Webhooks & Events →](/v3/essentials/webhooks) — get told when a transaction
+  settles instead of polling for it
+- [Fees & Billing →](/v3/essentials/billing-types) — who pays the fee, and what the
+  amounts in your responses mean
+- [Going to Production →](/v3/development) — when you're ready to move off sandbox

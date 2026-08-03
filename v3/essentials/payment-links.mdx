@@ -1,5 +1,5 @@
 ---
-title: "Hosted Payment Links"
+title: "Payment Links"
 description: "Collect a payment without writing any code — create a link in the dashboard and share it."
 ---
 
@@ -77,10 +77,32 @@ Check [Fees & Billing](/v3/essentials/billing-types) before reconciling — the 
 may be added on top of what your customer paid rather than taken out of it.
 </Note>
 
-## Doing it from the API instead
+## Creating links from the API
 
-Links can also be created over the API if you need one per order rather than one
-you share repeatedly. Talk to your account manager to get set up for it.
+If you need a link per order rather than one you share repeatedly, create them
+programmatically. Same options as the dashboard.
+
+| | |
+| --- | --- |
+| Create a link | `POST /api/v3/dashboard/payment-links` |
+| List your links | `GET /api/v3/dashboard/payment-links` |
+| Payments for one link | `GET /api/v3/dashboard/payment-links/{id}/transactions` |
+| A single payment | `GET /api/v3/dashboard/payment-links/transactions/reference/{referenceId}` |
+| Totals for one link | `GET /api/v3/dashboard/payment-links/{id}/analytics` |
+| Turn a link off | `POST /api/v3/dashboard/payment-links/{id}/deactivate` |
+
+The create call takes the same choices as the dashboard form: `type`, `pricing`,
+`enabledPaymentMethods`, `usageType` and `collectCustomerInfo`. The response
+carries the link's `id` and its shareable URL.
+
+<Note>
+Per-link routes take the `id` from the create response, not the short code in the
+URL your customer sees.
+</Note>
+
+Payments made through a link arrive as normal deposit webhooks —
+`transaction.deposit.status.updated` — so if you already handle deposits, you
+already handle these.
 
 ## Related
 
