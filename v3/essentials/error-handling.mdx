@@ -96,8 +96,11 @@ the date the suspension lifts:
 ## Request limits
 
 Limits are counted **per endpoint, per API key** — a busy status-check loop won't
-eat into your ability to create transactions. They're grouped by what the endpoint
-does:
+eat into your ability to create transactions.
+
+Because the count is per key, every server sharing a key shares its budget. If you
+run several workers in parallel and keep hitting limits, give them separate keys
+rather than raising the limit. They're grouped by what the endpoint does:
 
 | What you're calling | Sustained limit | Short burst |
 |---|---|---|
@@ -108,14 +111,16 @@ does:
 The burst limit catches rapid-fire requests inside a few seconds even when you're
 under the sustained limit, so pace retries rather than firing them together.
 
-Separately, our infrastructure caps **all traffic from a single IP address at
-1,000 requests per 5 minutes**, across every endpoint. Normal integrations never
-reach it; parallel workers sharing one outbound address sometimes do.
+A separate protection at our network edge caps sustained traffic from a single IP
+address across all endpoints. Normal integrations never reach it, but a fleet of
+workers sharing one outbound address can. If you're getting `429`s that don't line
+up with the per-endpoint limits above, that's usually why — contact support and
+we'll confirm.
 
 <Note>
 These are the standard limits. They're configurable per account, and high-volume
-integrators can be raised or exempted — talk to your account manager if you're
-designing something that needs it.
+integrators can be raised or exempted — talk to your account manager, or reach
+support through your usual channel, if you're designing something that needs it.
 </Note>
 
 ## Handling a 429

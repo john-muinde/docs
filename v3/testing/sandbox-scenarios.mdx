@@ -1,0 +1,142 @@
+---
+title: "Sandbox Scenarios"
+description: "Reserved numbers that drive a sandbox transaction or validation to a specific outcome, every time."
+---
+
+Sandbox behaves like production, it just doesn't move real money. What it gives you
+that production can't is **reserved numbers**: send to one and you get that outcome
+on demand.
+
+That matters because the cases your integration most needs to handle — a payout that
+fails, one that never settles, a frozen account — are the ones you can't reproduce
+against a real provider. A provider sandbox only tells you what it happens to know
+about, and is generally happy to succeed.
+
+<Note>
+Reserved numbers mean nothing in production — they're ordinary numbers there. Make
+sure none of them survive into your production configuration.
+</Note>
+
+## Getting set up
+
+Sandbox accounts are self-service. <a href="https://backoffice.kotanipay.com/register?env=sandbox" target="_blank">Register on the backoffice</a>, generate a key, and point at
+`https://sandbox-api.kotanipay.com`. See the [Quickstart](/v3/quickstart).
+
+## Payment outcomes
+
+Use as the customer phone number on a deposit, payout or onramp. Any format works —
+`+254700000001`, `254700000001` and `0700000001` are the same number.
+
+| Phone number | Settles as | After |
+| --- | --- | --- |
+| `+254700000001` | Success | ~5s |
+| `+254700000002` | Success | ~5s |
+| `+254700000010` | Failed — insufficient funds | ~5s |
+| `+254700000011` | Failed — account not found | ~5s |
+| `+254700000012` | Failed — limit exceeded | ~5s |
+| `+254700000013` | Failed — cancelled by customer | ~5s |
+| `+254700000020` | Never settles | — |
+| `+254700000021` | Success | ~60s |
+
+These behave like production, not like a mock. The transaction is accepted, sits
+pending, then settles — firing the same webhook, moving the same balances and
+writing the same timeline as a real one. A failed payout reverses the wallet debit,
+because a real failed payout does.
+
+**Any number that isn't reserved succeeds** after the usual delay, so you only need a
+reserved number when you want a particular outcome.
+
+### Worth testing
+
+<AccordionGroup>
+  <Accordion title="A payout that fails">
+    `+254700000010`. Confirm you handle the `FAILED` webhook, surface the reason, and
+    notice the wallet debit is reversed — the balance returns to what it was.
+  </Accordion>
+  <Accordion title="A transaction that never settles">
+    `+254700000020` stays pending forever. This is the one most integrations get
+    wrong: money is committed but no terminal webhook ever arrives. Make sure
+    something on your side eventually reconciles or escalates rather than waiting
+    indefinitely.
+  </Accordion>
+  <Accordion title="A slow provider">
+    `+254700000021` takes about a minute. Checks that you aren't treating a
+    transaction as final just because the create call returned, and that your polling
+    backs off sensibly.
+  </Accordion>
+  <Accordion title="Paying the wrong person">
+    `+254700000002` succeeds but is registered to a different name than
+    `+254700000001`. Pair it with the validation numbers below to catch a mismatched
+    recipient before you pay.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+Deposits credit your wallet on the same reconciliation pass production uses, so the
+balance moves within about a minute of the deposit settling rather than instantly.
+</Note>
+
+## Bank and card payments
+
+These aren't simulated. Bank and card providers run their own sandbox environments,
+so those transactions dispatch for real outside production and are tested against the
+provider's own test credentials and test cards. Reserved numbers here would take that
+away.
+
+## Validation outcomes
+
+Different numbers, for [Account Validation](/v3/essentials/account-validation) rather
+than payments. These return a fixed result without contacting a provider.
+
+### Phone numbers
+
+| Phone number | Result | Tests |
+| --- | --- | --- |
+| `+254700000001` | `MATCHED` — JANE MARY DOE | The happy path |
+| `+254700000002` | `MATCHED` — ROBERT JAMES SMITH | A name that *doesn't* match the one you expected |
+| `+254700000003` | `NOT_FOUND` | A number that can't be resolved |
+| `+254700000004` | `UNSUPPORTED` | A corridor where name lookup isn't available |
+| `+254700000005` | `TIMEOUT` | A slow provider (~1.5s) |
+| `+254700000006` | `ERROR` | A provider failure |
+| `+254700000007` | `MATCHED` — partially masked | A provider returning only part of the name |
+
+### Bank accounts
+
+| Account number | Result | Tests |
+| --- | --- | --- |
+| `1000000001` | `MATCHED` — JANE MARY DOE, `ACTIVE` | The happy path |
+| `1000000002` | `MATCHED` — ROBERT JAMES SMITH, `ACTIVE` | A name that *doesn't* match |
+| `1000000003` | `MATCHED` — `FROZEN` | A frozen account |
+| `1000000004` | `MATCHED` — `RESTRICTED` | A restricted account |
+| `1000000005` | `NOT_FOUND` | An account that can't be resolved |
+| `1000000006` | `UNSUPPORTED` | A corridor where validation isn't available |
+| `1000000007` | `ERROR` | A provider failure |
+
+### Paybill and till shortcodes
+
+| Shortcode | Result |
+| --- | --- |
+| `100001` | `MATCHED` — ACME TRADING LIMITED |
+| `100002` | `NOT_FOUND` |
+| `100003` | `ERROR` |
+
+### Checking a name before you pay
+
+Send the name you expect and the response scores it against the real one. Names are
+compared token by token, so middle names, initials and ordering still match — `Jane M
+Doe` matches `JANE MARY DOE`.
+
+Pair account `1000000002` with an expected name of `Jane Doe` to see a failed match:
+the account is real and `isValid` stays `true`, but `nameMatch.matched` is `false`.
+
+<Warning>
+When the response marks the name as masked, the provider returned only part of it, so
+the match is based on the visible portion alone. Treat it as "not contradicted"
+rather than confirmed.
+</Warning>
+
+<Note>
+Resolved names and match scores require name lookup to be enabled on your account.
+Without it you still get format and corridor validation, and `nameLookupStatus` comes
+back as `NOT_ENABLED`. Talk to your account manager to have it turned on.
+</Note>

@@ -40,6 +40,7 @@
                   "v3/quickstart",
                   "v3/getting-started/dashboard-login",
                   "v3/getting-started/api-keys",
+                  "v3/testing/sandbox-scenarios",
                   "v3/run-in-postman",
                   "v3/development"
                 ]
@@ -72,14 +73,6 @@
                   "v3/essentials/payment-links",
                   "v3/flows/bulk-payments-flow",
                   "v3/flows/settlement-flow"
-                ]
-              },
-              {
-                "group": "Sandbox Testing",
-                "pages": [
-                  "v3/testing/overview",
-                  "v3/testing/transactions",
-                  "v3/testing/account-validation"
                 ]
               }
             ]
@@ -324,6 +317,18 @@
     {
       "source": "/v3/essentials/rate-limits",
       "destination": "/v3/essentials/error-handling"
+    },
+    {
+      "source": "/v3/testing/overview",
+      "destination": "/v3/testing/sandbox-scenarios"
+    },
+    {
+      "source": "/v3/testing/transactions",
+      "destination": "/v3/testing/sandbox-scenarios"
+    },
+    {
+      "source": "/v3/testing/account-validation",
+      "destination": "/v3/testing/sandbox-scenarios"
     }
   ]
 }
