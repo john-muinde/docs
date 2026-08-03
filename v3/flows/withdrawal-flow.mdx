@@ -1,6 +1,6 @@
 ---
-title: "Withdrawal Flow"
-description: "How to disburse funds to customers via mobile money or bank transfer"
+title: "Withdrawals & Payouts"
+description: "Send money to mobile money wallets and bank accounts."
 ---
 
 A withdrawal is a disbursement — money moves from your Kotani Pay payout balance to a customer's mobile money wallet or bank account.
@@ -33,7 +33,7 @@ Your **payout balance** must have funds before you can disburse. If it doesn't, 
 - `FAILED` — disbursement failed (invalid number, network error, etc.); your payout balance is **automatically reversed**
 
 <Note>
-If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks).
+If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks) for both modes, and the [withdrawal payload](/v3/essentials/webhooks#transactionwithdrawalstatusupdated) for every field you receive with a worked example.
 </Note>
 
 **5. Poll for status** if needed — [GET /api/v3/withdraw/status/:reference_id](/v3/api-reference/withdrawals/mobile-money-status).

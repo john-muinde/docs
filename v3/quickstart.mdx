@@ -7,7 +7,7 @@ Three steps to your first authenticated call. Everything else has its own page �
 this one just gets you moving.
 
 <Note>
-**Sandbox accounts are self-service.** <a href="https://backoffice.kotanipay.com/register?env=sandbox" target="_blank">Register on the backoffice</a> and you can start immediately. Production accounts are provisioned by our team.
+**Sandbox accounts are self-service.** <a href="https://backoffice.kotanipay.com/register?env=sandbox" target="_blank">Register on the backoffice</a> and you can start immediately. When you're ready for real money, you [request go-live](/v3/development) from the dashboard — you don't need to email anyone.
 </Note>
 
 ## 1. Generate an API key
@@ -15,11 +15,12 @@ this one just gets you moving.
 In the dashboard: **API Keys → Generate New Key**. Copy it straight away — it isn't
 shown again.
 
-If you also want to verify webhook signatures, generate a **secure** key instead,
-which returns a `secret` alongside the key.
+You'll be asked to pick a key type. For your main server-to-server integration,
+choose **integrator level** — it has full access and is what you want here. Come
+back for **user bound** keys later when you want to restrict what a key can do.
 
-[Creating API keys →](/v3/getting-started/api-keys) — both the dashboard and API
-methods, and the difference between key types.
+[Creating API keys →](/v3/getting-started/api-keys) — key types in full, secure keys
+with a signing secret for webhook verification, and generating keys over the API.
 
 ## 2. Prove the key works
 

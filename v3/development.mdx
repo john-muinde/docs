@@ -1,141 +1,119 @@
 ---
 title: "Going to Production"
-description: "Environments, authentication, request structure, and error handling for the Kotani Pay API v3"
+description: "Environments, idempotency, and how to request go-live when you're ready for real money."
 ---
+
+Build against sandbox, then request go-live from the dashboard when you're ready.
+This page covers the differences between the two environments and the steps to
+switch.
 
 ## Environments
 
-Always develop against sandbox first. Production and sandbox share the same API structure — only the base URL and credentials differ.
+Sandbox and production share the same API structure — only the base URL and
+credentials differ.
 
 | Environment | Base URL |
 |-------------|----------|
 | **Sandbox** | `https://sandbox-api.kotanipay.com` |
 | **Production** | `https://api.kotanipay.com` |
 
-Sandbox API keys do not work in production and vice versa. Generate environment-specific credentials for each.
-
----
+Sandbox API keys do not work in production, or the reverse. Generate
+environment-specific credentials for each.
 
 ## Authentication
 
-Every request requires an `Authorization: Bearer` header. Both API keys and JWT tokens are accepted in the same header format.
+Every request needs an `Authorization: Bearer` header. API keys and JWTs both go in
+the same header.
 
-**API keys** are the right choice for server-to-server integrations — they do not expire unless revoked. **JWT tokens** are short-lived (1 hour) and mainly used during the API key generation flow.
+**API keys** are what you want for server-to-server work — they don't expire unless
+revoked. **JWTs** are short-lived and mainly used while generating a key over the
+API.
 
-See [API Keys](/v3/getting-started/api-keys) for how to generate a key and the difference between integrator-level and user-bound keys.
-
----
-
-## Request & Response Format
-
-All endpoints accept and return JSON. Set `Content-Type: application/json` on requests with a body.
-
-All responses follow a consistent envelope:
-
-**Success:**
-```json
-{
-  "success": true,
-  "message": "...",
-  "data": { }
-}
-```
-
-**Error:**
-```json
-{
-  "success": false,
-  "message": "Descriptive error message",
-  "error_code": 400,
-  "data": { }
-}
-```
-
-See [Error Handling](/v3/essentials/error-handling) for the full status code reference and error payload details.
-
----
-
-## Error Codes
-
-| Status | Meaning |
-|--------|---------|
-| `200` | Success |
-| `400` | Bad request — check your request body and parameters |
-| `401` | Unauthorized — API key or JWT is missing or invalid |
-| `403` | Forbidden — key exists but lacks permission for this operation |
-| `404` | Resource not found |
-| `429` | Rate limit exceeded |
-| `500` | Internal server error — contact support if persistent |
-
----
-
-## Rate Limits
-
-The API applies per-endpoint, per-key rate limits with three tiers:
-
-| Tier | Applied to |
-|------|------------|
-| **General** | Standard create/update operations |
-| **Sensitive** | Authentication and security-critical endpoints |
-| **Read-only** | GET/list endpoints |
-
-When rate limited, the response includes a `retryAfter` value in seconds. Specific limits are configurable per integrator — contact your account manager if you need a higher limit for a high-volume integration.
-
----
+[Creating API keys →](/v3/getting-started/api-keys)
 
 ## Idempotency
 
-For deposits and withdrawals, always send a reference ID. The field name differs by flow:
+Always send a reference ID on deposits and withdrawals. The field name differs by
+flow:
 
 - Deposits use `reference_id` (snake_case)
 - Withdrawals use `referenceId` (camelCase)
 
-Reference IDs must be unique per integrator. If a request times out or fails at the network level, retrying with the same reference ID will not create a duplicate transaction.
-
----
+Reference IDs must be unique per integrator. If a request times out or fails at the
+network level, retrying with the same reference ID will not create a duplicate
+transaction — which is the whole point of sending one.
 
 ## Webhooks
 
-Use webhooks instead of polling. Configure your endpoint in the dashboard under **Settings**.
+Use webhooks rather than polling; polling for status is the most common cause of
+hitting rate limits. Configure your endpoint in the dashboard under **Settings**.
 
-There are two delivery modes — which one you receive depends on whether a webhook secret is configured on your account. When a secret is configured, each request includes an `X-Kotani-Signature` header you must verify before processing. Without a secret, Kotani Pay posts directly to the `callbackUrl` on each transaction with no signature headers.
+[Webhooks & Events →](/v3/essentials/webhooks) — both delivery modes, every event,
+and signature verification.
 
-See [Webhooks](/v3/essentials/webhooks) for both delivery modes, all event types, payload schemas, and the signature verification code.
+## Errors and limits
 
----
+Status codes, error body shapes and the request limits you need to design around are
+all on one page.
 
-## Going to Production
+[Errors & Limits →](/v3/essentials/error-handling)
 
-1. Switch your base URL to `https://api.kotanipay.com`
-2. Run the magic link login flow against production to get a production JWT
-3. Generate a production API key using that JWT
-4. Update your webhook endpoint to point to your production server
+## Requesting go-live
+
+Going live is a request you make from the dashboard. You don't need to email anyone.
+
+<Steps>
+  <Step title="Finish onboarding">
+    Complete every onboarding step in the dashboard. The go-live request is blocked
+    until they're all done, so clear this first.
+  </Step>
+  <Step title="Submit your compliance documents">
+    Your dashboard shows a compliance checklist for the countries and services you
+    use. Upload each document and wait for approval — you can retract and re-submit
+    if you sent the wrong file.
+  </Step>
+  <Step title="Request go-live">
+    With onboarding complete, submit the request. A production account is created for
+    you straight away in a pending-review state, and our team is notified.
+  </Step>
+  <Step title="Track the status">
+    Your status reads **not started**, **requested** or **active**, alongside your
+    compliance progress, so you can see what's still outstanding. You'll be notified
+    when the review completes.
+  </Step>
+  <Step title="Switch over">
+    Once active, point your base URL at production, generate a production API key,
+    and update your webhook endpoint to your production server.
+  </Step>
+</Steps>
+
+<Note>
+Your sandbox configuration can be exported so your production account starts from
+the same setup rather than being rebuilt by hand. Ask support if you want this.
+</Note>
 
 <Warning>
-  Sandbox credentials do not work against the production URL. Always generate environment-specific keys.
+Confirm which environment you're in before your first live transaction. The
+dashboard shows this in the environment selector, top right.
 </Warning>
 
----
-
-## Transaction Flows
-
-Each flow walks through the full lifecycle — what to call, what the customer experiences, how the callback arrives, and how to poll for status.
+## Pick your product
 
 <CardGroup cols={2}>
-  <Card title="Deposit Flow" icon="arrow-down" href="/v3/flows/deposit-flow">
+  <Card title="Deposits & Collections" icon="arrow-down" href="/v3/flows/deposit-flow">
     Mobile money, bank checkout, and card collections
   </Card>
-  <Card title="Withdrawal Flow" icon="arrow-up" href="/v3/flows/withdrawal-flow">
+  <Card title="Withdrawals & Payouts" icon="arrow-up" href="/v3/flows/withdrawal-flow">
     Mobile money and bank disbursements
   </Card>
-  <Card title="Onramp Flow" icon="coins" href="/v3/flows/onramp-flow">
-    Fiat → crypto via mobile money or bank
+  <Card title="Onramp: Buy Crypto" icon="coins" href="/v3/flows/onramp-flow">
+    Local currency in, crypto out to a wallet
   </Card>
-  <Card title="Offramp Flow" icon="arrow-right-arrow-left" href="/v3/flows/offramp-flow">
-    Crypto → fiat disbursement and refund handling
+  <Card title="Offramp: Sell Crypto" icon="arrow-right-arrow-left" href="/v3/flows/offramp-flow">
+    Crypto in, local currency out
   </Card>
   <Card title="Payment Links" icon="link" href="/v3/essentials/payment-links">
-    Hosted checkout pages with multiple payment methods
+    Hosted checkout pages, no frontend to build
   </Card>
   <Card title="Bulk Payments" icon="list" href="/v3/flows/bulk-payments-flow">
     CSV-based mass disbursements with batch tracking

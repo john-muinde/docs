@@ -1,6 +1,6 @@
 ---
-title: "Offramp Flow"
-description: "Take crypto and pay out local currency — selling crypto, end to end."
+title: "Offramp: Sell Crypto"
+description: "Take crypto and pay out local currency."
 ---
 
 An offramp converts cryptocurrency into local fiat currency. The customer sends crypto to a Kotani Pay escrow address; once confirmed on-chain, Kotani Pay disburses the equivalent fiat to the customer's mobile money wallet or bank account.
@@ -54,7 +54,7 @@ Kotani Pay POSTs to your `callbackUrl` at each terminal state:
 - `REFUND_FAILED` — crypto refund failed; contact support
 
 <Note>
-If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks).
+If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks) for both modes, and the [offramp payload](/v3/essentials/webhooks#transactionofframpstatusupdated) for every field you receive with a worked example.
 </Note>
 
 ---

@@ -1,6 +1,6 @@
 ---
-title: "Deposit Flow"
-description: "How to collect payments from customers via mobile money, bank checkout, or card"
+title: "Deposits & Collections"
+description: "Take mobile money, bank and card payments from your customers."
 ---
 
 A deposit is a collection — money moves from your customer into your Kotani Pay deposit balance. There are three collection methods: mobile money, bank checkout, and card.
@@ -33,7 +33,7 @@ The most common collection method across Kenya, Uganda, Tanzania, Ghana, and oth
 - `FAILED` — collection failed (declined, insufficient funds, timeout)
 
 <Note>
-If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks).
+If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks) for both modes, and the [deposit payload](/v3/essentials/webhooks#transactiondepositstatusupdated) for every field you receive with a worked example.
 </Note>
 
 **5. Poll for status** if needed — [GET /api/v3/deposit/mobile-money/status/:reference_id](/v3/api-reference/deposits/mobile-money-status).

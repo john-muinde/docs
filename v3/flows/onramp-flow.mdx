@@ -1,6 +1,6 @@
 ---
-title: "Onramp Flow"
-description: "Take local currency and deliver crypto to a wallet — buying crypto, end to end."
+title: "Onramp: Buy Crypto"
+description: "Take local currency and deliver crypto to a wallet."
 ---
 
 An onramp converts local fiat currency into cryptocurrency. The customer pays via mobile money or bank checkout; once payment confirms, Kotani Pay sends the crypto to the wallet address you provided.
@@ -59,7 +59,7 @@ Kotani Pay POSTs to your `callbackUrl` when the transaction reaches a terminal s
 - `FAILED` — transaction failed; fiat refunded automatically
 
 <Note>
-If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks).
+If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks) for both modes, and the [onramp payload](/v3/essentials/webhooks#transactiononrampstatusupdated) for every field you receive with a worked example.
 </Note>
 
 ---
