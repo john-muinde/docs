@@ -48,6 +48,31 @@ prefix, and returned as `network` (the rail the lookup used) and `mno` (the
 operator the number belongs to). Send `network` yourself only if the number has
 been ported, or if a response says the network couldn't be determined.
 
+## Which field answers which question
+
+Three fields look similar and answer different questions. Read them together:
+
+| Field | Question it answers |
+| --- | --- |
+| `isSupported` | Do we serve this country and rail at all? |
+| `isValid` | Is this a usable destination? |
+| `nameLookupStatus` | Did we manage to resolve the name on it, and what came back? |
+| `nameMatch.matched` | Is the holder the person you named in `accountName`? |
+
+`isValid` starts from the account number or phone number format, and is
+**overridden to `false`** when a lookup comes back `NOT_FOUND` — at that point we
+have asked and the account does not exist, which is stronger evidence than any
+format check. For every other status (`ERROR`, `TIMEOUT`, `UNSUPPORTED`,
+`NOT_ENABLED`) we could not find out, so `isValid` keeps reporting the format
+result and you should read `nameLookupStatus` to see why.
+
+<Warning>
+A name mismatch does **not** make `isValid` false. `isValid: true` with
+`nameMatch.matched: false` means the account is real but belongs to somebody
+other than the name you sent — which is usually the more urgent problem. Check
+both before paying out.
+</Warning>
+
 ## When a lookup doesn't return a name
 
 `nameLookupStatus` is always accompanied by `nameLookupReason` explaining it, so

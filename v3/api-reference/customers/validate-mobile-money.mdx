@@ -63,6 +63,12 @@ resolve names at all (`UNSUPPORTED`) from something that needs a retry
 (`ERROR`, `TIMEOUT`). Check `nameLookupReason` before retrying — `UNSUPPORTED`
 will not resolve on a second attempt.
 
+`isValid` reports the number format, except on `NOT_FOUND` — once the network
+tells us there is no such subscriber, `isValid` comes back `false` too. A name
+*mismatch* is different: the number is real, so `isValid` stays `true` and
+`nameMatch.matched` tells you the holder is not who you expected. See
+[which field answers which question](/v3/essentials/account-validation#which-field-answers-which-question).
+
 Send `accountName` with the name you expect and the response adds a `nameMatch`
 block scoring it against the real one, so you can catch a wrong number before
 the money moves.
