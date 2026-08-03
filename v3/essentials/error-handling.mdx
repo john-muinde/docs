@@ -1,17 +1,45 @@
 ---
-title: "Error Handling"
-description: "HTTP status codes and error response format for the Kotani Pay API"
+title: "Errors & Limits"
+description: "How to read an error response, and the request limits you need to design around."
 ---
 
-The Kotani Pay API uses standard HTTP status codes. `2xx` means success, `4xx` means the request was rejected, `5xx` means something failed on the server.
+The API uses standard HTTP status codes. `2xx` succeeded, `4xx` means your request
+was rejected, `5xx` means something failed on our side.
 
----
+## Reading an error
 
-## Response Envelope
+**Always branch on the HTTP status code, and read `message` for the detail.**
 
-All responses — success and error — follow a consistent envelope.
+Error bodies are not identical across every endpoint — some carry `statusCode` and
+`error`, others carry `success` and `error_code`. Both always include `message`,
+and both put structured detail in `data`.
 
-**Success:**
+<CodeGroup>
+```json Shape A
+{
+  "statusCode": 429,
+  "message": "Too many requests. You have exceeded the limit of 60 requests per 60 seconds. Please wait before trying again.",
+  "error": "Too Many Requests",
+  "data": { "retryAfter": 60 }
+}
+```
+
+```json Shape B
+{
+  "success": false,
+  "message": "Descriptive error message",
+  "error_code": 400,
+  "data": { }
+}
+```
+</CodeGroup>
+
+<Warning>
+Don't key your error handling off `error_code` or `success` alone — they aren't
+present on every error. The HTTP status code is the reliable signal.
+</Warning>
+
+Successful responses are consistent:
 
 ```json
 {
@@ -21,18 +49,21 @@ All responses — success and error — follow a consistent envelope.
 }
 ```
 
-**Error:**
+## Status codes
 
-```json
-{
-  "success": false,
-  "message": "Descriptive error message",
-  "error_code": 400,
-  "data": { }
-}
-```
+| Status | Meaning |
+|--------|---------|
+| `200` | Success |
+| `400` | Bad request — invalid parameters or missing required fields |
+| `401` | Unauthorized — API key or JWT is missing or invalid |
+| `403` | Forbidden — valid key without permission, or a suspended customer |
+| `404` | Resource not found |
+| `429` | Too many requests — see [limits](#request-limits) below |
+| `500` | Something failed on our side — contact support if it persists |
 
-The `error_code` field mirrors the HTTP status code. For validation failures, `data.errors` contains the individual field messages:
+## Validation errors
+
+For validation failures, `data.errors` lists the individual field problems:
 
 ```json
 {
@@ -48,50 +79,56 @@ The `error_code` field mirrors the HTTP status code. For validation failures, `d
 }
 ```
 
----
+## Suspended customers
 
-## Status Codes
-
-| Status | Meaning |
-|--------|---------|
-| `200` | Success |
-| `400` | Bad request — invalid parameters or missing required fields |
-| `401` | Unauthorized — API key or JWT is missing or invalid |
-| `403` | Forbidden — key is valid but lacks permission, or the resource is not accessible |
-| `404` | Resource not found |
-| `429` | Rate limit exceeded |
-| `500` | Internal server error — contact support if it persists |
-
----
-
-## Rate Limit Errors
-
-When rate limited, the `data` field includes how long to wait:
-
-```json
-{
-  "success": false,
-  "message": "Too many requests. You have exceeded the limit of 60 requests per 60 seconds. Please wait before trying again.",
-  "error_code": 429,
-  "data": {
-    "retryAfter": 60
-  }
-}
-```
-
----
-
-## Customer Suspension
-
-If a `customer_key` belongs to a suspended customer, the request returns `403`:
+If a `customer_key` belongs to a suspended customer, the request returns `403` with
+the date the suspension lifts:
 
 ```json
 {
   "success": false,
   "message": "Customer cust_abc123 is temporarily suspended until 2025-01-01 12:00:00 UTC and cannot initiate transactions. Please contact support to resolve the customer's status.",
   "error_code": 403,
-  "data": {
-    "bannedUntil": "2025-01-01T12:00:00Z"
-  }
+  "data": { "bannedUntil": "2025-01-01T12:00:00Z" }
 }
 ```
+
+## Request limits
+
+Limits are counted **per endpoint, per API key** — a busy status-check loop won't
+eat into your ability to create transactions. They're grouped by what the endpoint
+does:
+
+| What you're calling | Sustained limit | Short burst |
+|---|---|---|
+| **Reading data** — status checks, lists, lookups | 100 per 5 seconds | 20 per 5 seconds |
+| **Moving money** — deposits, payouts, transfers | 60 per minute | 20 per 5 seconds |
+| **Signing in and managing keys** | 10 per minute | 3 per 10 seconds |
+
+The burst limit catches rapid-fire requests inside a few seconds even when you're
+under the sustained limit, so pace retries rather than firing them together.
+
+Separately, our infrastructure caps **all traffic from a single IP address at
+1,000 requests per 5 minutes**, across every endpoint. Normal integrations never
+reach it; parallel workers sharing one outbound address sometimes do.
+
+<Note>
+These are the standard limits. They're configurable per account, and high-volume
+integrators can be raised or exempted — talk to your account manager if you're
+designing something that needs it.
+</Note>
+
+## Handling a 429
+
+`data.retryAfter` tells you how many seconds to wait. Wait at least that long, then
+retry — don't retry immediately, and don't retry in a tight loop.
+
+## Staying under the limits
+
+- **Use webhooks instead of polling.** Polling for transaction status is the single
+  most common cause of hitting these limits. See [Webhooks](/v3/essentials/webhooks).
+- **Batch your lookups.** Use list endpoints with pagination rather than looping
+  one-by-one lookups.
+- **Back off on `429`.** Honour `retryAfter` rather than retrying on a fixed timer.
+- **Spread parallel workers.** If several workers share one outbound IP, they share
+  the infrastructure limit too.

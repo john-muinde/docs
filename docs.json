@@ -49,8 +49,7 @@
                   "v3/essentials/billing-types",
                   "v3/essentials/balances-and-settlement",
                   "v3/essentials/account-validation",
-                  "v3/essentials/error-handling",
-                  "v3/essentials/rate-limits"
+                  "v3/essentials/error-handling"
                 ]
               },
               {
@@ -68,19 +67,6 @@
                 ]
               },
               {
-                "group": "Transaction Flows",
-                "pages": [
-                  "v3/flows/deposit-flow",
-                  "v3/flows/withdrawal-flow",
-                  "v3/flows/onramp-flow",
-                  "v3/flows/offramp-flow",
-                  "v3/flows/payment-links-flow",
-                  "v3/flows/bulk-payments-flow",
-                  "v3/flows/settlement-flow",
-                  "v3/flows/crypto-bridge-flow"
-                ]
-              },
-              {
                 "group": "Testing & Going Live",
                 "pages": [
                   "v3/testing/overview",
@@ -88,6 +74,18 @@
                   "v3/testing/account-validation",
                   "v3/run-in-postman",
                   "v3/development"
+                ]
+              },
+              {
+                "group": "Transaction Flows",
+                "pages": [
+                  "v3/flows/deposit-flow",
+                  "v3/flows/withdrawal-flow",
+                  "v3/flows/onramp-flow",
+                  "v3/flows/offramp-flow",
+                  "v3/flows/bulk-payments-flow",
+                  "v3/flows/settlement-flow",
+                  "v3/flows/crypto-bridge-flow"
                 ]
               }
             ]
@@ -338,5 +336,11 @@
       "github": "https://github.com/kotanipay",
       "linkedin": "https://linkedin.com/company/kotanipay"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/v3/essentials/rate-limits",
+      "destination": "/v3/essentials/error-handling"
+    }
+  ]
 }
