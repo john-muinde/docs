@@ -7,17 +7,13 @@ Bulk payments let you disburse to hundreds or thousands of recipients in a singl
 
 ---
 
-## Before You Start
-
-- An API key — see [API Keys](/v3/getting-started/api-keys)
-- Funded payout wallets for each currency in your CSV
-- A `callbackUrl` — each individual payment fires a `transaction.withdrawal.status.updated` webhook as it settles
-
----
+<Note>
+You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl` — see the [Quickstart](/v3/quickstart) if you haven't set those up. For this flow you also need a funded payout wallet for every currency in your CSV. Each payment fires its own withdrawal webhook as it settles.
+</Note>
 
 ## 1. Validate Your CSV
 
-Call [POST /api/v3/bulk-payments/validate-csv](/v3/api-reference/bulk-payments/validate-csv) with your CSV file. Kotani Pay validates every row and returns:
+Call [Validate CSV File](/v3/api-reference/bulk-payments/validate-csv) with your CSV file. Kotani Pay validates every row and returns:
 
 - A summary grouped by currency with totals
 - Row-level errors with line numbers if any data is invalid
@@ -28,13 +24,13 @@ Fix any errors and re-upload. A file hash is computed to prevent duplicate submi
 
 ## 2. Preview Batches
 
-Call [POST /api/v3/bulk-payments/preview-batches](/v3/api-reference/bulk-payments/preview-batches) with the file hash. This shows you exactly how many batches will be created, the total per currency, and which wallet you'll need to assign to each.
+Call [Preview Bulk Payment Batches](/v3/api-reference/bulk-payments/preview-batches) with the file hash. This shows you exactly how many batches will be created, the total per currency, and which wallet you'll need to assign to each.
 
 ---
 
 ## 3. Create Batches
 
-Call [POST /api/v3/bulk-payments/create-batches](/v3/api-reference/bulk-payments/create-batches), assigning a payout wallet to each currency. Kotani Pay verifies your balance, creates the transaction record, and queues all batches for processing.
+Call [Create Bulk Payment Batches](/v3/api-reference/bulk-payments/create-batches), assigning a payout wallet to each currency. Kotani Pay verifies your balance, creates the transaction record, and queues all batches for processing.
 
 Save the `transactionId` and `batchId`s from the response — you'll need them to track progress.
 
@@ -61,9 +57,9 @@ For overall batch progress, poll the batch status endpoints rather than relying 
 
 ## 6. Track Progress
 
-- [GET /api/v3/bulk-payments/batches/:batchId](/v3/api-reference/bulk-payments/get-batch) — current batch status and success/fail counts
-- [GET /api/v3/bulk-payments/batches/:batchId/payments](/v3/api-reference/bulk-payments/get-batch-payments) — status of each individual payment
-- [GET /api/v3/bulk-payments/transactions/:transactionId](/v3/api-reference/bulk-payments/list-transactions) — overview of all batches under a transaction
+- [Get Bulk Payment Batch by ID](/v3/api-reference/bulk-payments/get-batch) — current batch status and success/fail counts
+- [Get Batch Payments](/v3/api-reference/bulk-payments/get-batch-payments) — status of each individual payment
+- [Get Paginated Transactions](/v3/api-reference/bulk-payments/list-transactions) — overview of all batches under a transaction
 
 Batch statuses move from `pending` → `processing` → `completed`, `completed_with_errors`, or `failed`.
 

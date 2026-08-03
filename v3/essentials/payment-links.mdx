@@ -79,30 +79,21 @@ may be added on top of what your customer paid rather than taken out of it.
 
 ## Creating links from the API
 
-If you need a link per order rather than one you share repeatedly, create them
-programmatically. Same options as the dashboard.
-
-| | |
-| --- | --- |
-| Create a link | `POST /api/v3/dashboard/payment-links` |
-| List your links | `GET /api/v3/dashboard/payment-links` |
-| Payments for one link | `GET /api/v3/dashboard/payment-links/{id}/transactions` |
-| A single payment | `GET /api/v3/dashboard/payment-links/transactions/reference/{referenceId}` |
-| Totals for one link | `GET /api/v3/dashboard/payment-links/{id}/analytics` |
-| Turn a link off | `POST /api/v3/dashboard/payment-links/{id}/deactivate` |
-
-The create call takes the same choices as the dashboard form: `type`, `pricing`,
-`enabledPaymentMethods`, `usageType` and `collectCustomerInfo`. The response
-carries the link's `id` and its shareable URL.
+If you need a link per order rather than one you share repeatedly, links can be
+created programmatically with the same options as the dashboard form — type,
+pricing, enabled payment methods, usage limit and which customer details to
+collect. You can also list your links, fetch the payments and totals for one, and
+deactivate it.
 
 <Note>
-Per-link routes take the `id` from the create response, not the short code in the
-URL your customer sees.
+These endpoints aren't in the API reference yet. Ask your account manager for the
+current contract rather than working from a path written down here — the reference
+is the only place we keep those in step with the API.
 </Note>
 
-Payments made through a link arrive as normal deposit webhooks —
-`transaction.deposit.status.updated` — so if you already handle deposits, you
-already handle these.
+Payments made through a link arrive as normal deposit webhooks, so if you already
+handle deposits you already handle these. See the
+[deposit payload](/v3/essentials/webhooks#transactiondepositstatusupdated).
 
 ## Related
 

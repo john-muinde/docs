@@ -7,24 +7,19 @@ An offramp converts cryptocurrency into local fiat currency. The customer sends 
 
 ---
 
-## Before You Start
-
-- An API key — see [API Keys](/v3/getting-started/api-keys)
-- A customer record for the recipient — see [Create Customer](/v3/api-reference/customers/mobile-money/create)
-- A funded payout balance in the disbursement currency
-- A `callbackUrl` on your server
-
----
+<Note>
+You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl` — see the [Quickstart](/v3/quickstart) if you haven't set those up. For this flow you also need a funded payout balance in the disbursement currency, and a [customer record](/v3/api-reference/customers/mobile-money/create) for the recipient.
+</Note>
 
 ## 1. Get a Rate Quote
 
-Fetch the current offramp rate to show the customer how much fiat they'll receive. Call [GET /api/v3/rates/offramp-rate](/v3/api-reference/rates/offramp-rate) with the crypto token and target fiat currency.
+Fetch the current offramp rate to show the customer how much fiat they'll receive. Call [Get Offramp Exchange Rate](/v3/api-reference/rates/offramp-rate) with the crypto token and target fiat currency.
 
 ---
 
 ## 2. Create the Offramp
 
-Call [POST /api/v3/offramp](/v3/api-reference/offramp/create) with your `callbackUrl`. The API responds with a `PENDING` transaction and a `depositAddress` — this is the on-chain address the customer must send crypto to. Display this address (and optionally a QR code) to them.
+Call [Create Offramp Request](/v3/api-reference/offramp/create) with your `callbackUrl`. The API responds with a `PENDING` transaction and a `depositAddress` — this is the on-chain address the customer must send crypto to. Display this address (and optionally a QR code) to them.
 
 ---
 
@@ -61,8 +56,8 @@ If you have a webhook secret configured, the callback arrives in a signed envelo
 
 ## 6. Poll for Status
 
-- [GET /api/v3/offramp/:referenceId](/v3/api-reference/offramp/get-status) — full transaction status
-- [GET /api/v3/offramp/refund-status/:referenceId](/v3/api-reference/offramp/refund-status) — refund status if fiat disbursement failed
+- [Get Offramp Status (by Reference ID)](/v3/api-reference/offramp/get-status) — full transaction status
+- [Get Refund Status](/v3/api-reference/offramp/refund-status) — refund status if fiat disbursement failed
 
 ---
 
@@ -70,8 +65,8 @@ If you have a webhook secret configured, the callback arrives in a signed envelo
 
 If the automatic refund fails, you can retry:
 
-- **Single retry** — [POST /api/v3/offramp/retry-refund/:referenceId](/v3/api-reference/offramp/retry-refund)
-- **Lightning offramps** — if the refund requires a bolt11 invoice, the customer provides one and you submit it via `POST /api/v3/offramp/submit-refund-invoice/:referenceId`
+- **Single retry** — [Retry Failed Refund](/v3/api-reference/offramp/retry-refund)
+- **Lightning offramps** — if the refund requires a bolt11 invoice, the customer provides one and you submit it. See [Offramp Refunds](/v3/essentials/offramp-refunds)
 
 See [Offramp Refunds](/v3/essentials/offramp-refunds) for the full refund states and handling.
 
@@ -81,7 +76,7 @@ See [Offramp Refunds](/v3/essentials/offramp-refunds) for the full refund states
 
 A transaction can only be cancelled while still in `PENDING` — before any crypto is received on-chain.
 
-[GET /api/v3/offramp/cancel/:referenceId](/v3/api-reference/offramp/cancel)
+[Cancel Offramp Transaction](/v3/api-reference/offramp/cancel)
 
 ---
 

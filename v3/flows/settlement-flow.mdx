@@ -7,14 +7,9 @@ A settlement moves your Kotani Pay balance to an external account — a bank acc
 
 ---
 
-## Before You Start
-
-- An API key — see [API Keys](/v3/getting-started/api-keys)
-- A fiat wallet with a deposit or payout balance to settle from
-- A beneficiary destination — either inline `beneficiaryDetails` or a [saved beneficiary](/v3/api-reference/settlements/settlement-config/beneficiaries)
-- A `callbackUrl` on your server if you want programmatic status notifications
-
----
+<Note>
+You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl` — see the [Quickstart](/v3/quickstart) if you haven't set those up. For this flow you also need a fiat wallet with a balance to settle from, and a destination — either inline beneficiary details or a [saved beneficiary](/v3/api-reference/settlements/settlement-config/beneficiaries).
+</Note>
 
 ## Settlement Lifecycle
 
@@ -61,7 +56,7 @@ The settlement resumes automatically on `pausedUntil` if set. Otherwise it resum
 
 ## Checking the Schedule
 
-Call [GET /api/v3/integrator/settlements/schedule](/v3/api-reference/settlements/schedule) before submitting to confirm settlements are open and your amount is within limits.
+Call [Settlement Schedule](/v3/api-reference/settlements/schedule) before submitting to confirm settlements are open and your amount is within limits.
 
 Key fields:
 
@@ -74,7 +69,7 @@ Key fields:
 
 ## Previewing Fees
 
-Call [GET /api/v3/integrator/settlements/fee-preview](/v3/api-reference/settlements/fee-preview) with `?amount=&walletId=` before submitting. The response shows the fee, net amount, and USD-equivalent values used for limit checking.
+Call [Settlement Fee Preview](/v3/api-reference/settlements/fee-preview) with `?amount=&walletId=` before submitting. The response shows the fee, net amount, and USD-equivalent values used for limit checking.
 
 ---
 
@@ -84,7 +79,7 @@ Call [GET /api/v3/integrator/settlements/fee-preview](/v3/api-reference/settleme
 
 **2. Preview the fee** — confirm the net amount is acceptable.
 
-**3. Submit** — call [POST /api/v3/integrator/settlements](/v3/api-reference/settlements/request-settlement). The response includes the settlement ID and initial status `PENDING`.
+**3. Submit** — call [Request Settlement](/v3/api-reference/settlements/request-settlement). The response includes the settlement ID and initial status `PENDING`.
 
 **4. Wait for review** — status moves to `UNDER_REVIEW` then `APPROVED`.
 
@@ -100,11 +95,11 @@ Batch settlements submit multiple wallet requests in one call. Each child settle
 
 **1. Prepare your requests array** — each item follows the same schema as a single settlement request: `walletId`, `amount`, `balanceSource`, plus `beneficiaryDetails` or `savedBeneficiaryId`.
 
-**2. Submit the batch** — call [POST /api/v3/integrator/settlements/batch](/v3/api-reference/settlements/batch/create) with an optional `batchReference` for your own tracking.
+**2. Submit the batch** — call [Create Batch Settlement](/v3/api-reference/settlements/batch/create) with an optional `batchReference` for your own tracking.
 
-**3. Track the batch** — call [GET /api/v3/integrator/settlements/batch/:batchId](/v3/api-reference/settlements/batch/get) for the overall status. Each child can also be fetched individually via [GET /api/v3/integrator/settlements/:id](/v3/api-reference/settlements/get-settlement).
+**3. Track the batch** — call [Get Settlement Batch](/v3/api-reference/settlements/batch/get) for the overall status. Each child can also be fetched individually via [Get Settlement](/v3/api-reference/settlements/get-settlement).
 
-**4. Cancelling** — call [DELETE /api/v3/integrator/settlements/batch/:batchId](/v3/api-reference/settlements/batch/cancel). Children still in `PENDING` are cancelled; children in `UNDER_REVIEW` or later are not affected.
+**4. Cancelling** — call [Cancel Settlement Batch](/v3/api-reference/settlements/batch/cancel). Children still in `PENDING` are cancelled; children in `UNDER_REVIEW` or later are not affected.
 
 ### Batch Status at Completion
 
@@ -124,12 +119,12 @@ The merge endpoint converts two or more existing individual settlements into a b
 
 **1. Identify settlements to merge** — all must be `PENDING` or `UNDER_REVIEW` and not already in a batch.
 
-**2. Submit the merge** — call [POST /api/v3/integrator/settlements/merge](/v3/api-reference/settlements/merge) with the `settlementIds` array (minimum 2).
+**2. Submit the merge** — call [Merge Settlements into Batch](/v3/api-reference/settlements/merge) with the `settlementIds` array (minimum 2).
 
 **3. A new batch is created** — the response contains the new batch ID. The source settlements become children of that batch.
 
 <Warning>
-You cannot un-merge settlements once grouped into a batch. To cancel, use [DELETE /api/v3/integrator/settlements/batch/:batchId](/v3/api-reference/settlements/batch/cancel).
+You cannot un-merge settlements once grouped into a batch. To cancel, use [Cancel Settlement Batch](/v3/api-reference/settlements/batch/cancel).
 </Warning>
 
 ---
@@ -190,16 +185,16 @@ Settlement events are delivered via the signed webhook system — see [Webhook N
 
 Store destination details once and reference by ID on any settlement or batch request.
 
-1. Create — [POST /api/v3/integrator/settlement-config/beneficiaries](/v3/api-reference/settlements/settlement-config/create-beneficiary)
+1. Create — [Create Settlement Beneficiary](/v3/api-reference/settlements/settlement-config/create-beneficiary)
 2. Use `savedBeneficiaryId` in your settlement or batch request
-3. Update — [PATCH /api/v3/integrator/settlement-config/beneficiaries/:id](/v3/api-reference/settlements/settlement-config/get-beneficiary)
-4. Delete — [DELETE /api/v3/integrator/settlement-config/beneficiaries/:id](/v3/api-reference/settlements/settlement-config/delete-beneficiary)
+3. Update — [Update Settlement Beneficiary](/v3/api-reference/settlements/settlement-config/get-beneficiary)
+4. Delete — [Delete Settlement Beneficiary](/v3/api-reference/settlements/settlement-config/delete-beneficiary)
 
 ---
 
 ## Notification Preferences
 
-Configure email and Slack notifications via [PATCH /api/v3/integrator/settlements/notification-preferences](/v3/api-reference/settlements/notification-preferences). These supplement signed webhook delivery and are intended for human awareness rather than programmatic integration.
+Configure email and Slack notifications via [Update Notification Preferences](/v3/api-reference/settlements/notification-preferences). These supplement signed webhook delivery and are intended for human awareness rather than programmatic integration.
 
 ---
 

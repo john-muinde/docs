@@ -11,20 +11,15 @@ Your **payout balance** must have funds before you can disburse. If it doesn't, 
 
 ---
 
-## Before You Start
-
-- An API key — see [API Keys](/v3/getting-started/api-keys)
-- A funded payout balance in the disbursement currency
-- A customer record for the recipient — see [Create Customer](/v3/api-reference/customers/mobile-money/create)
-- A `callbackUrl` on your server
-
----
+<Note>
+You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl` — see the [Quickstart](/v3/quickstart) if you haven't set those up. For this flow you also need a funded payout balance in the disbursement currency, and a [customer record](/v3/api-reference/customers/mobile-money/create) for the recipient.
+</Note>
 
 ## Mobile Money Withdrawal
 
 **1. Create the customer** if you haven't already. The customer record holds the recipient's phone number and network details.
 
-**2. Initiate the withdrawal** — call [POST /api/v3/withdraw/mobile-money](/v3/api-reference/withdrawals/mobile-money) with your `callbackUrl`. The API responds immediately with a `PENDING` transaction. Your payout balance is debited at this point.
+**2. Initiate the withdrawal** — call [Mobile Money Withdrawal](/v3/api-reference/withdrawals/mobile-money) with your `callbackUrl`. The API responds immediately with a `PENDING` transaction. Your payout balance is debited at this point.
 
 **3. The recipient receives funds.** If the disbursement succeeds, the customer receives an SMS confirmation from the mobile money network.
 
@@ -36,7 +31,7 @@ Your **payout balance** must have funds before you can disburse. If it doesn't, 
 If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks) for both modes, and the [withdrawal payload](/v3/essentials/webhooks#transactionwithdrawalstatusupdated) for every field you receive with a worked example.
 </Note>
 
-**5. Poll for status** if needed — [GET /api/v3/withdraw/status/:reference_id](/v3/api-reference/withdrawals/mobile-money-status).
+**5. Poll for status** if needed — [Mobile Money Withdrawal Status](/v3/api-reference/withdrawals/mobile-money-status).
 
 ---
 
@@ -44,8 +39,8 @@ If you have a webhook secret configured, the callback arrives in a signed envelo
 
 Two additional disbursement methods are available for Kenya:
 
-- **Lipa na M-Pesa** — sends to a till number or triggers an STK push — [POST /api/v3/withdraw/lipa-na-mpesa](/v3/api-reference/withdrawals/lipa-na-mpesa)
-- **Paybill** — sends to a paybill number with an account reference — [POST /api/v3/withdraw/paybill](/v3/api-reference/withdrawals/paybill)
+- **Lipa na M-Pesa** — sends to a till number or triggers an STK push — [Lipa na M-Pesa Withdrawal](/v3/api-reference/withdrawals/lipa-na-mpesa)
+- **Paybill** — sends to a paybill number with an account reference — [Paybill Withdrawal](/v3/api-reference/withdrawals/paybill)
 
 The flow is the same — initiate, wait for callback, poll if needed.
 
@@ -57,11 +52,11 @@ Currently supported in Kenya and South Africa.
 
 **1. Get supported banks** for the target currency — [GET /api/v3/customer/support/banks](v3/api-reference/country-support/banks). This gives you the bank codes to use in the request.
 
-**2. Initiate the withdrawal** — call [POST /api/v3/withdraw/v2/bank](/v3/api-reference/withdrawals/bank-v2) with your `callbackUrl` and the recipient's bank account details.
+**2. Initiate the withdrawal** — call [Bank Withdrawal](/v3/api-reference/withdrawals/bank-v2) with your `callbackUrl` and the recipient's bank account details.
 
 **3. Kotani Pay notifies you** via your `callbackUrl` when the transfer completes or fails — same event structure as mobile money withdrawals.
 
-**4. Poll for status** if needed — [GET /api/v3/withdraw/v2/bank/status/:referenceId](/v3/api-reference/withdrawals/bank-status).
+**4. Poll for status** if needed — [Bank Withdrawal Status](/v3/api-reference/withdrawals/bank-status).
 
 ---
 

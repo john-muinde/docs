@@ -7,14 +7,9 @@ A deposit is a collection — money moves from your customer into your Kotani Pa
 
 ---
 
-## Before You Start
-
-- An API key — see [API Keys](/v3/getting-started/api-keys)
-- A fiat wallet for the currency you're collecting in
-- A customer record for the person paying — see [Create Customer](/v3/api-reference/customers/mobile-money/create)
-- A publicly reachable `callbackUrl` on your server
-
----
+<Note>
+You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl` — see the [Quickstart](/v3/quickstart) if you haven't set those up. For this flow you also need a fiat wallet in the currency you're collecting, and a [customer record](/v3/api-reference/customers/mobile-money/create) for the person paying.
+</Note>
 
 ## Mobile Money Deposit
 
@@ -22,7 +17,7 @@ The most common collection method across Kenya, Uganda, Tanzania, Ghana, and oth
 
 **1. Create the customer** if you haven't already. The customer record holds the phone number and network details needed to trigger the collection.
 
-**2. Initiate the deposit** — call [POST /api/v3/deposit/mobile-money](/v3/api-reference/deposits/mobile-money) with your `callbackUrl`. The API responds immediately with a `PENDING` transaction. The customer has not paid yet.
+**2. Initiate the deposit** — call [Deposit via Mobile Money](/v3/api-reference/deposits/mobile-money) with your `callbackUrl`. The API responds immediately with a `PENDING` transaction. The customer has not paid yet.
 
 **3. The customer confirms.** Depending on the network:
 - M-PESA / Airtel — STK push, customer enters PIN to approve
@@ -36,13 +31,13 @@ The most common collection method across Kenya, Uganda, Tanzania, Ghana, and oth
 If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks) for both modes, and the [deposit payload](/v3/essentials/webhooks#transactiondepositstatusupdated) for every field you receive with a worked example.
 </Note>
 
-**5. Poll for status** if needed — [GET /api/v3/deposit/mobile-money/status/:reference_id](/v3/api-reference/deposits/mobile-money-status).
+**5. Poll for status** if needed — [Get Deposit Mobile Money Status](/v3/api-reference/deposits/mobile-money-status).
 
 ---
 
 ## Bank Checkout Deposit
 
-Call [POST /api/v3/deposit/bank/checkout](/v3/api-reference/deposits/bank-checkout) with your `callbackUrl`, a `customerRedirectUrl` (where to send the customer after they finish paying), `currency`, `amount`, and a `paymentMethod`. What happens next depends on the currency and payment method — bank checkout is not one flow, it's three:
+Call [Bank Checkout Deposit](/v3/api-reference/deposits/bank-checkout) with your `callbackUrl`, a `customerRedirectUrl` (where to send the customer after they finish paying), `currency`, `amount`, and a `paymentMethod`. What happens next depends on the currency and payment method — bank checkout is not one flow, it's three:
 
 **ZAR — `CAPITECPAY` or `CARD`.** Kotani Pay returns a hosted checkout page. Redirect the customer to `redirectUrl` in the response; they complete payment there (Capitec Pay app or card entry) and are sent back to your `customerRedirectUrl` afterward. No manual reference entry — the hosted page handles matching the payment.
 
@@ -54,19 +49,19 @@ The customer **must** enter `bankPaymentDetails.reference` as the payment narrat
 
 **NGN — Virtual account.** The response's `bankPaymentDetails` contains a one-time dedicated `accountNumber` (plus `bankName`, `accountName`, `amount`, `expiresInMinutes`). The customer pays the exact amount to that account from their own banking app before it expires. No narrative/reference is needed here — the account itself is unique to this transaction.
 
-**Then, for all three:** Kotani Pay notifies you via your `callbackUrl` when the bank confirms — same event structure as mobile money. Poll for status if needed — [GET /api/v3/deposit/bank/checkout/status/:reference_id](/v3/api-reference/deposits/bank-checkout-status).
+**Then, for all three:** Kotani Pay notifies you via your `callbackUrl` when the bank confirms — same event structure as mobile money. Poll for status if needed — [Bank Checkout Deposit Status](/v3/api-reference/deposits/bank-checkout-status).
 
 ---
 
 ## Card Deposit
 
-**1. Initiate the charge** — call [POST /api/v3/deposit/card](/v3/api-reference/deposits/card) with your `callbackUrl`.
+**1. Initiate the charge** — call [Card Deposit](/v3/api-reference/deposits/card) with your `callbackUrl`.
 
 **2. Handle 3DS if required.** If the response includes a redirect URL, send the customer there to complete 3D Secure authentication before the charge can settle.
 
 **3. Kotani Pay notifies you** via your `callbackUrl` when the charge settles.
 
-**4. Poll for status** if needed — [GET /api/v3/deposit/card/status/:reference_id](/v3/api-reference/deposits/card-status).
+**4. Poll for status** if needed — [Card Deposit Status](/v3/api-reference/deposits/card-status).
 
 ---
 

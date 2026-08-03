@@ -194,4 +194,4 @@ Fired when Kotani needs you to submit a Lightning invoice manually (Option B). I
 | All other errors | 5 | Auto-retried; `refund.failed` fired when exhausted |
 | Lightning — no invoice | ∞ | Waits until invoice submitted; `refund.lightning.invoice_needed` sent once |
 
-Use `POST /api/v3/offramp/retry-refund/{referenceId}` to manually trigger a retry on a `FAILED` refund.
+Use [Retry Refund](/v3/api-reference/offramp/retry-refund) to manually trigger a retry on a `FAILED` refund.

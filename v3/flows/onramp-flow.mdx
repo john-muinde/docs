@@ -7,24 +7,19 @@ An onramp converts local fiat currency into cryptocurrency. The customer pays vi
 
 ---
 
-## Before You Start
-
-- An API key — see [API Keys](/v3/getting-started/api-keys)
-- A customer record for the person paying — see [Create Customer](/v3/api-reference/customers/mobile-money/create)
-- A crypto wallet address to receive the funds
-- A `callbackUrl` on your server
-
----
+<Note>
+You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl` — see the [Quickstart](/v3/quickstart) if you haven't set those up. For this flow you also need a [customer record](/v3/api-reference/customers/mobile-money/create) for the person paying, and the crypto wallet address to deliver to.
+</Note>
 
 ## 1. Get a Rate Quote
 
-Fetch the current exchange rate before initiating so you can show the customer what crypto amount they'll receive. Call [GET /api/v3/rates/onramp-rate](/v3/api-reference/rates/onramp-rate) with the fiat currency and crypto token.
+Fetch the current exchange rate before initiating so you can show the customer what crypto amount they'll receive. Call [Get Onramp Exchange Rate](/v3/api-reference/rates/onramp-rate) with the fiat currency and crypto token.
 
 ---
 
 ## 2. Initiate the Onramp
 
-Call [POST /api/v3/onramp](/v3/api-reference/onramp/create) with your `callbackUrl` and the destination crypto wallet address. The API responds immediately with a `PENDING` transaction. The exchange rate is locked at this point.
+Call [Create Onramp](/v3/api-reference/onramp/create) with your `callbackUrl` and the destination crypto wallet address. The API responds immediately with a `PENDING` transaction. The exchange rate is locked at this point.
 
 ---
 
@@ -66,8 +61,8 @@ If you have a webhook secret configured, the callback arrives in a signed envelo
 
 ## 6. Poll for Status
 
-- [GET /api/v3/onramp/:referenceId](/v3/api-reference/onramp/get-status) — standard onramp status
-- [GET /api/v3/onramp/crypto/:referenceId](/v3/api-reference/onramp/get-crypto-status) — crypto delivery status
+- [Get Onramp Status (by Reference ID)](/v3/api-reference/onramp/get-status) — standard onramp status
+- [Get Crypto Onramp Status (by Reference ID)](/v3/api-reference/onramp/get-crypto-status) — crypto delivery status
 
 ---
 
