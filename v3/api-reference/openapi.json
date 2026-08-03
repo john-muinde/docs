@@ -4195,200 +4195,6 @@
         ]
       }
     },
-    "/api/v3/name-lookup": {
-      "post": {
-        "description": "Checks a phone number and network directly against whichever provider would actually handle a payout to them, reducing the risk of sending funds to the wrong recipient. No prior customer record is required — only integrators approved for name-lookup can call this endpoint.",
-        "operationId": "NameLookupController_lookup_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NameLookupRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Name lookup completed."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/NameLookupResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid API Key"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Resolve the account holder name for a phone number",
-        "tags": [
-          "NAME LOOKUP"
-        ]
-      }
-    },
-    "/api/v3/name-lookup/bank": {
-      "post": {
-        "description": "Returns the account holder name registered on the given account number/bank code, so you can confirm the recipient before a payout. No prior customer record is required — only integrators approved for name-lookup can call this endpoint.",
-        "operationId": "NameLookupController_validateBankAccount_api/v3",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BankAccountLookupRequestDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Account validation completed."
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/BankAccountLookupResponseDto"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Bad Request"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": false
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Invalid API Key"
-                    },
-                    "data": {
-                      "type": "object",
-                      "example": {}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT": []
-          }
-        ],
-        "summary": "Resolve a bank account holder name",
-        "tags": [
-          "NAME LOOKUP"
-        ]
-      }
-    },
     "/api/v3/customer/validate/mobile-money": {
       "post": {
         "description": "Validates a phone number in any format (with or without country code). Returns validation status, country information, formatted number, and whether the country is supported for mobile money.",
@@ -7710,18 +7516,18 @@
         "properties": {
           "from": {
             "type": "string",
-            "description": "From currency",
+            "description": "The currency being converted from — the one you hold.",
             "example": "USD"
           },
           "to": {
             "type": "string",
-            "description": "To currency",
-            "example": "EUR"
+            "description": "The currency being converted to — the one you want.",
+            "example": "KES"
           },
           "value": {
             "type": "string",
-            "description": "Rate value",
-            "example": "0.85"
+            "description": "How many units of `to` one unit of `from` buys. Multiply your `from` amount by this to get the `to` amount: 10 USD at 130.5 is 1305 KES. Divide to go the other way. Rates move, so re-read this before quoting a customer rather than caching it.",
+            "example": "130.5"
           }
         },
         "required": [
@@ -7735,48 +7541,48 @@
         "properties": {
           "from": {
             "type": "string",
-            "description": "From currency",
+            "description": "The currency being converted from — the one you hold.",
             "example": "USD"
           },
           "to": {
             "type": "string",
-            "description": "To currency",
-            "example": "EUR"
+            "description": "The currency being converted to — the one you want.",
+            "example": "KES"
           },
           "value": {
             "type": "string",
-            "description": "Rate value",
-            "example": "0.85"
+            "description": "How many units of `to` one unit of `from` buys. Multiply your `from` amount by this to get the `to` amount: 10 USD at 130.5 is 1305 KES. Divide to go the other way. Rates move, so re-read this before quoting a customer rather than caching it.",
+            "example": "130.5"
           },
           "id": {
             "type": "string",
-            "description": "Rate ID",
+            "description": "Identifier for this quote. Pass it on the transaction to be charged the rate you were quoted rather than the rate at the time you submit.",
             "example": "1234567890"
           },
           "fiatAmount": {
             "type": "number",
-            "description": "Fiat amount",
-            "example": "100"
+            "description": "The fiat side of the conversion, before any fee. On an offramp this is what the crypto is worth; the recipient gets transactionAmount.",
+            "example": "1305"
           },
           "cryptoAmount": {
             "type": "number",
-            "description": "Crypto amount",
-            "example": "100"
+            "description": "The crypto side of the conversion.",
+            "example": "10"
           },
           "transactionAmount": {
             "type": "number",
-            "description": "Transaction amount",
-            "example": "100"
+            "description": "The settlement amount — what actually reaches the recipient. Whether the fee has been taken out of it depends on who pays the fee on your account.",
+            "example": "1279"
           },
           "fee": {
             "type": "number",
-            "description": "Fee",
-            "example": "100"
+            "description": "Our fee on this transaction, in the fiat currency. Already rounded to the currency's precision — whole units for KES and similar, two decimals for USD — so use this figure rather than recalculating it.",
+            "example": "26"
           },
           "walletDebitAmount": {
             "type": "number",
-            "description": "OFFRAMP only. Total debited from your wallet, including any fee billed on top.",
-            "example": "106"
+            "description": "OFFRAMP only. What actually leaves your wallet, fee included where you pay it. This is the figure to reconcile your balance against — not transactionAmount, which is what the recipient receives.",
+            "example": "1331"
           }
         },
         "required": [
@@ -7790,58 +7596,42 @@
           "fee"
         ]
       },
-      "STABLE_COIN": {
-        "type": "string",
-        "enum": [
-          "CUSD",
-          "USDC",
-          "USDT",
-          "USDGLO",
-          "CKES",
-          "CGHS",
-          "MSAT",
-          "ADA"
-        ],
-        "description": "To currency"
-      },
-      "RATE_SOURCE": {
-        "type": "string",
-        "enum": [
-          "fiat",
-          "crypto"
-        ],
-        "description": "Which currency fiatAmount holds. Defaults to fiat, set crypto to pass a crypto amount."
-      },
       "OnrampRateRequest": {
         "type": "object",
         "properties": {
           "from": {
             "type": "string",
-            "description": "From currency",
+            "description": "The fiat currency the customer pays in.",
             "example": "KES"
           },
           "to": {
-            "description": "To currency",
-            "example": "USDT",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/STABLE_COIN"
-              }
-            ]
+            "type": "string",
+            "enum": [
+              "CUSD",
+              "USDC",
+              "USDT",
+              "USDGLO",
+              "CKES",
+              "CGHS",
+              "MSAT",
+              "ADA"
+            ],
+            "description": "The stablecoin to deliver.",
+            "example": "USDT"
           },
           "fiatAmount": {
             "type": "number",
-            "description": "Rate value",
-            "example": "0.85"
+            "description": "How much to convert. Holds the fiat amount by default; if you set source to crypto it holds the crypto amount instead.",
+            "example": 1000
           },
           "source": {
+            "type": "string",
+            "enum": [
+              "fiat",
+              "crypto"
+            ],
             "description": "Which currency fiatAmount holds. Defaults to fiat, set crypto to pass a crypto amount.",
-            "example": "fiat",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RATE_SOURCE"
-              }
-            ]
+            "example": "fiat"
           }
         },
         "required": [
@@ -7854,32 +7644,38 @@
         "type": "object",
         "properties": {
           "from": {
-            "description": "From currency",
-            "example": "USDC",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/STABLE_COIN"
-              }
-            ]
+            "type": "string",
+            "enum": [
+              "CUSD",
+              "USDC",
+              "USDT",
+              "USDGLO",
+              "CKES",
+              "CGHS",
+              "MSAT",
+              "ADA"
+            ],
+            "description": "The stablecoin being sold.",
+            "example": "USDC"
           },
           "to": {
             "type": "string",
-            "description": "To currency",
+            "description": "The fiat currency to pay out in.",
             "example": "EUR"
           },
           "cryptoAmount": {
             "type": "number",
-            "description": "Rate value",
-            "example": "0.85"
+            "description": "How much to convert. Holds the crypto amount by default; if you set source to fiat it holds the net payout you want the recipient to receive, and we work backwards to the crypto needed.",
+            "example": 10
           },
           "source": {
+            "type": "string",
+            "enum": [
+              "fiat",
+              "crypto"
+            ],
             "description": "Which currency cryptoAmount holds. Defaults to crypto, set fiat to pass the net payout.",
-            "example": "crypto",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/RATE_SOURCE"
-              }
-            ]
+            "example": "crypto"
           }
         },
         "required": [
@@ -7893,48 +7689,48 @@
         "properties": {
           "from": {
             "type": "string",
-            "description": "From currency",
+            "description": "The currency being converted from — the one you hold.",
             "example": "USD"
           },
           "to": {
             "type": "string",
-            "description": "To currency",
-            "example": "EUR"
+            "description": "The currency being converted to — the one you want.",
+            "example": "KES"
           },
           "value": {
             "type": "string",
-            "description": "Rate value",
-            "example": "0.85"
+            "description": "How many units of `to` one unit of `from` buys. Multiply your `from` amount by this to get the `to` amount: 10 USD at 130.5 is 1305 KES. Divide to go the other way. Rates move, so re-read this before quoting a customer rather than caching it.",
+            "example": "130.5"
           },
           "depositAmount": {
             "type": "number",
-            "description": "Deposit amount",
-            "example": "100"
+            "description": "What you collect from the payer, in the `from` currency, before the collection fee.",
+            "example": "10000"
           },
           "withdrawalAmount": {
             "type": "number",
-            "description": "Withdrawal amount",
-            "example": "100"
+            "description": "What is paid out in the `to` currency, before the payout fee. This is depositAmount converted at `value`.",
+            "example": "76"
           },
           "depositTransactionAmount": {
             "type": "number",
-            "description": "Deposit transaction amount",
-            "example": "100"
+            "description": "The collection side after its fee is applied — the fee-adjusted amount on the deposit leg.",
+            "example": "10250"
           },
           "withdrawalTransactionAmount": {
             "type": "number",
-            "description": "Withdrawal transaction amount",
-            "example": "100"
+            "description": "The payout side after its fee is applied — what the recipient actually receives.",
+            "example": "74"
           },
           "depositFee": {
             "type": "number",
-            "description": "Deposit fee",
-            "example": "100"
+            "description": "Fee on the collection leg, in the `from` currency. A fiat-to-fiat transfer is charged on both legs, so expect two fees.",
+            "example": "250"
           },
           "withdrawalFee": {
             "type": "number",
-            "description": "Withdrawal fee",
-            "example": "100"
+            "description": "Fee on the payout leg, in the `to` currency.",
+            "example": "2"
           }
         },
         "required": [
@@ -7954,18 +7750,18 @@
         "properties": {
           "from": {
             "type": "string",
-            "description": "From currency",
+            "description": "The fiat currency the customer pays in.",
             "example": "KES"
           },
           "to": {
             "type": "string",
-            "description": "To currency",
+            "description": "The fiat currency to pay out in.",
             "example": "EUR"
           },
           "amount": {
             "type": "number",
-            "description": "Rate value",
-            "example": "0.85"
+            "description": "How much to convert, in the `from` currency. Fees are quoted on both legs of a fiat-to-fiat transfer.",
+            "example": 10000
           }
         },
         "required": [
@@ -8806,8 +8602,8 @@
           },
           "paymentMethod": {
             "type": "string",
-            "description": "Payment method",
-            "example": "BANK_TRANSFER",
+            "description": "Payment method to list providers for. Must be one of the enum values below — BANK_TRANSFER is a different enum and is rejected here.",
+            "example": "bank",
             "enum": [
               "mobile_money",
               "bank",
@@ -9846,7 +9642,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-07-30T17:06:05.622Z"
+            "example": "2026-08-03T21:02:40.825Z"
           },
           "transactionCost": {
             "type": "number",
@@ -10444,89 +10240,6 @@
           "referenceId"
         ]
       },
-      "NameLookupRequestDto": {
-        "type": "object",
-        "properties": {
-          "currency": {
-            "type": "string",
-            "description": "Currency the payout would be made in — used to resolve which provider would actually handle it.",
-            "example": "KES"
-          },
-          "phoneNumber": {
-            "type": "string",
-            "description": "Phone number to validate, in international format.",
-            "example": "+254712345678"
-          },
-          "network": {
-            "type": "string",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "YAS",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "VODACOM",
-              "WAVE"
-            ],
-            "description": "Mobile network the phone number is on (check the Payment Providers API for what is available per corridor).",
-            "example": "MPESA"
-          },
-          "countryCode": {
-            "type": "string",
-            "description": "Country code (ISO-2 like KE, or ISO-3 like KEN).",
-            "example": "KE"
-          }
-        },
-        "required": [
-          "currency",
-          "phoneNumber",
-          "network",
-          "countryCode"
-        ]
-      },
-      "BankAccountLookupRequestDto": {
-        "type": "object",
-        "properties": {
-          "currency": {
-            "type": "string",
-            "description": "Currency the payout would be made in — used to resolve which provider would actually handle the bank payout.",
-            "example": "KES"
-          },
-          "accountNumber": {
-            "type": "string",
-            "description": "Bank account number to resolve.",
-            "example": "1234567890"
-          },
-          "bankCode": {
-            "type": "string",
-            "description": "Bank code the account is held with. May be a number or a string — use a zero-padded string for Nigeria.",
-            "example": "058"
-          },
-          "countryCode": {
-            "type": "string",
-            "description": "Country code (ISO-2 like NG, or ISO-3 like NGA).",
-            "example": "NG"
-          }
-        },
-        "required": [
-          "currency",
-          "accountNumber",
-          "bankCode",
-          "countryCode"
-        ]
-      },
       "NameMatchDto": {
         "type": "object",
         "properties": {
@@ -10723,12 +10436,12 @@
           },
           "phoneNumber": {
             "type": "string",
-            "description": "Phone number, any format. Required unless accountType is paybill or till.",
+            "description": "Required unless accountType is paybill or till. Send it in international format, including the country code.",
             "example": "+254712345678"
           },
           "shortCode": {
             "type": "string",
-            "description": "M-PESA paybill or till number. Required when accountType is paybill or till.",
+            "description": "Required when accountType is paybill or till. The M-PESA shortcode.",
             "example": "247247"
           },
           "accountReference": {
@@ -10738,7 +10451,7 @@
           },
           "countryCode": {
             "type": "string",
-            "description": "Country code (ISO2). Derived from the phone number when omitted; defaults to KE for paybill/till.",
+            "description": "Country code (ISO2). Only needed for paybill and till, where it defaults to KE.",
             "example": "KE"
           },
           "network": {
@@ -12700,78 +12413,6 @@
         },
         "required": [
           "webhookUrl"
-        ]
-      },
-      "NameLookupResponseDto": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "MATCHED",
-              "NOT_FOUND",
-              "ACCOUNT_UNAVAILABLE",
-              "UNSUPPORTED",
-              "TIMEOUT",
-              "ERROR",
-              "NOT_ENABLED"
-            ],
-            "example": "MATCHED"
-          },
-          "fullName": {
-            "type": "string",
-            "description": "Name on file with the mobile money provider, if resolved.",
-            "example": "JANE MARY DOE"
-          },
-          "matchScore": {
-            "type": "number",
-            "description": "Name match score, 0-100. Only returned where the corridor supports scoring.",
-            "example": 95
-          },
-          "reason": {
-            "type": "string",
-            "description": "Human-readable explanation, populated for every outcome other than MATCHED.",
-            "example": "Account does not exist."
-          }
-        },
-        "required": [
-          "status"
-        ]
-      },
-      "BankAccountLookupResponseDto": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "MATCHED",
-              "NOT_FOUND",
-              "ACCOUNT_UNAVAILABLE",
-              "UNSUPPORTED",
-              "TIMEOUT",
-              "ERROR",
-              "NOT_ENABLED"
-            ],
-            "example": "MATCHED"
-          },
-          "accountName": {
-            "type": "string",
-            "description": "Name registered on the bank account, if resolved (MATCHED outcomes).",
-            "example": "JANE MARY DOE"
-          },
-          "accountStatus": {
-            "type": "string",
-            "description": "The bank account's status (e.g. ACTIVE) — the validation signal returned alongside the resolved name.",
-            "example": "ACTIVE"
-          },
-          "reason": {
-            "type": "string",
-            "description": "Human-readable explanation, populated for every outcome other than MATCHED.",
-            "example": "Account does not exist."
-          }
-        },
-        "required": [
-          "status"
         ]
       }
     }

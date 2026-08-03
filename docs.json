@@ -136,8 +136,7 @@
                   "v3/api-reference/customers/mobile-money/get-by-phone",
                   "v3/api-reference/customers/mobile-money/update",
                   "v3/api-reference/customers/validate-mobile-money",
-                  "v3/api-reference/customers/validate-bank",
-                  "v3/api-reference/withdrawals/name-lookup"
+                  "v3/api-reference/customers/validate-bank"
                 ]
               },
               {
@@ -337,6 +336,10 @@
     {
       "source": "/v3/run-in-postman",
       "destination": "/v3/quickstart"
+    },
+    {
+      "source": "/v3/api-reference/withdrawals/name-lookup",
+      "destination": "/v3/essentials/account-validation"
     }
   ]
 }
