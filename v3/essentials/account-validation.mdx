@@ -81,11 +81,17 @@ you can tell the cases apart rather than retrying blindly:
 | Status | What it means | Retrying helps? |
 | --- | --- | --- |
 | `MATCHED` | Name resolved | — |
-| `NOT_FOUND` | The account doesn't exist on that network | No — check the number |
+| `NOT_FOUND` | The network or bank confirmed there is no such account, shortcode or subscriber. Also sets `isValid` to `false` | No — check the number |
 | `UNSUPPORTED` | This corridor can't resolve names, or we couldn't determine the network | No |
 | `TIMEOUT` | The network didn't answer in time | Yes |
-| `ERROR` | The lookup failed | Yes |
+| `ERROR` | The check didn't complete. Usually the network being busy or briefly unavailable rather than anything wrong with the account — `nameLookupReason` has the specifics | Yes, after a short wait |
 | `NOT_ENABLED` | Your account isn't enabled for name lookup | No |
+
+The distinction that matters is `NOT_FOUND` versus `ERROR`. `NOT_FOUND` is an
+answer — the account isn't there, and asking again won't change that. `ERROR`
+means we never got an answer, so the account may well be fine. Read
+`nameLookupReason` rather than the status alone; it carries the network's own
+wording, such as `"System is busy, please retry later"`.
 
 ## Validating a bank account
 
