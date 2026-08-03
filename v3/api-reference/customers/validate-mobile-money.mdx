@@ -6,10 +6,11 @@ openapi: "POST /api/v3/customer/validate/mobile-money"
 Checks a recipient before you pay them: the number format, the country it belongs
 to, and whether that corridor is supported.
 
-A local number on its own is genuinely ambiguous — `0712345678` is a real number
-in seven of the countries we support — so send it in international format, or add
-`countryCode`. Rather than guess, the response tells you it couldn't determine the
-country.
+**Send phone numbers in international format**, with the country code. National
+format is ambiguous — the same digits are a real number in several countries we
+support — so we won't guess: without a country we can determine, the response tells
+you so rather than validating the wrong corridor. If you can only supply a national
+number, send `countryCode` alongside it.
 
 For **paybill and till**, there is no useful format check: a shortcode is just
 digits, and whether it exists is exactly what the lookup answers. Those two types

@@ -39,9 +39,13 @@
                   "v3/overview",
                   "v3/quickstart",
                   "v3/getting-started/dashboard-login",
-                  "v3/getting-started/api-keys",
+                  "v3/getting-started/api-keys"
+                ]
+              },
+              {
+                "group": "Testing & Launch",
+                "pages": [
                   "v3/testing/sandbox-scenarios",
-                  "v3/run-in-postman",
                   "v3/development"
                 ]
               },
@@ -329,6 +333,10 @@
     {
       "source": "/v3/testing/account-validation",
       "destination": "/v3/testing/sandbox-scenarios"
+    },
+    {
+      "source": "/v3/run-in-postman",
+      "destination": "/v3/quickstart"
     }
   ]
 }
