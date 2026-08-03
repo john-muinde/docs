@@ -1,0 +1,90 @@
+---
+title: "Payment Links"
+description: "Collect a payment without writing any code — create a link in the dashboard and share it."
+---
+
+A payment link is a hosted checkout page we host for you. You create it in the
+dashboard, share the URL, and your customer pays. There is nothing to build and
+nothing to deploy.
+
+If you only need to take a payment, this is the fastest way to do it — no API key,
+no integration, no webhook handler.
+
+## Create one in the dashboard
+
+<Steps>
+  <Step title="Open Payment Links">
+    Log in to [the dashboard](https://backoffice.kotanipay.com) and choose
+    **Payment Links** in the left sidebar.
+  </Step>
+  <Step title="Name it and set the price">
+    Give the link a name your customer will recognise on the checkout page, then
+    choose how the amount works:
+
+    | Pricing | Use it for |
+    | --- | --- |
+    | **Fixed** | One product or service at one price |
+    | **Variable** | Customer enters an amount within a range you set |
+    | **Package** | A few preset tiers to pick from |
+    | **Customer choice** | Customer decides — donations, tips, top-ups |
+  </Step>
+  <Step title="Choose how they can pay">
+    Enable the payment methods you want to accept. Only methods enabled for your
+    account and currency will appear.
+  </Step>
+  <Step title="Set how many times it can be used">
+    **Single use** expires after one payment — good for invoices. **Limited use**
+    caps it at a number you choose. **Multi use** stays open until you deactivate
+    it or it reaches its expiry date.
+  </Step>
+  <Step title="Decide what to collect">
+    Ask for name, email or phone — each one required, optional, or off. Collect
+    only what you actually need; every extra field costs you completions.
+  </Step>
+  <Step title="Share it">
+    Copy the URL, or download the QR code to print or put on a screen. Both are on
+    the link's page in the dashboard.
+  </Step>
+</Steps>
+
+## Link types
+
+| Type | What it's for |
+| --- | --- |
+| **Standard** | General collection — products, services, bookings |
+| **Invoice** | A specific amount owed by a specific customer, usually single use |
+| **Donation** | Open-ended giving, usually customer-choice pricing and multi use |
+
+## After the payment
+
+Each payment against a link becomes a normal deposit on your account, so your
+payout balance is credited the same way as any other collection.
+
+From the link's page in the dashboard you can:
+
+- See every payment made through it, and its status
+- Download a PDF receipt for an individual payment
+- Deactivate the link to stop accepting payments, and reactivate it later
+- Export the transactions
+
+If you want payments pushed to your own system instead of checking the dashboard,
+set a webhook — payment link collections arrive as
+`transaction.deposit.status.updated`. See [Webhooks](/v3/essentials/webhooks).
+
+<Note>
+Amounts on these deposits follow the same fee rules as the rest of your account.
+Check [Fees & Billing](/v3/essentials/billing-types) before reconciling — the fee
+may be added on top of what your customer paid rather than taken out of it.
+</Note>
+
+## Doing it from the API instead
+
+Everything above is also available over the API if you want to generate links
+programmatically — one link per order, for example. See the
+[Payment Links flow](/v3/flows/payment-links-flow).
+
+## Related
+
+- [Payment Links flow](/v3/flows/payment-links-flow) — the API version, end to end
+- [Fees & Billing](/v3/essentials/billing-types) — who pays the fee, and rounding
+- [Webhooks](/v3/essentials/webhooks) — get told about payments automatically

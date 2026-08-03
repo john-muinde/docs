@@ -3,84 +3,35 @@ title: "Validate Mobile Money Account"
 openapi: "POST /api/v3/customer/validate/mobile-money"
 ---
 
-Checks a recipient before you pay them: the number format, the country it
-belongs to, and whether that corridor is supported.
+Checks a recipient before you pay them: the number format, the country it belongs
+to, and whether that corridor is supported.
 
-## What to send
+A local number on its own is genuinely ambiguous — `0712345678` is a real number
+in seven of the countries we support — so send it in international format, or add
+`countryCode`. Rather than guess, the response tells you it couldn't determine the
+country.
 
-Which fields are required depends on `accountType`, so the schema below marks
-them all optional. In practice there are two shapes:
+For **paybill and till**, there is no useful format check: a shortcode is just
+digits, and whether it exists is exactly what the lookup answers. Those two types
+therefore require name lookup to be enabled on your account.
 
-<CodeGroup>
-```json Phone number
-{
-  "phoneNumber": "+254712345678"
-}
-```
+## Reading the result
 
-```json Local number
-{
-  "phoneNumber": "0712345678",
-  "countryCode": "KE"
-}
-```
+`nameLookupStatus` tells you whether the name resolved, and `nameLookupReason`
+says why when it didn't — so you can tell a number that doesn't exist from a
+corridor that can't resolve names from something worth retrying.
 
-```json Paybill or till
-{
-  "accountType": "paybill",
-  "shortCode": "247247"
-}
-```
-</CodeGroup>
+`isValid` reports the number format, and flips to `false` once a lookup proves the
+destination unusable. A name **mismatch** is different: the number is real, so
+`isValid` stays `true` and `nameMatch.matched` is what tells you the holder isn't
+who you expected.
 
-| Sending | Required | Also accepted |
-| --- | --- | --- |
-| A phone number (default) | `phoneNumber` in international format, **or** `phoneNumber` + `countryCode` | `network`, `accountName` |
-| A paybill or till | `accountType`, `shortCode` | `accountReference` (paybill only), `countryCode`, `accountName` |
-
-Send the number in international format (`+254712345678`) or supply
-`countryCode` alongside a local one. A local number on its own is genuinely
-ambiguous — `0712345678` is a real number in seven of the countries we support
-— so rather than guess, the response asks you which country you mean.
-`countryCode` defaults to `KE` for a shortcode.
-
-You do not need to send `network`. It is resolved from the number's own prefix,
-and the response tells you which network was used (`network`) and which operator
-the number belongs to (`mno`). Send it only if the number has been ported, or if
-a response tells you the network could not be determined.
-
-## Resolving the account holder
-
-If your account is enabled for **name lookup**, the response also carries the
-name registered on the number (`accountName`) and `nameLookupStatus`. Without
-that entitlement you still get the format and corridor checks, and
-`nameLookupStatus` comes back as `NOT_ENABLED` — the request is identical
-either way.
-
-Whenever a lookup does not return a name, `nameLookupReason` says why, so you
-can tell a number that does not exist (`NOT_FOUND`) from a corridor that cannot
-resolve names at all (`UNSUPPORTED`) from something that needs a retry
-(`ERROR`, `TIMEOUT`). Check `nameLookupReason` before retrying — `UNSUPPORTED`
-will not resolve on a second attempt.
-
-`isValid` reports the number format, except on `NOT_FOUND` — once the network
-tells us there is no such subscriber, `isValid` comes back `false` too. A name
-*mismatch* is different: the number is real, so `isValid` stays `true` and
-`nameMatch.matched` tells you the holder is not who you expected. See
-[which field answers which question](/v3/essentials/account-validation#which-field-answers-which-question).
-
-Send `accountName` with the name you expect and the response adds a `nameMatch`
-block scoring it against the real one, so you can catch a wrong number before
-the money moves.
-
-## Paybill and till
-
-A shortcode is just digits, so there is no useful format check for one — whether
-it exists is exactly what the lookup answers. These two types therefore need
-name lookup enabled, and `accountReference` is the value a payer would enter as
-the account number on a paybill.
+<Note>
+Full status meanings, retry guidance, and how these fields relate are on
+[Account Validation](/v3/essentials/account-validation).
+</Note>
 
 <Tip>
-Use the [validation test values](/v3/testing/account-validation)
-to reproduce unresolvable numbers, timeouts and mismatched names on demand.
+Use the [validation test values](/v3/testing/account-validation) to reproduce
+unresolvable numbers, timeouts and mismatched names on demand.
 </Tip>

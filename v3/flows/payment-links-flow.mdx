@@ -15,9 +15,15 @@ A payment link is a hosted checkout page that Kotani Pay generates for you. Crea
 
 ---
 
+<Tip>
+If you don't need links generated programmatically, you can create and share one
+from the dashboard without writing any code — see [Payment
+Links](/v3/essentials/payment-links).
+</Tip>
+
 ## 1. Create the Payment Link
 
-Call `POST /api/v3/payment-links`. At a minimum you'll configure:
+Call `POST /api/v3/dashboard/payment-links`. At a minimum you'll configure:
 
 - **Pricing type** — fixed amount, variable (customer chooses within a range), package tiers, or open customer choice
 - **Payment methods** — which of mobile money, bank checkout, card, and crypto to enable
@@ -54,8 +60,14 @@ If you have a webhook secret configured, the callback arrives in a signed envelo
 
 ## 4. Poll for Status
 
-- `GET /api/v3/payment-links/transactions/:referenceId` — status of a specific payment
-- `GET /api/v3/payment-links/:shortCode/transactions` — all payments for a given link
+- `GET /api/v3/dashboard/payment-links/transactions/reference/{referenceId}` — status of a specific payment
+- `GET /api/v3/dashboard/payment-links/{id}/transactions` — all payments for a given link
+- `GET /api/v3/dashboard/payment-links/{id}/analytics` — totals for a given link
+
+<Note>
+The per-link routes take the link's `id` as returned by the create call, not its
+short code.
+</Note>
 
 ---
 

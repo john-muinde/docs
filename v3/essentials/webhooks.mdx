@@ -180,11 +180,16 @@ Fired whenever a deposit changes status — including intermediate states like `
 </ParamField>
 
 <ParamField body="transaction_amount" type="number" required>
-  Amount actually credited to your wallet after fees.
+  The fee-adjusted amount for this deposit. On deposits the fee moves in the
+  opposite direction to withdrawals, and whether it moves at all depends on your
+  [Fees & Billing](/v3/essentials/billing-types) — read that page before
+  reconciling against this field.
 </ParamField>
 
 <ParamField body="transaction_cost" type="number" required>
-  Processing fee charged.
+  Processing fee for this transaction. See
+  [Fees & Billing](/v3/essentials/billing-types) for who pays it and whether it is
+  already reflected in `transaction_amount`.
 </ParamField>
 
 <ParamField body="customer_key" type="string" required>
@@ -235,6 +240,13 @@ Fired whenever a deposit changes status — including intermediate states like `
   Raw internal error from the processing pipeline. Always present (may be empty string) for non-successful statuses.
 </ParamField>
 
+<Warning>
+The examples below assume the fee is paid by your customer, so it's included in
+`transaction_amount`. If you pay the fee instead, the same request produces
+different numbers — see [Fees & Billing](/v3/essentials/billing-types). Don't
+hard-code the relationship between these fields.
+</Warning>
+
 #### Example — successful mobile money deposit
 
 ```json
@@ -249,7 +261,7 @@ Fired whenever a deposit changes status — including intermediate states like `
     "wallet_id": "64a1b2c3d4e5f6a7b8c9d0e2",
     "callback_url": "https://your-server.com/webhook",
     "created_at": "2025-01-01T00:00:00.000Z",
-    "transaction_amount": 975,
+    "transaction_amount": 1025,
     "transaction_cost": 25,
     "customer_key": "cust_abc123",
     "telco_id": "OEI2AK4D9X"
@@ -292,7 +304,7 @@ Fired whenever a deposit changes status — including intermediate states like `
     "status": "SUCCESSFUL",
     "reference_id": "order-bank-001",
     "amount": 2000,
-    "transaction_amount": 1960,
+    "transaction_amount": 2040,
     "transaction_cost": 40,
     "customer_key": "cust_za_001",
     "bank_name": "Capitec",
@@ -328,7 +340,7 @@ Fired whenever a withdrawal changes status.
 </ParamField>
 
 <ParamField body="amount" type="number" required>
-  Amount requested for withdrawal.
+  The amount you requested in the withdrawal call.
 </ParamField>
 
 <ParamField body="walletId" type="string" required>
@@ -336,11 +348,16 @@ Fired whenever a withdrawal changes status.
 </ParamField>
 
 <ParamField body="transactionAmount" type="number" required>
-  Amount debited from your wallet including fees.
+  **What the recipient is paid.** This is the amount sent to their mobile money
+  wallet or bank account — not what leaves your wallet. Whether it equals
+  `amount` or `amount` minus the fee depends on your
+  [Fees & Billing](/v3/essentials/billing-types).
 </ParamField>
 
 <ParamField body="transactionCost" type="number" required>
-  Processing fee charged.
+  Processing fee for this transaction. Whether it is deducted from
+  `transactionAmount`, added to your wallet debit, or invoiced separately depends
+  on your [Fees & Billing](/v3/essentials/billing-types).
 </ParamField>
 
 <ParamField body="customerKey" type="string" required>
@@ -375,6 +392,13 @@ Fired whenever a withdrawal changes status.
   Raw error from the processing pipeline. Always present (may be empty string) for non-successful statuses.
 </ParamField>
 
+<Warning>
+As with deposits, these examples assume the fee is paid by your customer, so the
+recipient is paid `amount` minus the fee. If you pay the fee from your wallet, the
+recipient gets the full `amount` and the fee is added to your wallet debit instead
+— see [Fees & Billing](/v3/essentials/billing-types).
+</Warning>
+
 #### Example — successful withdrawal
 
 ```json
@@ -389,7 +413,7 @@ Fired whenever a withdrawal changes status.
     "walletId": "64a1b2c3d4e5f6a7b8c9d0e2",
     "callbackUrl": "https://your-server.com/webhook",
     "created_at": "2025-01-01T00:00:00.000Z",
-    "transactionAmount": 520,
+    "transactionAmount": 480,
     "transactionCost": 20,
     "customerKey": "cust_abc123",
     "telcoId": "OEI2AK4D9Y"

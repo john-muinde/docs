@@ -1,0 +1,106 @@
+---
+title: "Fees & Billing"
+description: "Who pays the transaction fee, and which amount it comes out of."
+---
+
+Every transaction has a fee. What differs between accounts is **who pays it** —
+and that changes what the amounts in your API responses and webhooks mean.
+
+Get this wrong and your books won't balance: you'll either think a recipient was
+paid more than they were, or count a fee you were never charged.
+
+## Who pays the fee
+
+There are three arrangements. Yours is set per wallet when your account is
+configured.
+
+<CardGroup cols={3}>
+  <Card title="Your customer pays it" icon="user">
+    The fee comes out of the transaction itself.
+  </Card>
+  <Card title="You pay it from your wallet" icon="wallet">
+    Your customer gets the full amount; the fee is taken from your wallet.
+  </Card>
+  <Card title="You're invoiced for it" icon="file-invoice">
+    Your customer gets the full amount; we bill you for fees separately.
+  </Card>
+</CardGroup>
+
+## What that looks like
+
+A payout of **500 KES** with a **20 KES** fee:
+
+| | Your recipient receives | Your wallet is debited |
+| --- | --- | --- |
+| **Your customer pays the fee** | 480 | 500 |
+| **You pay from your wallet** | 500 | 520 |
+| **You're invoiced** | 500 | 500, fee billed later |
+
+Same request, same fee, and **your recipient gets a different amount**. This is
+the part worth checking before you go live.
+
+<Warning>
+If your customer pays the fee and you tell your end user "you will receive 500",
+you are wrong by the fee every time. Quote them `transactionAmount`, not the
+amount you requested.
+</Warning>
+
+## Collections work the other way round
+
+On a payout the fee comes **off** the amount. On a collection it goes **on top**,
+because your customer has to cover both the payment and the fee.
+
+So collecting 1,000 with a 25 fee reports `transaction_amount` of **1025**, not
+975. If you assume collections behave like payouts, your reconciliation will be
+out by twice the fee.
+
+## Reading the amounts
+
+| Field | What it means |
+| --- | --- |
+| `amount` | What you asked for in the API call |
+| `transactionAmount` / `transaction_amount` | The fee-adjusted amount. On payouts, **what your recipient is actually paid** |
+| `transactionCost` / `transaction_cost` | The fee. Always reported, whoever pays it |
+| `walletDebitAmount` | Offramp only. What actually left your wallet, fee included |
+
+<Note>
+`transactionAmount` is **not** your wallet debit. It's the amount sent to your
+recipient. Don't assume a fixed relationship between these three fields — read all
+of them and your integration stays correct on any arrangement, including one you
+get moved to later.
+</Note>
+
+## Rounding
+
+Some currencies are quoted in whole units, others to two decimal places, and we
+round fees and amounts to match.
+
+- **Whole units** — KES, UGX, TZS and similar. A fee of 19.6 becomes 20.
+- **Two decimals** — USD, and other currencies normally quoted with cents.
+
+Rounding happens on the fee first, then the amounts are derived from it, so the
+numbers you receive always add up exactly. You won't see a one-unit discrepancy
+between the fee and the amounts.
+
+<Tip>
+Don't build your own rounding on top of ours. Use the values we return rather than
+recalculating from `amount` and a fee percentage — you'll drift by a unit.
+</Tip>
+
+## Finding your arrangement
+
+You can see this in [the dashboard](https://backoffice.kotanipay.com) for each of
+your wallets. It's set per wallet, and can differ between collections and payouts
+on the same wallet — so check both if you do both.
+
+The dashboard is also where you see which countries and currencies you're live in,
+and where you request new ones.
+
+If your reconciliation doesn't match one of the three patterns above, talk to
+support before writing workarounds.
+
+## Related
+
+- [Webhooks](/v3/essentials/webhooks) — where these amounts arrive
+- [Balances & Settlement](/v3/essentials/balances-and-settlement) — how your payout
+  balance is drawn down

@@ -3,32 +3,30 @@ title: "Validate Bank Account"
 openapi: "POST /api/v3/customer/validate/bank"
 ---
 
-Checks a bank account before you pay it: the account number format, the bank
-code, and whether the country is supported.
+Checks a bank account before you pay it: the account number format, the bank code,
+and whether the country is supported.
 
-If your account is enabled for **name lookup**, the response also carries the
-name actually registered on the account (`accountName`), its status
-(`accountStatus` — `ACTIVE`, `FROZEN` or `RESTRICTED`), and `nameLookupStatus`.
-Without that entitlement you still get the format and corridor checks, and
-`nameLookupStatus` comes back as `NOT_ENABLED` — the request is identical either
-way.
+With name lookup enabled, the response also carries the name registered on the
+account and its status — a frozen or restricted account will usually reject an
+incoming payment, so it's worth checking before you send.
 
-Whenever a lookup does not return a name, `nameLookupReason` says why, so you can
-tell an account that does not exist (`NOT_FOUND`) from a corridor that cannot
-resolve names at all (`UNSUPPORTED`) from something worth retrying (`ERROR`,
-`TIMEOUT`).
+## Reading the result
 
-`isValid` reports the account number format, except on `NOT_FOUND` — once the
-bank tells us the account does not exist, `isValid` comes back `false` too. A
-name *mismatch* is different: the account is real, so `isValid` stays `true` and
-`nameMatch.matched` is what tells you the holder is not who you expected. See
-[which field answers which question](/v3/essentials/account-validation#which-field-answers-which-question).
+`nameLookupStatus` tells you whether the name resolved, and `nameLookupReason` says
+why when it didn't — so you can tell an account that doesn't exist from a corridor
+that can't resolve names from something worth retrying.
 
-Send `accountName` with the name you expect on the account and the response adds
-a `nameMatch` block scoring it against the real one, so you can catch a wrong
-account number before the money moves.
+`isValid` reports the account number format, and flips to `false` once a lookup
+proves the destination unusable. A name **mismatch** is different: the account is
+real, so `isValid` stays `true` and `nameMatch.matched` is what tells you the
+holder isn't who you expected.
+
+<Note>
+Full status meanings, retry guidance, and how these fields relate are on
+[Account Validation](/v3/essentials/account-validation).
+</Note>
 
 <Tip>
-Use the [validation test values](/v3/testing/account-validation)
-to reproduce frozen, unresolvable and mismatched-name accounts on demand.
+Use the [validation test values](/v3/testing/account-validation) to reproduce
+frozen, unresolvable and mismatched-name accounts on demand.
 </Tip>

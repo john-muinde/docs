@@ -34,35 +34,37 @@
             "tab": "Documentation",
             "groups": [
               {
-                "group": "Testing",
-                "pages": [
-                  "v3/run-in-postman",
-              "v3/testing/overview",
-              "v3/testing/transactions",
-              "v3/testing/account-validation"
-                ]
-              },
-              {
                 "group": "Getting Started",
                 "pages": [
                   "v3/overview",
                   "v3/quickstart",
                   "v3/getting-started/dashboard-login",
-                  "v3/getting-started/api-keys",
-                  "v3/development"
+                  "v3/getting-started/api-keys"
                 ]
               },
               {
-                "group": "Essentials",
+                "group": "Core Concepts",
                 "pages": [
-                  "v3/essentials/balances-and-settlement",
-                  "v3/essentials/webhooks",
-                  "v3/essentials/request-signing",
-                  "v3/essentials/offramp-refunds",
                   "v3/essentials/transaction-statuses",
-              "v3/essentials/account-validation",
+                  "v3/essentials/billing-types",
+                  "v3/essentials/balances-and-settlement",
+                  "v3/essentials/account-validation",
                   "v3/essentials/error-handling",
                   "v3/essentials/rate-limits"
+                ]
+              },
+              {
+                "group": "Connecting Your System",
+                "pages": [
+                  "v3/essentials/webhooks",
+                  "v3/essentials/request-signing"
+                ]
+              },
+              {
+                "group": "Products",
+                "pages": [
+                  "v3/essentials/payment-links",
+                  "v3/essentials/offramp-refunds"
                 ]
               },
               {
@@ -74,7 +76,18 @@
                   "v3/flows/offramp-flow",
                   "v3/flows/payment-links-flow",
                   "v3/flows/bulk-payments-flow",
-                  "v3/flows/settlement-flow"
+                  "v3/flows/settlement-flow",
+                  "v3/flows/crypto-bridge-flow"
+                ]
+              },
+              {
+                "group": "Testing & Going Live",
+                "pages": [
+                  "v3/testing/overview",
+                  "v3/testing/transactions",
+                  "v3/testing/account-validation",
+                  "v3/run-in-postman",
+                  "v3/development"
                 ]
               }
             ]
@@ -134,7 +147,8 @@
                   "v3/api-reference/customers/mobile-money/get-by-phone",
                   "v3/api-reference/customers/mobile-money/update",
                   "v3/api-reference/customers/validate-mobile-money",
-                  "v3/api-reference/customers/validate-bank"
+                  "v3/api-reference/customers/validate-bank",
+                  "v3/api-reference/withdrawals/name-lookup"
                 ]
               },
               {
@@ -165,6 +179,14 @@
                 "pages": [
                   "v3/api-reference/deposits/bank-checkout",
                   "v3/api-reference/deposits/bank-checkout-status"
+                ]
+              },
+              {
+                "group": "On-Chain Deposits",
+                "pages": [
+                  "v3/api-reference/deposits/deposit-on-chain",
+                  "v3/api-reference/deposits/deposit-on-chain-status",
+                  "v3/api-reference/deposits/deposit-on-chain-supported-chains"
                 ]
               },
               {
@@ -223,6 +245,17 @@
                   "v3/api-reference/offramp/list-transactions",
                   "v3/api-reference/offramp/refund-status",
                   "v3/api-reference/offramp/retry-refund"
+                ]
+              },
+              {
+                "group": "Crypto Bridge (Partners)",
+                "pages": [
+                  "v3/api-reference/deposits/crypto-bridge",
+                  "v3/api-reference/deposits/crypto-bridge-status",
+                  "v3/api-reference/rates/crypto-bridge-rate",
+                  "v3/api-reference/deposits/crypto-bridge-get-refund-config",
+                  "v3/api-reference/deposits/crypto-bridge-regenerate-refund-config",
+                  "v3/api-reference/deposits/crypto-bridge-webhook-provider-settlement"
                 ]
               },
               {
