@@ -39,27 +39,27 @@ Our API documentation is built using OpenAPI specifications to provide you with:
 
 ## Test with Postman
 
-Our comprehensive Postman collection includes all 57 API endpoints organized by functionality, plus pre-configured environments for sandbox and production testing.
+Our comprehensive Postman collection includes all merchant-facing API endpoints organized by functionality, with built-in collection variables so you can point the same collection at sandbox or production.
 
 **What's included:**
 
 - Complete API collection with all endpoints
-- Sandbox and production environment configurations
-- Pre-configured authentication workflows
+- Collection variables for switching between sandbox and production
+- Automatic request signing when `KOTANI_PAY_SIGNATURE` is set
 - Sample request bodies and response examples
-- Environment variables for easy testing
 
 **To get started:**
 
 1. Click the "Run in Postman" button above to fork the collection
-2. Import both the collection and environment to your Postman workspace
-3. Set up your API credentials in the environment variables
-4. Start testing endpoints immediately
+2. Set `BASE_URL` and `API_KEY` (and `KOTANI_PAY_SIGNATURE`, if your account requires request signing) in the collection's variables
+3. Start testing endpoints immediately
 
 <Tip>
-  The Postman collection automatically handles authentication token management
-  and includes examples for common workflows like deposits, payouts, and wallet
-  management.
+  API keys are generated from your Kotani Pay dashboard, not through the
+  collection itself. Once your `API_KEY` variable is set, every request
+  authenticates automatically, and if your account has request signing
+  enabled, the collection signs each request for you as soon as
+  `KOTANI_PAY_SIGNATURE` is set.
 </Tip>
 
 ## Base URLs
