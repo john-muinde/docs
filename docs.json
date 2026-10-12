@@ -278,16 +278,6 @@
                 ]
               },
               {
-                "group": "KYC & Compliance",
-                "pages": [
-                  "v3/api-reference/kyc/create-basic-details",
-                  "v3/api-reference/kyc/create-address",
-                  "v3/api-reference/kyc/create-document",
-                  "v3/api-reference/kyc/get-status",
-                  "v3/api-reference/kyc/list-integrator-users"
-                ]
-              },
-              {
                 "group": "Bulk Payments",
                 "pages": [
                   "v3/api-reference/bulk-payments/get-wallets",
