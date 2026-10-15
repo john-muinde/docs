@@ -8022,16 +8022,6 @@
             "description": "The amount of the wallet",
             "example": 1000
           },
-          "privateAddress": {
-            "type": "string",
-            "description": "Wallet private address",
-            "example": "0x1234567890"
-          },
-          "publicAddress": {
-            "type": "string",
-            "description": "Wallet public address",
-            "example": "0x1234567890"
-          },
           "address": {
             "type": "string",
             "description": "Wallet transaction address",
