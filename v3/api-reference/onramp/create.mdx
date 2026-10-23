@@ -4,3 +4,31 @@ openapi: "POST /api/v3/onramp"
 ---
 
 You can create an onramp request with either mobile money or bank checkout to convert fiat to crypto.
+
+## Which country the payment is collected in
+
+Most currencies belong to one country, so `currency` is enough. XOF and XAF are shared by several countries (XOF is used in Senegal, Côte d'Ivoire, Benin, Burkina Faso, Mali, Niger and Togo), so the country is worked out in this order:
+
+1. **`country`, if you send it.** An ISO-2 code such as `SN`. It must be a country that uses `currency` and must match the country of the phone number, otherwise the request is rejected with a `400`.
+2. **The phone number.** A `+221` number paying in XOF is collected in Senegal, a `+225` number in Côte d'Ivoire.
+3. **The currency's default country**, when there is no phone number to go by.
+
+You don't need to send `country`, because the phone number already decides. Send it when you want the request rejected if the number is not from the country you expect.
+
+```json Senegal, XOF
+{
+  "mobileMoney": {
+    "phoneNumber": "+221771234567",
+    "accountName": "Jane Doe",
+    "providerNetwork": "ORANGE"
+  },
+  "currency": "XOF",
+  "country": "SN",
+  "fiatAmount": 5000,
+  "chain": "BASE",
+  "token": "USDC",
+  "receiverAddress": "0x...",
+  "referenceId": "your-unique-reference",
+  "callbackUrl": "https://example.com/callback"
+}
+```

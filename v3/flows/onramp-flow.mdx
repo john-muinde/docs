@@ -21,6 +21,10 @@ Fetch the current exchange rate before initiating so you can show the customer w
 
 Call [Create Onramp](/v3/api-reference/onramp/create) with your `callbackUrl` and the destination crypto wallet address. The API responds immediately with a `PENDING` transaction. The exchange rate is locked at this point.
 
+<Note>
+For currencies shared by several countries (XOF, XAF), the payment is collected in the phone number's country. You can also send `country` to state it. See [Which country the payment is collected in](/v3/api-reference/onramp/create#which-country-the-payment-is-collected-in).
+</Note>
+
 ---
 
 ## 3. Customer Pays
