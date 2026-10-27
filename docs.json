@@ -269,15 +269,6 @@
                 ]
               },
               {
-                "group": "Cross-Border Payments",
-                "pages": [
-                  "v3/api-reference/cross-border/generate-invoice",
-                  "v3/api-reference/cross-border/get-invoice",
-                  "v3/api-reference/cross-border/pay-invoice",
-                  "v3/api-reference/cross-border/pay-invoice-status"
-                ]
-              },
-              {
                 "group": "Bulk Payments",
                 "pages": [
                   "v3/api-reference/bulk-payments/get-wallets",
