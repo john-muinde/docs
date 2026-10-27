@@ -170,14 +170,6 @@
                 ]
               },
               {
-                "group": "On-Chain Deposits",
-                "pages": [
-                  "v3/api-reference/deposits/deposit-on-chain",
-                  "v3/api-reference/deposits/deposit-on-chain-status",
-                  "v3/api-reference/deposits/deposit-on-chain-supported-chains"
-                ]
-              },
-              {
                 "group": "Bank Withdrawals",
                 "pages": [
                   "v3/api-reference/withdrawals/bank-v2",
