@@ -24,19 +24,27 @@ Sandbox accounts are self-service. <a href="https://backoffice.kotanipay.com/reg
 
 ## These work in every country we support
 
-Reserved phone numbers are matched on their **last nine digits only**. Put your own
-corridor's country code in front and you get the same outcome:
+Reserved phone numbers are matched on their **last six digits only**. Use any valid
+mobile number for your corridor that ends in those six digits and you get the same
+outcome. For example, every number below fails with insufficient funds:
 
 | | |
 | --- | --- |
-| Kenya | `+254700000010` |
-| Uganda | `+256700000010` |
-| Ghana | `+233700000010` |
-| Tanzania | `+255700000010` |
+| Kenya | `+254712000010` |
+| Uganda | `+256712000010` |
+| Tanzania | `+255621000010` |
+| Rwanda | `+250720000010` |
+| Ghana | `+233241000010` |
+| Nigeria | `+2348021000010` |
+| Zambia | `+260961000010` |
+| Cameroon | `+237671000010` |
+| Senegal | `+221701000010` |
+| Côte d'Ivoire | `+2250123000010` |
 
-All four resolve to the same reserved outcome. So the tables below list the
-**nine-digit ending** — prefix it with the country code for the corridor you're
-testing, in international format.
+The number still has to be a real number format for its country (the right length
+and a mobile prefix), because sandbox validates phone numbers exactly as production
+does. So the tables below list the **six-digit ending**: take a valid mobile number
+for the corridor you're testing and replace its last six digits.
 
 <Note>
 This applies to phone numbers only. The bank account numbers and shortcodes further
@@ -49,14 +57,14 @@ Use as the customer phone number on a deposit, payout or onramp.
 
 | Phone number ends with | Settles as | After |
 | --- | --- | --- |
-| `700000001` | Success | ~5s |
-| `700000002` | Success | ~5s |
-| `700000010` | Failed — insufficient funds | ~5s |
-| `700000011` | Failed — account not found | ~5s |
-| `700000012` | Failed — limit exceeded | ~5s |
-| `700000013` | Failed — cancelled by customer | ~5s |
-| `700000020` | Never settles | — |
-| `700000021` | Success | ~60s |
+| `000001` | Success | ~5s |
+| `000002` | Success | ~5s |
+| `000010` | Failed: insufficient funds | ~5s |
+| `000011` | Failed: account not found | ~5s |
+| `000012` | Failed: limit exceeded | ~5s |
+| `000013` | Failed: cancelled by customer | ~5s |
+| `000020` | Never settles | never |
+| `000021` | Success | ~60s |
 
 These behave like production, not like a mock. The transaction is accepted, sits
 pending, then settles — firing the same webhook, moving the same balances and
@@ -70,23 +78,23 @@ reserved number when you want a particular outcome.
 
 <AccordionGroup>
   <Accordion title="A payout that fails">
-    `…700000010`. Confirm you handle the `FAILED` webhook, surface the reason, and
+    `…000010`. Confirm you handle the `FAILED` webhook, surface the reason, and
     notice the wallet debit is reversed — the balance returns to what it was.
   </Accordion>
   <Accordion title="A transaction that never settles">
-    `…700000020` stays pending forever. This is the one most integrations get
+    `…000020` stays pending forever. This is the one most integrations get
     wrong: money is committed but no terminal webhook ever arrives. Make sure
     something on your side eventually reconciles or escalates rather than waiting
     indefinitely.
   </Accordion>
   <Accordion title="A slow provider">
-    `…700000021` takes about a minute. Checks that you aren't treating a
+    `…000021` takes about a minute. Checks that you aren't treating a
     transaction as final just because the create call returned, and that your polling
     backs off sensibly.
   </Accordion>
   <Accordion title="Paying the wrong person">
-    `…700000002` succeeds but is registered to a different name than
-    `…700000001`. Pair it with the validation numbers below to catch a mismatched
+    `…000002` succeeds but is registered to a different name than
+    `…000001`. Pair it with the validation numbers below to catch a mismatched
     recipient before you pay.
   </Accordion>
 </AccordionGroup>
@@ -110,17 +118,17 @@ than payments. These return a fixed result without contacting a provider.
 
 ### Phone numbers
 
-Same nine-digit rule as above — prefix with your corridor's country code.
+Same six-digit rule as above: any valid mobile number for your corridor with this ending.
 
 | Phone number ends with | Result | Tests |
 | --- | --- | --- |
-| `700000001` | `MATCHED` — JANE MARY DOE | The happy path |
-| `700000002` | `MATCHED` — ROBERT JAMES SMITH | A name that *doesn't* match the one you expected |
-| `700000003` | `NOT_FOUND` | A number that can't be resolved |
-| `700000004` | `UNSUPPORTED` | A corridor where name lookup isn't available |
-| `700000005` | `TIMEOUT` | A slow provider (~1.5s) |
-| `700000006` | `ERROR` | A provider failure |
-| `700000007` | `MATCHED` — partially masked | A provider returning only part of the name |
+| `000001` | `MATCHED`: JANE MARY DOE | The happy path |
+| `000002` | `MATCHED`: ROBERT JAMES SMITH | A name that *doesn't* match the one you expected |
+| `000003` | `NOT_FOUND` | A number that can't be resolved |
+| `000004` | `UNSUPPORTED` | A corridor where name lookup isn't available |
+| `000005` | `TIMEOUT` | A slow provider (~1.5s) |
+| `000006` | `ERROR` | A provider failure |
+| `000007` | `MATCHED`: partially masked | A provider returning only part of the name |
 
 ### Bank accounts
 
