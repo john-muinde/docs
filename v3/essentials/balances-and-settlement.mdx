@@ -23,6 +23,24 @@ Think of it as: *money available to send out.*
 
 ---
 
+## How money moves, product by product
+
+Which of your balances a transaction touches depends on the product. This is also what decides how you can earn on it.
+
+| Product | What happens to your balances | How you earn |
+|---|---|---|
+| **Deposit** (collection) | The customer's payment is credited to your **deposit balance**, less the fee if your customer pays it ([Fees & Billing](/v3/essentials/billing-types)). | Set the amount you ask the customer for. Anything above your price stays in your deposit balance. |
+| **Withdrawal** (payout) | The amount is debited from your **payout balance**, plus the fee if you pay it. | Charge your customer on your side before you send the payout. |
+| **Onramp** (mobile money or bank checkout) | The customer's payment is credited to your **deposit balance**, and the crypto is sent from **your crypto wallet** with us. | The quoted rate includes a spread, so the fiat you receive is worth more than the crypto you send. That spread is yours. |
+| **Onramp with [hosted checkout](/v3/flows/hosted-checkout-onramp)** | **Neither your fiat nor your crypto wallet is used.** The customer pays on the hosted page and we deliver the crypto, so you don't prefund anything. | A **partner fee** set on your account, shown in the quote and credited to your **deposit balance** in the onramp currency once the customer has paid. |
+| **Offramp** | The customer sends crypto to our address and we pay out the fiat. Your balances don't fund it. | Quote your customer your own rate on your side. |
+
+### Charging your customer once
+
+You can add your markup on your side as in the table, or ask your account manager to set it up with us: we then include it in the price we quote, so your customer sees one amount and is charged once, and your share is credited to your balance. On hosted checkout this is the only option, because the payment never passes through your wallets.
+
+---
+
 ## Viewing Your Balances
 
 In the dashboard, go to **Wallets** in the left sidebar. Each currency has its own wallet card showing both balances separately.
