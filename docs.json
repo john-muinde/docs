@@ -72,6 +72,7 @@
                   "v3/flows/deposit-flow",
                   "v3/flows/withdrawal-flow",
                   "v3/flows/onramp-flow",
+                  "v3/flows/hosted-checkout-onramp",
                   "v3/flows/offramp-flow",
                   "v3/essentials/offramp-refunds",
                   "v3/essentials/payment-links",

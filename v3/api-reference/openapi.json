@@ -84,7 +84,7 @@
     },
     "/api/v3/rate/onramp": {
       "post": {
-        "description": "An integrator can use this endpoint to get the exchange rate between two currencies",
+        "description": "An integrator can use this endpoint to get the exchange rate between two currencies. For an onramp that will use hosted checkout, send `chain`: the quote then carries a `hosted` block with exactly what the customer receives and every fee, in USD, and refuses an amount too small to deliver on that chain.",
         "operationId": "RateController_getOnrampRates_api/v3",
         "parameters": [],
         "requestBody": {
@@ -7314,6 +7314,14 @@
             "type": "number",
             "description": "OFFRAMP only. What actually leaves your wallet, fee included where you pay it. This is the figure to reconcile your balance against — not transactionAmount, which is what the recipient receives.",
             "example": "1331"
+          },
+          "hosted": {
+            "description": "ONRAMP with hosted checkout only (send `chain`). The exact amounts, in USD. On these quotes fiatAmount, fee and transactionAmount are local-currency estimates.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HostedOnrampQuoteDto"
+              }
+            ]
           }
         },
         "required": [
@@ -7363,6 +7371,19 @@
             ],
             "description": "Which currency fiatAmount holds. Defaults to fiat, set crypto to pass a crypto amount.",
             "example": "fiat"
+          },
+          "chain": {
+            "description": "The chain the crypto is delivered on. Send it for an onramp that will use hosted checkout: the quote then includes the network fee for that chain and a `hosted` block with the exact amount the customer receives. Ignored for other onramps.",
+            "example": "CELO",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Chain"
+              }
+            ]
+          },
+          "hostedCheckout": {
+            "type": "boolean",
+            "description": "Quote for hosted checkout (or not) explicitly, as on the onramp request. When omitted with a chain, hosted checkout is assumed where your account uses it for this currency."
           }
         },
         "required": [
@@ -11986,6 +12007,70 @@
         },
         "required": [
           "webhookUrl"
+        ]
+      },
+      "HostedOnrampQuoteDto": {
+        "type": "object",
+        "properties": {
+          "chain": {
+            "type": "string",
+            "description": "Chain the crypto is delivered on.",
+            "example": "CELO"
+          },
+          "receiveAmount": {
+            "type": "number",
+            "description": "Exactly what reaches the customer's wallet.",
+            "example": 10
+          },
+          "networkFee": {
+            "type": "number",
+            "description": "Network fee for delivering on this chain, in USD.",
+            "example": 0.5
+          },
+          "processingFee": {
+            "type": "number",
+            "description": "Payment processing fee, in USD.",
+            "example": 0.17
+          },
+          "fee": {
+            "type": "number",
+            "description": "Our fee, in USD.",
+            "example": 0.3
+          },
+          "totalUsd": {
+            "type": "number",
+            "description": "What the customer pays, in USD: receiveAmount plus every fee. They pay it in local currency at checkout.",
+            "example": 10.97
+          },
+          "feesCurrency": {
+            "type": "string",
+            "example": "USD"
+          },
+          "estimatedRate": {
+            "type": "number",
+            "description": "Indicative local currency per USD.",
+            "example": 129.4
+          },
+          "estimatedFiatAmount": {
+            "type": "number",
+            "description": "totalUsd in local currency at estimatedRate. A guide: the final local amount is set when the payment is picked up.",
+            "example": 1420
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "chain",
+          "receiveAmount",
+          "networkFee",
+          "processingFee",
+          "fee",
+          "totalUsd",
+          "feesCurrency",
+          "estimatedRate",
+          "estimatedFiatAmount",
+          "note"
         ]
       }
     }

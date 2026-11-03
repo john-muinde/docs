@@ -1,0 +1,193 @@
+---
+title: "Onramp: Hosted Checkout"
+description: "Send your customer to a hosted payment page, and we deliver the crypto to their wallet. No prefunding."
+---
+
+With hosted checkout your customer pays on a hosted page in their local currency (for example M-Pesa in Kenya), and once the payment completes we send the crypto straight to their wallet.
+
+You don't prefund anything: neither your fiat wallet nor your crypto wallet is touched. The customer's payment covers the crypto, the network fee and the fees, and you see every figure before the customer pays.
+
+<Note>
+Hosted checkout is enabled per account and country. Ask your account manager to switch it on. You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl`.
+</Note>
+
+---
+
+## How it works
+
+1. **Quote.** Ask for a hosted quote with the chain you want to deliver on. You get exactly what the customer receives, every fee, and an estimate in local currency.
+2. **Create.** Create the onramp with that quote's `rateId`. You get back a `redirectUrl`.
+3. **Customer pays.** Send the customer to `redirectUrl`. They pay in local currency on the hosted page.
+4. **Crypto delivered.** As soon as the payment completes, the crypto is sent to the wallet. We notify your `callbackUrl` and you can poll the status.
+
+---
+
+## 1. Get a hosted quote
+
+Call [Get Onramp Exchange Rate](/v3/api-reference/rates/onramp-rate) with `chain` and `hostedCheckout: true`.
+
+```json Request: POST /api/v3/rate/onramp
+{
+  "from": "KES",
+  "to": "USDT",
+  "fiatAmount": 1300,
+  "chain": "CELO",
+  "hostedCheckout": true
+}
+```
+
+```json Response
+{
+  "success": true,
+  "message": "Available exchange rate.",
+  "data": {
+    "id": "6ae9c7178c219480ed06e509",
+    "from": "KES",
+    "to": "USDT",
+    "value": "130",
+    "fiatAmount": 1386,
+    "transactionAmount": 1386,
+    "cryptoAmount": 10,
+    "fee": 0,
+    "hosted": {
+      "chain": "CELO",
+      "receiveAmount": 10,
+      "networkFee": 0.5,
+      "processingFee": 0.16,
+      "fee": 0,
+      "totalUsd": 10.66,
+      "feesCurrency": "USD",
+      "estimatedRate": 130,
+      "estimatedFiatAmount": 1386,
+      "note": "The customer receives exactly receiveAmount. They pay totalUsd in local currency at checkout; estimatedFiatAmount is a guide, as the final local-currency amount is set when the payment is picked up."
+    }
+  }
+}
+```
+
+### Reading the quote
+
+| Field | Meaning |
+|---|---|
+| `hosted.receiveAmount` | **Exactly** what reaches the customer's wallet. |
+| `hosted.networkFee` | The network fee for the chain, in USD. |
+| `hosted.processingFee` | The payment processing fee, in USD. |
+| `hosted.fee` | Our fee, in USD. |
+| `hosted.totalUsd` | What the customer pays, in USD: `receiveAmount` plus every fee. |
+| `hosted.estimatedFiatAmount` | `totalUsd` in local currency at `hosted.estimatedRate`. This is a guide: the final local amount is set when the payment is picked up, and is usually within about 1% of it. |
+| `id` | The `rateId` to create the onramp with. Valid for **60 seconds**, and usable once. |
+
+Show the customer `receiveAmount` and `estimatedFiatAmount` before they pay. On a hosted quote the top-level `fiatAmount`, `transactionAmount` and `fee` are local-currency estimates; the `hosted` figures are the exact ones.
+
+### What `fiatAmount` means
+
+- **By default** (`source` omitted or `fiat`), `fiatAmount` is the local amount to convert. The fees are added on top, so the customer pays more than `fiatAmount`: in the example, 1300 KES converts to 10 USDT and the customer pays about 1386 KES.
+- **With `source: "crypto"`**, `fiatAmount` holds the crypto amount the customer must receive. Use this when the customer needs an exact amount, for example `"fiatAmount": 10, "source": "crypto"` for exactly 10 USDT.
+
+---
+
+## 2. Create the onramp
+
+Call [Create Onramp](/v3/api-reference/onramp/create) with `hostedCheckout: true`, the quote's `rateId`, and no `mobileMoney` or `bankCheckout`. Create it within 60 seconds of the quote.
+
+```json Request: POST /api/v3/onramp
+{
+  "fiatAmount": 1300,
+  "currency": "KES",
+  "country": "KE",
+  "chain": "CELO",
+  "token": "USDT",
+  "hostedCheckout": true,
+  "rateId": "6ae9c7178c219480ed06e509",
+  "receiverAddress": "0x...",
+  "referenceId": "your-unique-reference",
+  "callbackUrl": "https://example.com/callback"
+}
+```
+
+The response carries the `redirectUrl` to send the customer to, and the same `hosted` block as the quote.
+
+- `currency`, `token` and `chain` must match the quote.
+- `receiverAddress` must be a valid address for `chain` (a `0x...` address on EVM chains, a base58 address on Solana). An invalid address is refused here, before the customer pays.
+- Without a `rateId`, the onramp is quoted from `fiatAmount` at that moment.
+
+---
+
+## 3. The customer pays
+
+Redirect the customer to `redirectUrl`. They see the amount in their local currency, choose how to pay (for example M-Pesa), and confirm. A payment usually completes within a few minutes.
+
+---
+
+## 4. Crypto is delivered
+
+As soon as the payment completes, the crypto is sent to `receiverAddress`. Delivery usually confirms within a few minutes, depending on the chain.
+
+| `depositStatus` | `onchainStatus` | Meaning |
+|---|---|---|
+| `PENDING` | `PENDING` | Waiting for the customer to pay. |
+| `SUCCESSFUL` | `PENDING` | Paid. The crypto is on its way: a good moment to tell the customer. |
+| `SUCCESSFUL` | `SUCCESSFUL` | Crypto delivered; `transactionHash` is set. |
+| `CANCELLED` or `FAILED` | `FAILED` | The customer did not pay. Nothing was collected. |
+
+You receive a callback on your `callbackUrl` when the onramp reaches a final state, and you can poll [Get Onramp Status](/v3/api-reference/onramp/get-status) at any time. The status response's `rate.hosted` holds the same breakdown as the quote.
+
+---
+
+## Chains, tokens and network fees
+
+| Chain | Tokens | Network fee |
+|---|---|---|
+| `BASE` | USDC | 0.10 USD |
+| `CELO` | USDT, USDC, CUSD | 0.50 USD |
+| `POLYGON` | USDC | 0.50 USD |
+| `BINANCE` | USDT, USDC | 0.50 USD |
+| `OPTIMISM` | USDT, USDC | 1.00 USD |
+| `SOLANA` | USDT, USDC | 1.00 USD |
+
+The quote always returns the current fee in `hosted.networkFee`. Use the quote, not this table, for what you show the customer.
+
+<Tip>
+For small amounts, choose a chain with a low network fee. On a 2 USD onramp, a 1.00 USD network fee is half the payment; on Base it is 0.10 USD.
+</Tip>
+
+---
+
+## Minimum amounts
+
+The customer must receive more than the chain's network fee. A quote or onramp below that is refused before the customer pays, and the message tells you the smallest `fiatAmount` that works:
+
+```json
+{
+  "success": false,
+  "message": "Amount too small to deliver USDT on SOLANA: the network fee is 1 USD, so the customer must receive more than that. Send at least 132 KES (the customer then receives 1.01 USDT and pays about 267 KES in total, fees included), or choose a chain with a lower network fee.",
+  "error_code": 400
+}
+```
+
+Send the amount it names as `fiatAmount`, not the total.
+
+---
+
+## Errors
+
+| Message | What to do |
+|---|---|
+| `Amount too small to deliver ... Send at least N` | Send at least `N` as `fiatAmount`, or use a cheaper chain. |
+| `<token> on <chain> is not supported for hosted checkout` | Use a chain and token from the table above. |
+| `receiverAddress is not a valid <chain> address` | Check the address belongs to that chain. |
+| `Rate expired` | Quote again and create within 60 seconds. |
+| `Rate has already been used in another transaction` | Each `rateId` works once: quote again. |
+| `This rate was quoted for a different currency, token or chain` | Create the onramp with the same `currency`, `token` and `chain` as the quote. |
+
+---
+
+## Testing checklist
+
+Use small amounts and a wallet you control.
+
+1. Quote 100 KES on `SOLANA`: it is refused with the minimum.
+2. Quote about 300 KES on `CELO` with `hostedCheckout: true`. Note `hosted.receiveAmount` and `hosted.estimatedFiatAmount`.
+3. Within 60 seconds, create the onramp with that `rateId` and a Celo `0x...` address.
+4. Open `redirectUrl`. The page should ask for roughly `estimatedFiatAmount` in local currency.
+5. Pay, then check the wallet receives exactly `hosted.receiveAmount`, and that your callback arrives with `onchainStatus` `SUCCESSFUL` and a `transactionHash`.
