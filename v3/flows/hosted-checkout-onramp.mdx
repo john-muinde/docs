@@ -55,6 +55,8 @@ Call [Get Onramp Exchange Rate](/v3/api-reference/rates/onramp-rate) with `chain
       "networkFee": 0.5,
       "processingFee": 0.16,
       "fee": 0,
+      "partnerFee": 0,
+      "partnerFeeLocal": 0,
       "totalUsd": 10.66,
       "feesCurrency": "USD",
       "estimatedRate": 130,
@@ -73,6 +75,8 @@ Call [Get Onramp Exchange Rate](/v3/api-reference/rates/onramp-rate) with `chain
 | `hosted.networkFee` | The network fee for the chain, in USD. |
 | `hosted.processingFee` | The payment processing fee, in USD. |
 | `hosted.fee` | Our fee, in USD. |
+| `hosted.partnerFee` | Your markup, in USD, when your account has one. 0 otherwise. |
+| `hosted.partnerFeeLocal` | Your markup in the onramp currency: exactly what is credited to your fiat wallet once the customer has paid. |
 | `hosted.totalUsd` | What the customer pays, in USD: `receiveAmount` plus every fee. |
 | `hosted.estimatedFiatAmount` | `totalUsd` in local currency at `hosted.estimatedRate`. This is a guide: the final local amount is set when the payment is picked up, and is usually within about 1% of it. |
 | `id` | The `rateId` to create the onramp with. Valid for **60 seconds**, and usable once. |
@@ -83,6 +87,10 @@ Show the customer `receiveAmount` and `estimatedFiatAmount` before they pay. On 
 
 - **By default** (`source` omitted or `fiat`), `fiatAmount` is the local amount to convert. The fees are added on top, so the customer pays more than `fiatAmount`: in the example, 1300 KES converts to 10 USDT and the customer pays about 1386 KES.
 - **With `source: "crypto"`**, `fiatAmount` holds the crypto amount the customer must receive. Use this when the customer needs an exact amount, for example `"fiatAmount": 10, "source": "crypto"` for exactly 10 USDT.
+
+### Earning on hosted onramps
+
+The customer's payment never passes through your wallets, so to earn on a hosted onramp ask your account manager to set a **partner fee** on your account (a percentage of the crypto amount). It appears in the quote as `hosted.partnerFee`, the customer pays it with everything else, and `hosted.partnerFeeLocal` is credited to your fiat wallet in the onramp currency as soon as the customer has paid. Nothing else is credited to your wallets on a hosted onramp.
 
 ---
 

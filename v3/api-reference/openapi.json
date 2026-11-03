@@ -12037,6 +12037,16 @@
             "description": "Our fee, in USD.",
             "example": 0.3
           },
+          "partnerFee": {
+            "type": "number",
+            "description": "Your markup on this onramp, in USD, when your account has one. Collected from the customer and credited to your fiat wallet as partnerFeeLocal once the customer has paid.",
+            "example": 0.25
+          },
+          "partnerFeeLocal": {
+            "type": "number",
+            "description": "partnerFee in the onramp currency: exactly what your fiat wallet is credited when the customer has paid. Fixed at quote time.",
+            "example": 32
+          },
           "totalUsd": {
             "type": "number",
             "description": "What the customer pays, in USD: receiveAmount plus every fee. They pay it in local currency at checkout.",
@@ -12066,6 +12076,8 @@
           "networkFee",
           "processingFee",
           "fee",
+          "partnerFee",
+          "partnerFeeLocal",
           "totalUsd",
           "feesCurrency",
           "estimatedRate",
