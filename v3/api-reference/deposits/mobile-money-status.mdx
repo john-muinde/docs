@@ -5,4 +5,6 @@ openapi: "GET /api/v3/deposit/mobile-money/status/{reference_id}"
 
 An integrator can use this endpoint to check the status of a mobile money deposit transaction.
 
-The `reference_id` path parameter accepts either the Kotani platform reference ID or the telco/MNO transaction ID — whichever is available.
+The `reference_id` path parameter accepts our reference ID, the reference number, the telco ID or the provider reference, whichever is available.
+
+Polling is rate limited. You receive a `429` for very new transactions and when you poll the same reference again within its cooldown. Use [webhooks](/v3/essentials/webhooks) rather than polling in a tight loop.

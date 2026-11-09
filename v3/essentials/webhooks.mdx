@@ -3,7 +3,7 @@ title: "Webhooks & Events"
 description: "Receive real-time notifications about transaction status updates and other events."
 ---
 
-Kotani Pay pushes notifications to your server when key events happen — transaction status changes, refund outcomes, KYC updates, and system notices.
+Kotani Pay pushes notifications to your server when key events happen, transaction status changes, refund outcomes, payment link payments, and settlement updates.
 
 ---
 
@@ -34,6 +34,8 @@ The body is always wrapped in this envelope:
 }
 ```
 
+Every `data` object includes a `timestamp` field (ISO 8601). It is part of `data`, so it is covered by the signature.
+
 The `signature` field in the body mirrors `X-Kotani-Signature` — the **header is the source of truth** for verification.
 
 ---
@@ -58,23 +60,24 @@ Configure a webhook secret in **Settings** to switch to signed webhooks.
 | `transaction.withdrawal.status.updated` | A withdrawal changes status |
 | `transaction.onramp.status.updated` | An onramp (fiat→crypto) changes status |
 | `transaction.offramp.status.updated` | An offramp (crypto→fiat) changes status |
-| `kyc.status.changed` | A customer's KYC verification outcome changes |
+| `payment.confirmed` | A [payment link](/v3/essentials/payment-links) payment succeeded |
 | `refund.completed` | Crypto refund successfully sent back to the sender |
 | `refund.failed` | Refund exhausted all retry attempts |
 | `refund.lightning.invoice_needed` | Lightning offramp needs a bolt11 invoice to process the refund |
 | `settlement.approved` | A settlement request was approved |
 | `settlement.processed` | A settlement was completed and funds disbursed |
 | `settlement.rejected` | A settlement request was rejected |
+| `settlement.cancelled` | A settlement request was cancelled |
 | `settlement.paused` | A settlement was paused pending review |
 | `settlement.batch.approved` | A settlement batch was approved |
 | `settlement.batch.processed` | A settlement batch completed (fully or partially) |
 | `settlement.batch.rejected` | A settlement batch was rejected |
+| `settlement.batch.partial` | Only some settlements in a batch succeeded |
 | `settlement.batch.cancelled` | A settlement batch was cancelled |
-| `system.event` | Operational notices and maintenance alerts |
-| `transaction.status.updated` | _(Deprecated)_ Use the specific events above |
+| `settlement.batch.consolidated` | A batch was merged into a new consolidated batch |
 
 <Note>
-  Settlement events are opt-in. Subscribe to them in **Settings → Webhooks**.
+  New integrators are subscribed to all events by default. You can unsubscribe from individual events in **Settings → Webhooks**. If you are unsubscribed from an event, that callback is not delivered.
 </Note>
 
 ---
@@ -151,7 +154,7 @@ app.post('/webhook', express.json(), (req, res) => {
 
 ### `transaction.deposit.status.updated`
 
-Fired whenever a deposit changes status — including intermediate states like `INITIATED` and `IN_PROGRESS` as well as terminal states (`SUCCESSFUL`, `FAILED`, `CANCELLED`).
+Fires once when a deposit reaches a final status: `SUCCESSFUL`, `FAILED`, `CANCELLED`, `EXPIRED`, `DECLINED`, `REVERSED` or `ERROR_OCCURRED`. It does not fire for intermediate statuses such as `INITIATED` or `IN_PROGRESS`. If a final status is later corrected (for example `EXPIRED` to `SUCCESSFUL`), the event fires again.
 
 #### Payload fields
 
@@ -319,7 +322,7 @@ hard-code the relationship between these fields.
 
 ### `transaction.withdrawal.status.updated`
 
-Fired whenever a withdrawal changes status.
+Fires when a withdrawal reaches a final status: `SUCCESSFUL`, `FAILED`, `CANCELLED`, `DECLINED`, `REVERSED`, `EXPIRED` or `ERROR_OCCURRED`.
 
 #### Payload fields
 
@@ -448,16 +451,12 @@ recipient gets the full `amount` and the fee is added to your wallet debit inste
 
 ### `transaction.onramp.status.updated`
 
-Fired when a fiat→crypto onramp transaction changes status. Onramp has **two independent status fields** — fiat collection (`depositStatus`) and on-chain delivery (`onchainStatus`).
+Fires once the fiat deposit is `SUCCESSFUL`, `FAILED` or `CANCELLED` and the on-chain leg is `SUCCESSFUL` or `FAILED`. Onramp has **two independent status fields**: fiat collection (`depositStatus`) and on-chain delivery (`onchainStatus`). There is no combined status field.
 
 #### Payload fields
 
 <ParamField body="referenceId" type="string" required>
   Your reference ID for the onramp transaction.
-</ParamField>
-
-<ParamField body="status" type="string" required>
-  Combined overall status of the onramp.
 </ParamField>
 
 <ParamField body="depositStatus" type="string" required>
@@ -468,20 +467,16 @@ Fired when a fiat→crypto onramp transaction changes status. Onramp has **two i
   Status of the on-chain crypto delivery leg.
 </ParamField>
 
-<ParamField body="chain" type="string" required>
-  Blockchain the crypto was sent on (e.g. `POLYGON`, `STELLAR`).
+<ParamField body="transactionHash" type="string | null" required>
+  Blockchain transaction hash once on-chain delivery completes. `null` if there is none.
 </ParamField>
 
-<ParamField body="token" type="string" required>
-  Token delivered (e.g. `USDT`, `USDC`).
+<ParamField body="rate" type="object">
+  Rate used for the conversion.
 </ParamField>
 
 <ParamField body="cryptoAmount" type="number" required>
-  Expected crypto amount to deliver.
-</ParamField>
-
-<ParamField body="cryptoAmountReceived" type="number">
-  Actual crypto amount delivered on-chain (may differ from `cryptoAmount` due to gas).
+  Crypto amount to deliver.
 </ParamField>
 
 <ParamField body="fiatAmount" type="number" required>
@@ -496,72 +491,51 @@ Fired when a fiat→crypto onramp transaction changes status. Onramp has **two i
   Total fiat the customer paid (`fiatAmount + fiatFee`).
 </ParamField>
 
-<ParamField body="receiverAddress" type="string">
-  On-chain address the crypto was delivered to.
-</ParamField>
-
-<ParamField body="transactionHash" type="string">
-  Blockchain transaction hash once on-chain delivery completes.
-</ParamField>
-
-<ParamField body="rate" type="object">
-  Rate used for the conversion (`from`, `to`, `cryptoAmount`).
-</ParamField>
-
 <ParamField body="error" type="object">
-  Error details if the onramp failed. Contains `message`, `code`, and `details`.
+  Present when the onramp did not succeed. Contains `message`, `code`, and, when available, `details`.
 </ParamField>
 
-#### Example — successful onramp
+#### Example: successful onramp
 
 ```json
 {
   "event": "transaction.onramp.status.updated",
   "data": {
     "referenceId": "onramp-001",
-    "status": "SUCCESSFUL",
     "depositStatus": "SUCCESSFUL",
     "onchainStatus": "SUCCESSFUL",
-    "chain": "POLYGON",
-    "token": "USDT",
-    "cryptoAmount": 38.5,
-    "cryptoAmountReceived": 38.5,
-    "fiatAmount": 5000,
-    "fiatFee": 100,
-    "fiatAmountToSend": 5100,
-    "receiverAddress": "0xrecipient123...",
     "transactionHash": "0xabc123def456...",
     "rate": {
       "from": "KES",
       "to": "USDT",
       "cryptoAmount": 38.5
-    }
+    },
+    "cryptoAmount": 38.5,
+    "fiatAmount": 5000,
+    "fiatFee": 100,
+    "fiatAmountToSend": 5100
   },
   "signature": "sha256=a1b2c3d4e5f6..."
 }
 ```
 
-#### Example — fiat collected, crypto transfer failed
+#### Example: fiat collected, crypto transfer failed
 
 ```json
 {
   "event": "transaction.onramp.status.updated",
   "data": {
     "referenceId": "onramp-002",
-    "status": "FAILED",
     "depositStatus": "SUCCESSFUL",
     "onchainStatus": "FAILED",
-    "chain": "POLYGON",
-    "token": "USDT",
+    "transactionHash": null,
     "cryptoAmount": 38.5,
     "fiatAmount": 5000,
     "fiatFee": 100,
     "fiatAmountToSend": 5100,
-    "transactionHash": null,
     "error": {
       "message": "Crypto transfer failed after retries",
-      "code": "CRYPTO_TRANSFER_FAILED",
-      "details": {}
+      "code": "CRYPTO_TRANSFER_FAILED"
     }
   },
   "signature": "sha256=a1b2c3d4e5f6..."
@@ -578,6 +552,10 @@ Fired when a crypto→fiat offramp changes status.
 
 <ParamField body="referenceId" type="string" required>
   Your reference ID for the offramp transaction.
+</ParamField>
+
+<ParamField body="integratorId" type="string" required>
+  Your integrator ID.
 </ParamField>
 
 <ParamField body="status" type="string" required>
@@ -659,6 +637,7 @@ Fired when a crypto→fiat offramp changes status.
   "event": "transaction.offramp.status.updated",
   "data": {
     "referenceId": "offramp-001",
+    "integratorId": "64a1b2c3d4e5f6a7b8c9d0aa",
     "status": "SUCCESSFUL",
     "onchainStatus": "SUCCESSFUL",
     "fiatAmount": 5000,
@@ -691,6 +670,7 @@ Fired when a crypto→fiat offramp changes status.
   "event": "transaction.offramp.status.updated",
   "data": {
     "referenceId": "offramp-002",
+    "integratorId": "64a1b2c3d4e5f6a7b8c9d0aa",
     "status": "FAILED",
     "onchainStatus": "SUCCESSFUL",
     "fiatAmount": 5000,
@@ -733,7 +713,7 @@ Fired when a crypto refund has been successfully sent back to the sender.
 </ParamField>
 
 <ParamField body="refundAmount" type="number" required>
-  Amount refunded (in the token's native units — sats for Lightning, token units for EVM/Solana).
+  Amount refunded. For Lightning this is an integer number of sats; for other chains it is in token units.
 </ParamField>
 
 <ParamField body="chain" type="string" required>
@@ -789,7 +769,7 @@ Fired when a refund has exhausted all retry attempts. Manual intervention is req
 </ParamField>
 
 <ParamField body="refundAmount" type="number" required>
-  Amount that was attempted for refund.
+  Amount that was attempted for refund. For Lightning this is an integer number of sats.
 </ParamField>
 
 <ParamField body="chain" type="string" required>
@@ -861,11 +841,11 @@ Fired when a Lightning offramp fiat disbursement fails and Kotani needs a bolt11
 </ParamField>
 
 <ParamField body="refundAmount" type="number" required>
-  Amount to be refunded in millisatoshis.
+  Amount to be refunded, in sats. The invoice you submit must be for this amount in sats.
 </ParamField>
 
 <ParamField body="refundAmountSats" type="number" required>
-  Amount to be refunded in satoshis.
+  Amount to be refunded, in sats. Same value as `refundAmount`.
 </ParamField>
 
 <ParamField body="chain" type="string" required>
@@ -894,7 +874,7 @@ Fired when a Lightning offramp fiat disbursement fails and Kotani needs a bolt11
     "status": "FAILED",
     "onchainStatus": "SUCCESSFUL",
     "refundStatus": "INVOICE_NEEDED",
-    "refundAmount": 1500000,
+    "refundAmount": 1500,
     "refundAmountSats": 1500,
     "chain": "LIGHTNING",
     "currency": "KES",
@@ -926,9 +906,9 @@ See [Offramp Refunds](/v3/essentials/offramp-refunds) for the full refund lifecy
 
 ### Settlement events
 
-Settlement events are **opt-in** — subscribe to them in **Settings → Webhooks**.
+Settlement events are delivered like every other event: new integrators are subscribed to all events by default and can unsubscribe in **Settings → Webhooks**.
 
-All single-settlement events (`settlement.approved`, `settlement.processed`, `settlement.rejected`, `settlement.paused`) share the same payload shape.
+All single-settlement events (`settlement.approved`, `settlement.processed`, `settlement.rejected`, `settlement.cancelled`, `settlement.paused`) share the same payload shape.
 
 #### Single settlement payload fields
 
@@ -1026,7 +1006,7 @@ All single-settlement events (`settlement.approved`, `settlement.processed`, `se
 
 #### Batch settlement payload fields
 
-Batch events (`settlement.batch.approved`, `settlement.batch.processed`, `settlement.batch.rejected`, `settlement.batch.cancelled`) carry the same fields plus a `settlements` array.
+Batch events (`settlement.batch.approved`, `settlement.batch.processed`, `settlement.batch.partial`, `settlement.batch.rejected`, `settlement.batch.cancelled`, `settlement.batch.consolidated`) carry batch-level fields and a `settlements` array. There is no batch-level amount, fee or currency.
 
 <ParamField body="batchId" type="string" required>
   Kotani internal batch ID.
@@ -1048,6 +1028,16 @@ Batch events (`settlement.batch.approved`, `settlement.batch.processed`, `settle
   Array of settlement summaries in the batch. Each entry contains `_id`, `subReference`, `status`, `currency`, `netAmount`, `tentativeUsdNetAmount`, `referenceId`, and `channels`.
 </ParamField>
 
+<ParamField body="consolidatedIntoBatchId" type="string | null">
+  ID of the consolidated batch this batch was merged into. `null` unless the batch was consolidated.
+</ParamField>
+
+---
+
+### `payment.confirmed`
+
+Fired when a [payment link](/v3/essentials/payment-links) payment succeeds. See that page for the payload.
+
 ---
 
 ## Configuring Webhooks
@@ -1064,7 +1054,7 @@ You can rotate the signing secret at any time. Update your verification logic wi
 
 ## Retries
 
-If your endpoint returns a non-`2xx` response or times out, Kotani Pay retries delivery with exponential backoff — up to every 2 hours for a maximum of 24 hours. Return `200 OK` as quickly as possible and handle processing asynchronously.
+If your endpoint returns a non-`2xx` response or times out, Kotani Pay retries the delivery. We retry a failed delivery a few times straight away with backoff, then roughly every minute for up to 10 attempts, within 24 hours for deposits and 48 hours for withdrawals. A `4xx` response other than `429` is not retried. Each attempt times out after 5 seconds, so return `200 OK` as quickly as possible and handle processing asynchronously.
 
 ---
 

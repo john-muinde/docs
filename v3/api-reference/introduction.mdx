@@ -69,26 +69,20 @@ Our comprehensive Postman collection includes all merchant-facing API endpoints 
 
 ## Authentication
 
-All API endpoints require authentication using JWT Bearer tokens. You can obtain an access token by:
+API calls use an API key as the Bearer token:
 
-1. Creating an integrator account
-2. Logging in to get a JWT token
-3. Generating an API key for ongoing operations
-
-```json
-"security": [
-  {
-    "JWT": []
-  }
-]
+```bash
+curl -X GET https://api.kotanipay.com/api/v3/wallet/fiat \
+  -H "Authorization: Bearer <your-api-key>"
 ```
+
+Create API keys in the dashboard (see [API Keys](/v3/getting-started/api-keys)). There is no login-for-JWT step and no key generation over the API. Some endpoints also accept [request signing](/v3/essentials/request-signing).
 
 ## Getting Started
 
 1. **Create an Integrator Account** - Register your business to access the API
-2. **Login** - Authenticate to receive your JWT token
-3. **Generate API Key** - Create an API key for secure transaction processing
-4. **Start Integrating** - Begin making API calls to process transactions
+2. **Generate an API Key** - Create an API key in the dashboard
+3. **Start Integrating** - Make API calls with the key as the Bearer token
 
 ## Support
 

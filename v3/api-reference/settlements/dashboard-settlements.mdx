@@ -19,13 +19,15 @@ See [Settlement Schedule](/v3/api-reference/settlements/schedule).
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `enabled` | boolean | Whether settlements are currently open for requests |
-| `allowedDays` | number[] | Days of the week accepted (0 = Sunday … 6 = Saturday) |
+| `enabled` | boolean | Whether the schedule rules apply. `false` means no schedule restrictions |
+| `allowedDays` | number[] | Days of the week accepted (0 = Sunday to 6 = Saturday). When the schedule applies, requests on other days are rejected with `400`, not queued |
 | `cutoffEnabled` | boolean | Whether a daily cutoff time is enforced |
-| `cutoffTime` | string | Cutoff in `HH:MM` format — requests after this are queued to the next allowed day |
+| `cutoffTime` | string | Cutoff in `HH:MM` format. When the schedule applies, requests after this are rejected with `400`, not queued |
 | `timezone` | string | IANA timezone for cutoff evaluation (e.g. `"Africa/Nairobi"`) |
 | `minAmount` | number | Minimum settlement amount in USD |
 | `maxAmount` | number | Maximum settlement amount in USD |
+
+The schedule (`enabled`, `allowedDays` and the cutoff) is currently enforced only on admin-created requests. For API requests it is informational, while `minAmount` and `maxAmount` are enforced.
 
 ---
 
@@ -37,7 +39,7 @@ Preview the fee before submitting.
 
 See [Settlement Fee Preview](/v3/api-reference/settlements/fee-preview).
 
-Query parameters: `amount` (required), `walletId` (required).
+Query parameters: `amount` (required), `walletId` (optional; pass it to get the currency and USD figures).
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -48,6 +50,7 @@ Query parameters: `amount` (required), `walletId` (required).
 | `currency` | string | Local currency code |
 | `usdRate` | number | Exchange rate used to convert to USD |
 | `usdAmount` | number | `amount` in USD |
+| `usdFee` | number | `fee` in USD |
 | `usdNetAmount` | number | `netAmount` in USD |
 
 ---
@@ -62,9 +65,9 @@ See [Request Settlement](/v3/api-reference/settlements/request-settlement).
 |-------|------|----------|-------------|
 | `walletId` | string | Yes | Fiat wallet to settle from |
 | `amount` | number | Yes | Amount in the wallet's local currency |
-| `balanceSource` | string | Yes | `PAYOUT` or `DEPOSIT` |
-| `beneficiaryDetails` | object | Conditional | Inline beneficiary — required if `savedBeneficiaryId` is omitted |
-| `savedBeneficiaryId` | string | Conditional | Saved beneficiary ID — required if `beneficiaryDetails` is omitted |
+| `balanceSource` | string | No | `PAYOUT` or `DEPOSIT`. Defaults to `PAYOUT` |
+| `beneficiaryDetails` | object | No | Inline beneficiary. Send this or `savedBeneficiaryId`; if both are sent, the inline `beneficiaryDetails` wins. The API does not enforce that one of them is present |
+| `savedBeneficiaryId` | string | No | Saved beneficiary ID. Send this or `beneficiaryDetails` |
 | `integratorNote` | string | No | Internal memo |
 | `callbackUrl` | string | No | URL to receive webhook on status change |
 
@@ -92,8 +95,9 @@ See [Create Batch Settlement](/v3/api-reference/settlements/batch/create).
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `requests` | object[] | Yes | Array of settlement sub-requests. Each accepts `walletId`, `amount`, `balanceSource`, and optionally `beneficiaryDetails` or `savedBeneficiaryId` |
-| `batchReference` | string | No | Your own idempotency reference for the batch |
+| `requests` | object[] | Yes | Array of settlement sub-requests. Each accepts `walletId`, `amount`, and optionally `balanceSource`, `beneficiaryDetails`, `savedBeneficiaryId`, `subReference` and `integratorNote` |
+| `batchReference` | string | No | Your own reference for the batch. Must be unique: a repeated value returns `409` |
+| `callbackUrl` | string | No | Callback URL for batch events (batch-level only) |
 | `integratorNote` | string | No | Internal memo for the batch |
 
 ### GET /api/v3/integrator/settlements/batch
@@ -106,7 +110,7 @@ See [Get Settlement Batch](/v3/api-reference/settlements/batch/get).
 
 ### DELETE /api/v3/integrator/settlements/batch/:batchId
 
-See [Cancel Settlement Batch](/v3/api-reference/settlements/batch/cancel). Cancels all children still in `PENDING`.
+See [Cancel Settlement Batch](/v3/api-reference/settlements/batch/cancel). A batch can be cancelled only while it is `PENDING_REVIEW`. Cancels all children still in `PENDING`.
 
 ---
 
@@ -121,6 +125,8 @@ See [Merge Settlements into Batch](/v3/api-reference/settlements/merge).
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `settlementIds` | string[] | Yes | IDs to merge. Minimum 2. All must be `PENDING` or `UNDER_REVIEW` and not already in a batch |
+| `batchReference` | string | No | Your own reference for the resulting batch. Must be unique: a repeated value returns `409` |
+| `callbackUrl` | string | No | Callback URL for batch events |
 | `integratorNote` | string | No | Internal memo for the resulting batch |
 
 ---

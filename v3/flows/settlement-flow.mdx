@@ -60,10 +60,14 @@ Call [Settlement Schedule](/v3/api-reference/settlements/schedule) before submit
 
 Key fields:
 
-- `enabled` — if `false`, requests will be rejected
-- `allowedDays` — requests on unlisted days are queued to the next allowed day
-- `cutoffEnabled` / `cutoffTime` / `timezone` — requests after the cutoff are queued to the next allowed day
-- `minAmount` / `maxAmount` — both in USD; your local-currency amount is converted before this check
+- `enabled`: whether the schedule rules apply. If `false`, there are no schedule restrictions.
+- `allowedDays`: when the schedule applies, requests on days not in this list are rejected with `400`, not queued.
+- `cutoffEnabled` / `cutoffTime` / `timezone`: when the schedule applies, requests after the cutoff are rejected with `400`, not queued.
+- `minAmount` / `maxAmount`: both in USD; your local-currency amount is converted before this check. These limits are enforced on API requests.
+
+<Note>
+The schedule (`enabled`, `allowedDays` and the cutoff) is currently enforced only on requests created by Kotani Pay admins. For requests you submit through the API it is informational, while `minAmount` and `maxAmount` are enforced.
+</Note>
 
 ---
 
@@ -93,21 +97,21 @@ Call [Settlement Fee Preview](/v3/api-reference/settlements/fee-preview) with `?
 
 Batch settlements submit multiple wallet requests in one call. Each child settlement is processed independently. The batch status reflects the aggregate of its children.
 
-**1. Prepare your requests array** — each item follows the same schema as a single settlement request: `walletId`, `amount`, `balanceSource`, plus `beneficiaryDetails` or `savedBeneficiaryId`.
+**1. Prepare your requests array.** Each item has `walletId` and `amount`, plus optional `balanceSource`, `savedBeneficiaryId`, `beneficiaryDetails`, `subReference` and `integratorNote`. A `callbackUrl` can be set on the batch only, not on individual items.
 
-**2. Submit the batch** — call [Create Batch Settlement](/v3/api-reference/settlements/batch/create) with an optional `batchReference` for your own tracking.
+**2. Submit the batch**: call [Create Batch Settlement](/v3/api-reference/settlements/batch/create) with an optional `batchReference` for your own tracking. Submitting a `batchReference` you have already used returns `409`. It is not treated as a replay.
 
 **3. Track the batch** — call [Get Settlement Batch](/v3/api-reference/settlements/batch/get) for the overall status. Each child can also be fetched individually via [Get Settlement](/v3/api-reference/settlements/get-settlement).
 
-**4. Cancelling** — call [Cancel Settlement Batch](/v3/api-reference/settlements/batch/cancel). Children still in `PENDING` are cancelled; children in `UNDER_REVIEW` or later are not affected.
+**4. Cancelling**: call [Cancel Settlement Batch](/v3/api-reference/settlements/batch/cancel). A batch can be cancelled only while it is `PENDING_REVIEW`. Children still in `PENDING` are cancelled; children in `UNDER_REVIEW` or later are not affected.
 
 ### Batch Status at Completion
 
 | Condition | Webhook fired |
 |-----------|---------------|
 | All children `PROCESSED` | `settlement.batch.processed` |
-| All children `REJECTED` | `settlement.batch.rejected` |
-| Mix of `PROCESSED` and `REJECTED`/`FAILED` | `settlement.batch.partial` |
+| No child succeeded (batch becomes `FAILED`) | `settlement.batch.rejected` |
+| Some children succeeded and others did not | `settlement.batch.partial` |
 | Batch cancelled | `settlement.batch.cancelled` |
 | Batch approved by admin | `settlement.batch.approved` |
 
@@ -122,6 +126,8 @@ The merge endpoint converts two or more existing individual settlements into a b
 **2. Submit the merge** — call [Merge Settlements into Batch](/v3/api-reference/settlements/merge) with the `settlementIds` array (minimum 2).
 
 **3. A new batch is created** — the response contains the new batch ID. The source settlements become children of that batch.
+
+When Kotani Pay merges whole batches into a new consolidated batch, each merged batch receives a `settlement.batch.consolidated` event carrying `consolidatedIntoBatchId`.
 
 <Warning>
 You cannot un-merge settlements once grouped into a batch. To cancel, use [Cancel Settlement Batch](/v3/api-reference/settlements/batch/cancel).
@@ -141,10 +147,11 @@ Settlement events are delivered via the signed webhook system — see [Webhook N
 | `settlement.cancelled` | Settlement cancelled by integrator |
 | `settlement.paused` | Admin pauses the settlement |
 | `settlement.batch.approved` | Batch approved by admin |
-| `settlement.batch.rejected` | All children in a batch are `REJECTED` |
+| `settlement.batch.rejected` | Batch rejected, or no child in the batch succeeded (the batch becomes `FAILED`) |
 | `settlement.batch.processed` | All children in a batch reach `PROCESSED` |
 | `settlement.batch.partial` | Some children `PROCESSED`, others `REJECTED` or `FAILED` |
 | `settlement.batch.cancelled` | Batch cancelled by integrator |
+| `settlement.batch.consolidated` | Batch merged into a new consolidated batch |
 
 ### Example: `settlement.paused`
 
@@ -152,12 +159,25 @@ Settlement events are delivered via the signed webhook system — see [Webhook N
 {
   "event": "settlement.paused",
   "data": {
-    "settlementId": "stl_abc123",
+    "settlementId": "64a1b2c3d4e5f6a7b8c9d0f1",
+    "referenceId": "SET-2025-001",
     "status": "PAUSED",
-    "pauseReason": "Additional KYC documentation required for this destination",
-    "pausedUntil": "2025-05-10T00:00:00.000Z",
+    "amount": 50000,
+    "fee": 750,
+    "feePercentage": 1.5,
+    "netAmount": 49250,
     "currency": "KES",
-    "amount": 50000
+    "tentativeUsdAmount": 387.5,
+    "tentativeUsdFee": 5.81,
+    "tentativeUsdNetAmount": 381.69,
+    "balanceSource": "DEPOSIT",
+    "batchId": null,
+    "subReference": null,
+    "beneficiaryDetails": {
+      "bankName": "Equity Bank",
+      "accountNumber": "0123456789"
+    },
+    "timestamp": "2025-05-01T12:00:00.000Z"
   },
   "signature": "sha256=a1b2c3..."
 }
@@ -165,15 +185,40 @@ Settlement events are delivered via the signed webhook system — see [Webhook N
 
 ### Example: `settlement.batch.partial`
 
+Batch events carry the batch shape described in [Webhooks](/v3/essentials/webhooks#batch-settlement-payload-fields).
+
 ```json
 {
   "event": "settlement.batch.partial",
   "data": {
-    "batchId": "bat_def789",
-    "processedCount": 3,
-    "rejectedCount": 1,
-    "failedCount": 0,
-    "totalCount": 4
+    "batchId": "def789",
+    "batchReference": "payroll-2025-05",
+    "status": "PARTIAL",
+    "settlements": [
+      {
+        "_id": "64a1b2c3d4e5f6a7b8c9d0f1",
+        "subReference": "emp-001",
+        "status": "PROCESSED",
+        "currency": "KES",
+        "netAmount": 49250,
+        "tentativeUsdNetAmount": 381.69,
+        "referenceId": "SET-2025-001",
+        "channels": []
+      },
+      {
+        "_id": "64a1b2c3d4e5f6a7b8c9d0f2",
+        "subReference": "emp-002",
+        "status": "FAILED",
+        "currency": "KES",
+        "netAmount": 19700,
+        "tentativeUsdNetAmount": 152.7,
+        "referenceId": "SET-2025-002",
+        "channels": []
+      }
+    ],
+    "totalTentativeUsdAmount": 534.39,
+    "consolidatedIntoBatchId": null,
+    "timestamp": "2025-05-01T12:00:00.000Z"
   },
   "signature": "sha256=b2c3d4..."
 }

@@ -29,11 +29,11 @@ Which of your balances a transaction touches depends on the product. This is als
 
 | Product | What happens to your balances | How you earn |
 |---|---|---|
-| **Deposit** (collection) | The customer's payment is credited to your **deposit balance**, less the fee if your customer pays it ([Fees & Billing](/v3/essentials/billing-types)). | Set the amount you ask the customer for. Anything above your price stays in your deposit balance. |
+| **Deposit** (collection) | You are credited to your **deposit balance**. When your customer pays the fee, you are credited the full amount (the amount the customer paid plus the fee). When you pay the fee, you are credited the amount minus the fee ([Fees & Billing](/v3/essentials/billing-types)). | Set the amount you ask the customer for. Anything above your price stays in your deposit balance. |
 | **Withdrawal** (payout) | The amount is debited from your **payout balance**, plus the fee if you pay it. | Charge your customer on your side before you send the payout. |
 | **Onramp** (mobile money or bank checkout) | The customer's payment is credited to your **deposit balance**, and the crypto is sent from **your crypto wallet** with us. | The quoted rate includes a spread, so the fiat you receive is worth more than the crypto you send. That spread is yours. |
 | **Onramp with [hosted checkout](/v3/flows/hosted-checkout-onramp)** | **Neither your fiat nor your crypto wallet is used.** The customer pays on the hosted page and we deliver the crypto, so you don't prefund anything. | A **partner fee** set on your account, shown in the quote and credited to your **deposit balance** in the onramp currency once the customer has paid. |
-| **Offramp** | The customer sends crypto to our address and we pay out the fiat. Your balances don't fund it. | Quote your customer your own rate on your side. |
+| **Offramp** | The customer sends crypto to our address and we pay out the fiat. The fiat payout is debited from your **payout balance** (plus the fee if you pay it), so keep it funded. | Quote your customer your own rate on your side. |
 
 ### Charging your customer once
 
@@ -81,13 +81,13 @@ Before you can send money to users, you need funds in your **payout balance**. Y
 
 See the [Transfer Deposit Balance](/v3/api-reference/wallets/fiat/transfer-deposit-balance) endpoint in the API reference for the full request and response details.
 
-The transfer is immediate — your payout balance increases and your deposit balance decreases by the same amount.
+The transfer is immediate: your payout balance increases and your deposit balance decreases by the same amount. Amounts held by active settlement requests cannot be moved.
 
 ---
 
 ## Settlement
 
-Settlement is the process of moving your collected funds out of Kotani Pay to your external account. Currently, **settlement is manual only** — there is no automated settlement schedule.
+Settlement is the process of moving your collected funds out of Kotani Pay to your external account. You can request a settlement through the API (see the [settlement flow](/v3/flows/settlement-flow)) or from the dashboard.
 
 ### How Settlement Works
 
@@ -138,7 +138,7 @@ After the test transaction is confirmed, the remaining funds are released prompt
 
 **Is there an API endpoint to request settlement?**
 
-Settlement requests are currently handled manually — reach out through your communication channel to begin the process.
+Yes. You can request a settlement through the API (see the [settlement flow](/v3/flows/settlement-flow)) or from the dashboard.
 
 ---
 

@@ -27,11 +27,13 @@ Include all three headers on every request.
 
 Construct the payload string before computing the signature.
 
-**POST / PUT / PATCH**
+**Every method except GET (POST, PUT, PATCH and DELETE)**
 
 ```
 ${timestamp}.${nonce}.${JSON.stringify(requestBody)}
 ```
+
+For a request with an empty body, sign `{}`.
 
 **GET**
 
@@ -39,7 +41,7 @@ ${timestamp}.${nonce}.${JSON.stringify(requestBody)}
 ${timestamp}.${nonce}.${lastPathSegment}
 ```
 
-where `lastPathSegment` is the final segment of the request URL path. For example, a request to `/api/v3/wallets/fiat/64a1b2c3d4e5f6a7b8c9d0e2` uses `64a1b2c3d4e5f6a7b8c9d0e2`.
+where `lastPathSegment` is the final segment of the request URL path. The query string is excluded: only the path is signed. For example, a request to `/api/v3/wallet/fiat/64a1b2c3d4e5f6a7b8c9d0e2` uses `64a1b2c3d4e5f6a7b8c9d0e2`.
 
 <Warning>
   Serialize the request body with **no extra spaces** — compact JSON only. Any whitespace difference between your serialisation and the server's will cause a signature mismatch and a `401 Unauthorized` response.
@@ -150,20 +152,32 @@ Usage:
 ```typescript
 const headers = signRequest({
   secret: process.env.KOTANI_PAY_SIGNATURE!,
-  body: { wallet_id: "64a1b2c3d4e5f6a7b8c9d0e2", amount: 1000 },
+  body: {
+    customer_key: "cust_abc123",
+    wallet_id: "64a1b2c3d4e5f6a7b8c9d0e2",
+    amount: 1000,
+    reference_id: "order-abc-001",
+  },
   method: "POST",
 });
 
-await fetch("https://api.kotanipay.com/api/v3/deposits/mobile-money", {
+await fetch("https://api.kotanipay.com/api/v3/deposit/mobile-money", {
   method: "POST",
   headers: {
     "Authorization": `Bearer ${process.env.KOTANI_API_KEY}`,
     "Content-Type": "application/json",
     ...headers,
   },
-  body: JSON.stringify({ wallet_id: "64a1b2c3d4e5f6a7b8c9d0e2", amount: 1000 }),
+  body: JSON.stringify({
+    customer_key: "cust_abc123",
+    wallet_id: "64a1b2c3d4e5f6a7b8c9d0e2",
+    amount: 1000,
+    reference_id: "order-abc-001",
+  }),
 });
 ```
+
+Unknown fields in the request body are rejected with `400`, so send only fields the endpoint documents.
 
 ### Python
 
@@ -176,7 +190,7 @@ def sign_request(secret: str, body: dict | str, method: str) -> dict:
     if method.upper() == "GET":
         payload = f"{timestamp}.{nonce}.{body}"
     else:
-        payload = f"{timestamp}.{nonce}.{json.dumps(body, separators=(',', ':'))}"
+        payload = f"{timestamp}.{nonce}.{json.dumps(body, separators=(',', ':'), ensure_ascii=False)}"
     signature = hmac.new(
         secret.encode(), payload.encode(), hashlib.sha256
     ).hexdigest()
@@ -189,7 +203,7 @@ def sign_request(secret: str, body: dict | str, method: str) -> dict:
 
 - **The nonce is single-use.** Reusing a nonce that the server has already accepted returns `401 Unauthorized`. Generate a fresh UUID v4 for every request.
 - **The timestamp window is ±5 minutes.** A request whose `x-timestamp` falls outside that window returns `401 Unauthorized`. Ensure your server clock is NTP-synchronised.
-- **Compact JSON serialisation is required.** Use `JSON.stringify` without formatting options in Node.js, and `json.dumps(..., separators=(',', ':'))` in Python. Extra whitespace breaks the signature.
+- **Compact JSON serialisation is required.** Use `JSON.stringify` without formatting options in Node.js, and `json.dumps(..., separators=(',', ':'), ensure_ascii=False)` in Python. Extra whitespace breaks the signature.
 - **Your API secret is shown once.** The secret is displayed at key generation time and cannot be retrieved afterwards. Store it in a secrets manager or environment variable — never in source code.
 - **Secure mode is permanent.** Once request signing is activated for your account it cannot be turned off. Test your signing implementation in the sandbox environment before going live.
 

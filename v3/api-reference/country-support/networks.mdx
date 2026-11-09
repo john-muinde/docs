@@ -3,4 +3,4 @@ title: "Get Available Networks"
 openapi: "GET /api/v3/customer/support/networks/{countryCode}"
 ---
 
-Get all active mobile money networks available in a specific country, including network codes and phone number prefixes.
+Get the active mobile money networks available in a specific country. The response contains only `countryCode`, `networks` and `isRequired`; it does not include network codes or phone number prefixes.

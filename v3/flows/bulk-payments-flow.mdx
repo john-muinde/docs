@@ -3,12 +3,12 @@ title: "Bulk Payments"
 description: "How to disburse funds to many recipients at once — validate a CSV, assign wallets, and track batch processing"
 ---
 
-Bulk payments let you disburse to hundreds or thousands of recipients in a single operation. Upload a CSV of recipients, assign a payout wallet per currency, and Kotani Pay processes the payments asynchronously — one batch per currency.
+Bulk payments let you disburse to hundreds or thousands of recipients in a single operation. Upload a CSV of recipients, assign a payout wallet per currency, and Kotani Pay processes the payments asynchronously, one batch per currency. Bulk payouts are mobile money only.
 
 ---
 
 <Note>
-You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl` — see the [Quickstart](/v3/quickstart) if you haven't set those up. For this flow you also need a funded payout wallet for every currency in your CSV. Each payment fires its own withdrawal webhook as it settles.
+You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl`, see the [Quickstart](/v3/quickstart) if you haven't set those up. For this flow you also need a funded payout wallet for every currency in your CSV. Each payment fires its own withdrawal webhook to your configured webhook URL as it settles (the batch `callbackUrl` is not used for these).
 </Note>
 
 ## 1. Validate Your CSV
@@ -18,13 +18,13 @@ Call [Validate CSV File](/v3/api-reference/bulk-payments/validate-csv) with your
 - A summary grouped by currency with totals
 - Row-level errors with line numbers if any data is invalid
 
-Fix any errors and re-upload. A file hash is computed to prevent duplicate submissions.
+Fix any errors and re-upload. The response also includes a `fileHash` and an `isDuplicate` flag, which tells you whether the same file was submitted before.
 
 ---
 
 ## 2. Preview Batches
 
-Call [Preview Bulk Payment Batches](/v3/api-reference/bulk-payments/preview-batches) with the file hash. This shows you exactly how many batches will be created, the total per currency, and which wallet you'll need to assign to each.
+Call [Preview Bulk Payment Batches](/v3/api-reference/bulk-payments/preview-batches) with the same body you will send to create the batches (`recipients[]` and `walletSelections[]`). This shows you how many batches will be created and the total per currency. No fees are computed.
 
 ---
 
@@ -32,13 +32,13 @@ Call [Preview Bulk Payment Batches](/v3/api-reference/bulk-payments/preview-batc
 
 Call [Create Bulk Payment Batches](/v3/api-reference/bulk-payments/create-batches), assigning a payout wallet to each currency. Kotani Pay verifies your balance, creates the transaction record, and queues all batches for processing.
 
-Save the `transactionId` and `batchId`s from the response — you'll need them to track progress.
+The response is an array of batches, one per currency. Each has `id` (the batch ID), `batchName`, `status`, `currency`, `totalAmount`, `totalPayments`, `successfulPayments`, `failedPayments`, `pendingPayments`, `createdAt` and `progress`. Save each batch `id`: you need it to track progress.
 
 ---
 
 ## 4. Processing Happens Asynchronously
 
-Batches process in the background. For each recipient, Kotani Pay initiates a disbursement to their mobile money wallet or bank account. Your payout balance is debited as each payment is sent.
+Batches process in the background. For each recipient, Kotani Pay initiates a disbursement to their mobile money wallet. Your payout balance is debited as each payment is sent.
 
 - If a disbursement succeeds, the recipient gets an SMS from the mobile money network
 - If a disbursement fails, the debit is automatically reversed
@@ -61,7 +61,7 @@ For overall batch progress, poll the batch status endpoints rather than relying 
 - [Get Batch Payments](/v3/api-reference/bulk-payments/get-batch-payments) — status of each individual payment
 - [Get Paginated Transactions](/v3/api-reference/bulk-payments/list-transactions) — overview of all batches under a transaction
 
-Batch statuses move from `pending` → `processing` → `completed`, `completed_with_errors`, or `failed`.
+Batch statuses are `pending`, `processing`, `completed`, `failed` and `cancelled`.
 
 ---
 

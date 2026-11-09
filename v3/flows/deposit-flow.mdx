@@ -17,15 +17,15 @@ The most common collection method across Kenya, Uganda, Tanzania, Ghana, and oth
 
 **1. Create the customer** if you haven't already. The customer record holds the phone number and network details needed to trigger the collection.
 
-**2. Initiate the deposit** — call [Deposit via Mobile Money](/v3/api-reference/deposits/mobile-money) with your `callbackUrl`. The API responds immediately with a `PENDING` transaction. The customer has not paid yet.
+**2. Initiate the deposit**: call [Deposit via Mobile Money](/v3/api-reference/deposits/mobile-money) with your `callbackUrl`. The create response returns the reference IDs (`id`, `reference_id`, `reference_number`, `customer_key`, `redirect_url` and `message`), not a status. The deposit is `PENDING` until the callback arrives. The customer has not paid yet.
 
 **3. The customer confirms.** Depending on the network:
 - M-PESA / Airtel — STK push, customer enters PIN to approve
 - MTN / others — USSD prompt or SMS confirmation
 
-**4. Kotani Pay notifies you** via your `callbackUrl` when the transaction settles:
-- `SUCCESSFUL` — funds collected, your deposit balance will be credited
-- `FAILED` — collection failed (declined, insufficient funds, timeout)
+**4. Kotani Pay notifies you** via your `callbackUrl` once the deposit reaches a final status. The callback can carry any final status: `SUCCESSFUL`, `FAILED`, `CANCELLED`, `EXPIRED`, `DECLINED`, `REVERSED` or `ERROR_OCCURRED`.
+- `SUCCESSFUL`: funds collected, your deposit balance will be credited
+- `FAILED`, `DECLINED`, `EXPIRED` and the other final statuses: nothing was collected (for example declined, insufficient funds or timeout)
 
 <Note>
 If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks) for both modes, and the [deposit payload](/v3/essentials/webhooks#transactiondepositstatusupdated) for every field you receive with a worked example.
@@ -37,7 +37,7 @@ If you have a webhook secret configured, the callback arrives in a signed envelo
 
 ## Bank Checkout Deposit
 
-Call [Bank Checkout Deposit](/v3/api-reference/deposits/bank-checkout) with your `callbackUrl`, a `customerRedirectUrl` (where to send the customer after they finish paying), `currency`, `amount`, and a `paymentMethod`. What happens next depends on the currency and payment method — bank checkout is not one flow, it's three:
+Call [Bank Checkout Deposit](/v3/api-reference/deposits/bank-checkout) with your `callbackUrl`, a `customerRedirectUrl` (where to send the customer after they finish paying), `currency`, `amount`, and a `paymentMethod` and the customer's `fullName` (required). What happens next depends on the currency and payment method, bank checkout is not one flow, it's four:
 
 **ZAR — `CAPITECPAY` or `CARD`.** Kotani Pay returns a hosted checkout page. Redirect the customer to `redirectUrl` in the response; they complete payment there (Capitec Pay app or card entry) and are sent back to your `customerRedirectUrl` afterward. No manual reference entry — the hosted page handles matching the payment.
 
@@ -49,7 +49,9 @@ The customer **must** enter `bankPaymentDetails.reference` as the payment narrat
 
 **NGN — Virtual account.** The response's `bankPaymentDetails` contains a one-time dedicated `accountNumber` (plus `bankName`, `accountName`, `amount`, `expiresInMinutes`). The customer pays the exact amount to that account from their own banking app before it expires. No narrative/reference is needed here — the account itself is unique to this transaction.
 
-**Then, for all three:** Kotani Pay notifies you via your `callbackUrl` when the bank confirms — same event structure as mobile money. Poll for status if needed — [Bank Checkout Deposit Status](/v3/api-reference/deposits/bank-checkout-status).
+**USSD.** Send `paymentMethod` `USSD` with an `institution` (the customer's bank, required because the dial code is issued per bank). The response includes `ussdPaymentDetails` with the code the customer dials from their own phone.
+
+**Then, for all of them:** Kotani Pay notifies you via your `callbackUrl` when the bank confirms: same event structure as mobile money. Poll for status if needed: [Bank Checkout Deposit Status](/v3/api-reference/deposits/bank-checkout-status).
 
 ---
 

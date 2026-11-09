@@ -206,10 +206,8 @@
                 "pages": [
                   "v3/api-reference/onramp/create",
                   "v3/api-reference/onramp/status",
-                  "v3/api-reference/onramp/get-status",
                   "v3/api-reference/onramp/crypto",
-                  "v3/api-reference/onramp/crypto-status",
-                  "v3/api-reference/onramp/get-crypto-status"
+                  "v3/api-reference/onramp/crypto-status"
                 ]
               },
               {
@@ -217,7 +215,6 @@
                 "pages": [
                   "v3/api-reference/offramp/create",
                   "v3/api-reference/offramp/status",
-                  "v3/api-reference/offramp/get-status",
                   "v3/api-reference/offramp/cancel",
                   "v3/api-reference/offramp/list-transactions",
                   "v3/api-reference/offramp/refund-status",
@@ -310,6 +307,18 @@
     {
       "source": "/v3/api-reference/withdrawals/name-lookup",
       "destination": "/v3/essentials/account-validation"
+    },
+    {
+      "source": "/v3/api-reference/onramp/get-status",
+      "destination": "/v3/api-reference/onramp/status"
+    },
+    {
+      "source": "/v3/api-reference/onramp/get-crypto-status",
+      "destination": "/v3/api-reference/onramp/crypto-status"
+    },
+    {
+      "source": "/v3/api-reference/offramp/get-status",
+      "destination": "/v3/api-reference/offramp/status"
     }
   ]
 }

@@ -19,13 +19,13 @@ Fetch the current offramp rate to show the customer how much fiat they'll receiv
 
 ## 2. Create the Offramp
 
-Call [Create Offramp Request](/v3/api-reference/offramp/create) with your `callbackUrl`. The API responds with a `PENDING` transaction and a `depositAddress` — this is the on-chain address the customer must send crypto to. Display this address (and optionally a QR code) to them.
+Call [Create Offramp Request](/v3/api-reference/offramp/create) with your `callbackUrl`. The API responds with a `PENDING` transaction and an `escrowAddress`: the on-chain address the customer must send crypto to (a bolt11 invoice for Lightning). Display it (and optionally a QR code) to them. `senderAddress` is required for every chain except Lightning.
 
 ---
 
 ## 3. Customer Sends Crypto
 
-The customer sends the exact amount to the `depositAddress` from their own wallet. Kotani Pay monitors the address and advances the transaction to `CRYPTO_RECEIVED` once the required confirmations are reached. No further action is needed from your server at this step.
+The customer sends the exact amount to the `escrowAddress` from their own wallet. Kotani Pay monitors the address and sets `onchainStatus` to `SUCCESSFUL` once the required confirmations are reached. No further action is needed from your server at this step.
 
 ---
 
@@ -34,19 +34,18 @@ The customer sends the exact amount to the `depositAddress` from their own walle
 Once crypto is confirmed, Kotani Pay initiates the fiat disbursement. The recipient gets an SMS confirmation from the mobile money network when funds arrive.
 
 <Warning>
-If fiat disbursement fails after crypto is received, Kotani Pay automatically initiates a crypto refund 5 minutes after the failure. The transaction moves to `REFUND_PENDING`. Track this via the refund endpoints below.
+If fiat disbursement fails after crypto is received, Kotani Pay automatically initiates a crypto refund 5 minutes after the failure. The refund starts with `refundStatus` `PENDING`. Track this via the refund endpoints below.
 </Warning>
 
 ---
 
 ## 5. Kotani Pay Notifies You
 
-Kotani Pay POSTs to your `callbackUrl` at each terminal state:
+Offramp `status` uses the same values as withdrawals (`PENDING`, `IN_PROGRESS`, `SUCCESSFUL`, `FAILED`, `CANCELLED`, `REVERSED` and so on; see [Transaction Statuses](/v3/essentials/transaction-statuses)). Kotani Pay POSTs to your `callbackUrl` as the transaction settles:
 
-- `SUCCESS` — fiat delivered to the recipient
-- `FAILED` — disbursement failed
-- `REFUNDED` — crypto returned to sender after a failed fiat disbursement
-- `REFUND_FAILED` — crypto refund failed; contact support
+- `SUCCESSFUL`: fiat delivered to the recipient
+- `FAILED`: disbursement failed
+- After a failed disbursement the crypto is refunded. `refundStatus` moves through `PENDING` to `SUCCESSFUL` or `FAILED`. When the refund succeeds, the offramp `status` becomes `REVERSED` and a `refund.completed` event fires. If it fails, a `refund.failed` event fires; contact support
 
 <Note>
 If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks) for both modes, and the [offramp payload](/v3/essentials/webhooks#transactionofframpstatusupdated) for every field you receive with a worked example.
@@ -56,7 +55,7 @@ If you have a webhook secret configured, the callback arrives in a signed envelo
 
 ## 6. Poll for Status
 
-- [Get Offramp Status (by Reference ID)](/v3/api-reference/offramp/get-status) — full transaction status
+- [Get Offramp Status (by Reference ID)](/v3/api-reference/offramp/status): full transaction status
 - [Get Refund Status](/v3/api-reference/offramp/refund-status) — refund status if fiat disbursement failed
 
 ---

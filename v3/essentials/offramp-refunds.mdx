@@ -22,7 +22,7 @@ For **Lightning**, Kotani cannot push funds unprompted — it needs a bolt11 inv
 
 ### Option A — Provide a refund invoice at create time (recommended)
 
-Include `refund_config` when creating the offramp. If fiat fails, Kotani pays the invoice immediately — no manual intervention needed.
+Include `refund_config` when creating the offramp. If fiat fails, Kotani pays the invoice immediately, no manual intervention needed. `refund_config` is accepted only for `LIGHTNING` offramps; for any other chain the request is rejected with `400`.
 
 ```json
 {
@@ -44,10 +44,10 @@ Include `refund_config` when creating the offramp. If fiat fails, Kotani pays th
 
 | Field | Required | Notes |
 |---|---|---|
-| `bolt11` | Yes | Valid, unpaid Lightning invoice |
+| `bolt11` | No | Valid, unpaid Lightning invoice |
 | `payment_hash` | Recommended | Used to detect if invoice was already paid |
-| `amount_msat` | Yes | Must match the expected refund amount exactly |
-| `expires_at` | Yes | ISO 8601 — Kotani uses this to decide whether to call `generate_invoice_url` |
+| `amount_msat` | No | If sent, must match the expected refund amount exactly |
+| `expires_at` | No | ISO 8601, Kotani uses this to decide whether to call `generate_invoice_url` |
 | `generate_invoice_url` | Recommended | Called when `bolt11` is expired; see contract below |
 
 > **Important:** Lightning invoices expire. Always provide `generate_invoice_url` so Kotani can fetch a fresh one if the refund is triggered after the invoice expires. Without it, and with an expired invoice, Kotani falls back to Option B.
@@ -114,7 +114,7 @@ Fired when Kotani successfully refunds crypto to the integrator.
     "status": "REVERSED",
     "refundStatus": "SUCCESSFUL",
     "refundTransactionHash": "0xabc123...",
-    "refundAmount": 0.015,
+    "refundAmount": 1500,
     "chain": "LIGHTNING",
     "token": "MSAT",
     "currency": "KES",
@@ -124,11 +124,11 @@ Fired when Kotani successfully refunds crypto to the integrator.
 }
 ```
 
-The parent transaction's `status` is set to `REVERSED` once refunded.
+The parent transaction's `status` is set to `REVERSED` once refunded. For Lightning, `refundAmount` is an integer number of sats (the same value as `refundAmountSats` in `refund.lightning.invoice_needed`).
 
 ### `refund.failed`
 
-Fired when refund attempts are exhausted (after up to 5 retries for general errors, 10 for gas/fund errors).
+Fired when the refund fails for good: either the error is not one that is retried automatically, or the 5 automatic retries for gas/fund errors and timeouts are used up.
 
 ```json
 {
@@ -136,7 +136,7 @@ Fired when refund attempts are exhausted (after up to 5 retries for general erro
   "data": {
     "referenceId": "TXN-001",
     "refundStatus": "FAILED",
-    "refundAmount": 0.015,
+    "refundAmount": 1500,
     "chain": "LIGHTNING",
     "token": "MSAT",
     "currency": "KES",
@@ -159,7 +159,7 @@ Fired when Kotani needs you to submit a Lightning invoice manually (Option B). I
   "event": "refund.lightning.invoice_needed",
   "data": {
     "referenceId": "TXN-001",
-    "refundAmount": 1500000,
+    "refundAmount": 1500,
     "refundAmountSats": 1500,
     "chain": "LIGHTNING",
     "requiresAction": true,
@@ -187,11 +187,11 @@ Fired when Kotani needs you to submit a Lightning invoice manually (Option B). I
 
 ## Retry Logic
 
-| Scenario | Max Retries | Behaviour |
+| Scenario | Automatic retries | Behaviour |
 |---|---|---|
-| Gas / insufficient funds | 10 | Auto-retried on next cron cycle |
-| Timeout | 5 | Auto-retried on next cron cycle |
-| All other errors | 5 | Auto-retried; `refund.failed` fired when exhausted |
+| Gas / insufficient funds | Up to 5 | Auto-retried on the next cron cycle; `refund.failed` fires when exhausted |
+| Timeout | Up to 5 | Auto-retried on the next cron cycle; `refund.failed` fires when exhausted |
+| All other errors | None | Fail immediately; `refund.failed` fires |
 | Lightning — no invoice | ∞ | Waits until invoice submitted; `refund.lightning.invoice_needed` sent once |
 
-Use [Retry Refund](/v3/api-reference/offramp/retry-refund) to manually trigger a retry on a `FAILED` refund.
+Use [Retry Refund](/v3/api-reference/offramp/retry-refund) (`POST /offramp/retry-refund/{referenceId}`) to manually trigger a retry on a `FAILED` refund. Manual retries allow up to 10 attempts in total for gas/fund errors and 4 for other errors.

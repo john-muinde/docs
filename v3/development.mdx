@@ -22,26 +22,26 @@ environment-specific credentials for each.
 
 ## Authentication
 
-Every request needs an `Authorization: Bearer` header. API keys and JWTs both go in
-the same header.
-
-**API keys** are what you want for server-to-server work — they don't expire unless
-revoked. **JWTs** are short-lived and mainly used while generating a key over the
-API.
+Every request needs an `Authorization: Bearer` header carrying your API key. Keys
+are created in the dashboard, and they don't expire unless revoked. There is no
+login-for-JWT step and no key generation over the API. Some endpoints also accept
+[request signing](/v3/essentials/request-signing).
 
 [Creating API keys →](/v3/getting-started/api-keys)
 
 ## Idempotency
 
-Always send a reference ID on deposits and withdrawals. The field name differs by
-flow:
+Send a reference ID on deposits and withdrawals. On deposits it is optional and one
+is generated for you if you leave it out; on withdrawals, always send your own so you can reconcile. The field
+name differs by flow:
 
 - Deposits use `reference_id` (snake_case)
 - Withdrawals use `referenceId` (camelCase)
 
-Reference IDs must be unique per integrator. If a request times out or fails at the
-network level, retrying with the same reference ID will not create a duplicate
-transaction — which is the whole point of sending one.
+Reference IDs must be unique across the platform. Reusing one returns `400`; it does
+not return the original transaction. If a request times out, poll the status
+endpoint for that reference ID before you retry, so you don't create a second
+transaction.
 
 ## Webhooks
 

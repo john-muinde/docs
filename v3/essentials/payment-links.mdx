@@ -58,7 +58,7 @@ no integration, no webhook handler.
 ## After the payment
 
 Each payment against a link becomes a normal deposit on your account, so your
-payout balance is credited the same way as any other collection.
+deposit balance is credited the same way as any other collection.
 
 From the link's page in the dashboard you can:
 
@@ -68,8 +68,33 @@ From the link's page in the dashboard you can:
 - Export the transactions
 
 If you want payments pushed to your own system instead of checking the dashboard,
-set a webhook — payment link collections arrive as
-`transaction.deposit.status.updated`. See [Webhooks](/v3/essentials/webhooks).
+set a webhook. You receive a `payment.confirmed` event, and only when a payment
+succeeds. There is no failure event. It is delivered to the link's `callbackUrl`
+if it has one, otherwise to your webhook URL. See [Webhooks](/v3/essentials/webhooks).
+
+```json
+{
+  "event": "payment.confirmed",
+  "data": {
+    "object": "payment_link_transaction",
+    "referenceId": "PLT-0001",
+    "paymentLinkId": "64a1b2c3d4e5f6a7b8c9d0e1",
+    "shortCode": "abc123",
+    "status": "successful",
+    "paymentMethod": "mobile_money",
+    "amount": 1000,
+    "currency": "KES",
+    "depositId": "64a1b2c3d4e5f6a7b8c9d0e2",
+    "customer": { "name": "Jane Doe", "email": "jane@example.com" },
+    "completedAt": "2025-01-01T00:05:00.000Z",
+    "timestamp": "2025-01-01T00:05:00.000Z"
+  },
+  "signature": "sha256=a1b2c3d4e5f6..."
+}
+```
+
+`token`, `network`, `transactionHash` and `depositId` appear only when they apply
+to the payment.
 
 <Note>
 Amounts on these deposits follow the same fee rules as the rest of your account.
@@ -79,21 +104,12 @@ may be added on top of what your customer paid rather than taken out of it.
 
 ## Creating links from the API
 
-If you need a link per order rather than one you share repeatedly, links can be
-created programmatically with the same options as the dashboard form — type,
-pricing, enabled payment methods, usage limit and which customer details to
-collect. You can also list your links, fetch the payments and totals for one, and
-deactivate it.
+Payment links are created and managed in the dashboard. There is no API key
+endpoint for them yet, so a link per order cannot be created from your server today.
+If you need that, talk to your account manager.
 
-<Note>
-These endpoints aren't in the API reference yet. Ask your account manager for the
-current contract rather than working from a path written down here — the reference
-is the only place we keep those in step with the API.
-</Note>
-
-Payments made through a link arrive as normal deposit webhooks, so if you already
-handle deposits you already handle these. See the
-[deposit payload](/v3/essentials/webhooks#transactiondepositstatusupdated).
+Payments made through a link are reported with the `payment.confirmed` event
+described above.
 
 ## Related
 

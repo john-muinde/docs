@@ -3,4 +3,4 @@ title: "Update Fiat Wallet"
 openapi: "PATCH /api/v3/wallet/fiat/{id}"
 ---
 
-Update the configuration and settings of an existing fiat wallet.
+Update an existing fiat wallet. Only `name`, `country` and `locked` can be changed, and `name` is required.

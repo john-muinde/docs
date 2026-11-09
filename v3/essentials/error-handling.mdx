@@ -10,33 +10,22 @@ was rejected, `5xx` means something failed on our side.
 
 **Always branch on the HTTP status code, and read `message` for the detail.**
 
-Error bodies are not identical across every endpoint — some carry `statusCode` and
-`error`, others carry `success` and `error_code`. Both always include `message`,
-and both put structured detail in `data`.
+Every error body has the same shape: `success` is `false`, `message` describes the
+problem, `error_code` repeats the HTTP status code, and `data` carries structured
+detail. Some errors also include an optional `code` with a machine-readable reason.
 
-<CodeGroup>
-```json Shape A
+```json
 {
-  "statusCode": 429,
+  "success": false,
   "message": "Too many requests. You have exceeded the limit of 60 requests per 60 seconds. Please wait before trying again.",
-  "error": "Too Many Requests",
+  "error_code": 429,
   "data": { "retryAfter": 60 }
 }
 ```
 
-```json Shape B
-{
-  "success": false,
-  "message": "Descriptive error message",
-  "error_code": 400,
-  "data": { }
-}
-```
-</CodeGroup>
-
 <Warning>
-Don't key your error handling off `error_code` or `success` alone — they aren't
-present on every error. The HTTP status code is the reliable signal.
+The HTTP status code is the most reliable signal. Branch on it first, then read
+`message` for the detail.
 </Warning>
 
 Successful responses are consistent:
@@ -79,6 +68,9 @@ For validation failures, `data.errors` lists the individual field problems:
 }
 ```
 
+Unknown fields in a request body are rejected with `400`. Send only the fields the
+endpoint documents.
+
 ## Suspended customers
 
 If a `customer_key` belongs to a suspended customer, the request returns `403` with
@@ -104,9 +96,9 @@ rather than raising the limit. They're grouped by what the endpoint does:
 
 | What you're calling | Sustained limit | Short burst |
 |---|---|---|
-| **Reading data** — status checks, lists, lookups | 100 per 5 seconds | 20 per 5 seconds |
-| **Moving money** — deposits, payouts, transfers | 60 per minute | 20 per 5 seconds |
-| **Signing in and managing keys** | 10 per minute | 3 per 10 seconds |
+| **Creating deposits and withdrawals**, and name lookup and account validation | 10 per minute | 3 per 10 seconds |
+| **Status checks and rate lookups** | 100 per 5 seconds | 20 per 5 seconds |
+| **Everything else** | 60 per minute | 20 per 5 seconds |
 
 The burst limit catches rapid-fire requests inside a few seconds even when you're
 under the sustained limit, so pace retries rather than firing them together.
@@ -118,7 +110,7 @@ up with the per-endpoint limits above, that's usually why — contact support an
 we'll confirm.
 
 <Note>
-These are the standard limits. They're configurable per account, and high-volume
+These are the standard limits. They can be adjusted per account, and high-volume
 integrators can be raised or exempted — talk to your account manager, or reach
 support through your usual channel, if you're designing something that needs it.
 </Note>

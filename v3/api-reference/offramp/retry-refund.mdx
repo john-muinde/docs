@@ -3,4 +3,4 @@ title: "Retry Failed Refund"
 openapi: "POST /api/v3/offramp/retry-refund/{referenceId}"
 ---
 
-Retry a failed crypto refund for an offramp transaction. Can be retried up to 3 times.
+Retry a failed crypto refund for an offramp transaction. You can retry up to 10 attempts in total for gas or fund errors and up to 4 for other errors.

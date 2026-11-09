@@ -3,4 +3,4 @@ title: "Preview Bulk Payment Batches"
 openapi: "POST /api/v3/dashboard/bulk-payments/api/preview"
 ---
 
-Preview bulk payment batches before creating them to review fees and totals.
+Preview bulk payment batches before creating them. The request body is the same as for creating batches (`recipients[]` and `walletSelections[]`). The preview shows the batches and totals only; no fees are computed.

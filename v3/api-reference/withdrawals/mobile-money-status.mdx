@@ -5,4 +5,6 @@ openapi: "GET /api/v3/withdraw/status/{reference_id}"
 
 This endpoint will return the status of the mobile money withdrawal request.
 
-The `reference_id` path parameter accepts either the Kotani platform reference ID or the telco/MNO transaction ID — whichever is available.
+The `reference_id` path parameter accepts our reference ID, the reference number, the telco ID or the provider reference, whichever is available.
+
+Polling is rate limited. You receive a `429` for very new transactions and when you poll the same reference again within its cooldown. Use [webhooks](/v3/essentials/webhooks) rather than polling in a tight loop.

@@ -21,6 +21,7 @@ Terminal statuses include:
 - `DECLINED`
 - `PERMANENTLY_FAILED`
 - `REVERSED`
+- `ERROR_OCCURRED`
 
 ### Intermediate Statuses
 
@@ -36,8 +37,7 @@ Intermediate statuses include:
 ### Special Statuses
 
 Special statuses are used for specific scenarios:
-- `DUPLICATE` - Transaction is a duplicate of an existing one
-- `ERROR_OCCURRED` - An error occurred during processing
+- `DUPLICATE_PENDING` - A withdrawal held as a suspected duplicate (see [Withdrawal Transaction Statuses](#withdrawal-transaction-statuses))
 - `REQUIRE_REVIEW` - Transaction requires manual review
 - `NOT_INITIATED` - Transaction has not been initiated yet
 
@@ -72,7 +72,7 @@ Used for mobile money deposits, bank deposits, and card deposits.
 </ParamField>
 
 <ParamField path="EXPIRED" type="string">
-  **Terminal Status** - Payment request expired before customer completed payment (typically 30 minutes timeout).
+  **Terminal Status** - A pending deposit that is never confirmed is expired after up to 48 hours. (An onramp with no payment is cancelled after 30 minutes instead.)
 </ParamField>
 
 <ParamField path="CANCELLED" type="string">
@@ -87,12 +87,8 @@ Used for mobile money deposits, bank deposits, and card deposits.
   **Terminal Status** - Payment was reversed/refunded.
 </ParamField>
 
-<ParamField path="DUPLICATE" type="string">
-  Duplicate transaction detected (same reference ID already exists).
-</ParamField>
-
 <ParamField path="ERROR_OCCURRED" type="string">
-  An unexpected error occurred during processing.
+  **Terminal Status** - An unexpected error occurred during processing.
 </ParamField>
 
 <ParamField path="REQUIRE_REVIEW" type="string">
@@ -158,7 +154,11 @@ Used for mobile money withdrawals and bank withdrawals.
 </ParamField>
 
 <ParamField path="ERROR_OCCURRED" type="string">
-  An error occurred during withdrawal processing.
+  **Terminal Status** - An error occurred during withdrawal processing.
+</ParamField>
+
+<ParamField path="DUPLICATE_PENDING" type="string">
+  The withdrawal is held as a suspected duplicate. Release or cancel it with `POST /api/v3/withdraw/{referenceId}/resolve-duplicate` and the body `{"action": "proceed"}` or `{"action": "cancel"}`.
 </ParamField>
 
 <ParamField path="REQUIRE_REVIEW" type="string">
@@ -212,7 +212,7 @@ Tracks the crypto transfer status (sending crypto to external wallet).
 </ParamField>
 
 <ParamField path="CANCELLED" type="string">
-  **Terminal Status** - Crypto transfer cancelled (usually because deposit failed).
+  **Terminal Status** - Only set when an onramp receives no payment and is cancelled after 30 minutes. If the deposit fails or is cancelled, `onchainStatus` becomes `FAILED` instead (error code `DEPOSIT_FAILED`).
 </ParamField>
 
 ---
@@ -285,6 +285,7 @@ Internal statuses tracking callback delivery to your webhook URL.
     - `DECLINED`
     - `PERMANENTLY_FAILED`
     - `REVERSED`
+    - `ERROR_OCCURRED`
   </Accordion>
 
   <Accordion title="Handling failures">
@@ -363,7 +364,7 @@ Onchain:  PENDING → IN_PROGRESS → SUCCESSFUL
 ### Failed Onramp Flow (Deposit Fails)
 ```
 Deposit:  PENDING → INITIATED → FAILED
-Onchain:  PENDING → CANCELLED
+Onchain:  PENDING → FAILED (error code DEPOSIT_FAILED)
 ```
 
 ### Failed Onramp Flow (Crypto Transfer Fails)

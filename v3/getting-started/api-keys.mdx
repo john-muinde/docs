@@ -27,9 +27,11 @@ API keys are used for server-to-server authentication with the Kotani Pay API. Y
 Include the key in the `Authorization` header of every API request:
 
 ```bash
-curl -X GET https://sandbox-api.kotanipay.com/health \
+curl -X GET https://sandbox-api.kotanipay.com/api/v3/wallet/fiat \
   -H "Authorization: Bearer eyJ1c2VyX2lkIjoiYWJjMTIzIi4uLn0=.a1b2c3d4..."
 ```
+
+Use `GET /api/v3/wallet/fiat` as your key test: it is read-only and only succeeds with a valid key. `GET /health` is unauthenticated, so it succeeds even with a wrong key.
 
 ---
 

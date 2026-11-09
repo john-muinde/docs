@@ -23,7 +23,7 @@ Fetch the current exchange rate before initiating so you can show the customer w
 
 ## 2. Initiate the Onramp
 
-Call [Create Onramp](/v3/api-reference/onramp/create) with your `callbackUrl` and the destination crypto wallet address. The API responds immediately with a `PENDING` transaction. The exchange rate is locked at this point.
+Call [Create Onramp](/v3/api-reference/onramp/create) with your `callbackUrl` and the destination crypto wallet address. The response returns `id`, `referenceId`, `referenceNumber`, `message`, `customerKey`, `redirectUrl` and `hosted`. The rate is locked only when you pass a `rateId` from the rate quote in step 1, and a `rateId` is valid for 60 seconds.
 
 <Note>
 For currencies shared by several countries (XOF, XAF), the payment is collected in the phone number's country. You can also send `country` to state it. See [Which country the payment is collected in](/v3/api-reference/onramp/create#which-country-the-payment-is-collected-in).
@@ -34,7 +34,7 @@ For currencies shared by several countries (XOF, XAF), the payment is collected 
 ## 3. Customer Pays
 
 - **Mobile money** — the customer receives an STK push (M-PESA, Airtel) or USSD prompt (MTN, others) and confirms by entering their PIN
-- **Bank checkout** — the response includes a `checkoutUrl`; redirect the customer there to complete payment on the bank's page
+- **Bank checkout**: the response includes a `redirectUrl`; redirect the customer there to complete payment on the bank's page
 
 The customer has not paid yet when you receive the initial response — they must complete their confirmation step.
 
@@ -42,24 +42,30 @@ The customer has not paid yet when you receive the initial response — they mus
 
 ## 4. Crypto is Delivered
 
-Once fiat payment confirms, Kotani Pay converts at the locked rate and sends crypto to the wallet:
+Onramp has two independent status fields, `depositStatus` (the fiat payment) and `onchainStatus` (the crypto delivery). Once fiat payment confirms, Kotani Pay sends the crypto to the wallet:
 
-- `CRYPTO_PENDING` — fiat confirmed, crypto transfer in progress
-- `PROCESSING` — blockchain transaction submitted, awaiting on-chain confirmations
-- `SUCCESS` — crypto delivered
+| `depositStatus` | `onchainStatus` | Meaning |
+|---|---|---|
+| `PENDING` or `INITIATED` | `PENDING` | Waiting for the customer to pay |
+| `SUCCESSFUL` | `PENDING` or `IN_PROGRESS` | Fiat confirmed, crypto transfer in progress |
+| `SUCCESSFUL` | `SUCCESSFUL` | Crypto delivered (`transactionHash` is set) |
+| `SUCCESSFUL` | `FAILED` | Fiat collected but the crypto transfer failed |
+| `FAILED` or `CANCELLED` | `FAILED` | The customer did not pay |
+
+See [Transaction Statuses](/v3/essentials/transaction-statuses) for every value.
 
 <Warning>
-If the crypto transfer fails after fiat is collected, the fiat amount is automatically refunded to your fiat wallet.
+If the crypto transfer fails after fiat is collected, it is retried once automatically. If it fails again, it needs support. The fiat stays credited to your deposit balance; it is not refunded automatically.
 </Warning>
 
 ---
 
 ## 5. Kotani Pay Notifies You
 
-Kotani Pay POSTs to your `callbackUrl` when the transaction reaches a terminal state:
+Kotani Pay POSTs to your `callbackUrl` once the deposit is `SUCCESSFUL`, `FAILED` or `CANCELLED` and the on-chain leg is `SUCCESSFUL` or `FAILED`:
 
-- `SUCCESS` — crypto delivered to the wallet
-- `FAILED` — transaction failed; fiat refunded automatically
+- `depositStatus` `SUCCESSFUL` and `onchainStatus` `SUCCESSFUL`: crypto delivered to the wallet
+- `onchainStatus` `FAILED`: the crypto was not delivered (either the customer did not pay, or the transfer failed after fiat was collected)
 
 <Note>
 If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks) for both modes, and the [onramp payload](/v3/essentials/webhooks#transactiononrampstatusupdated) for every field you receive with a worked example.
@@ -69,8 +75,8 @@ If you have a webhook secret configured, the callback arrives in a signed envelo
 
 ## 6. Poll for Status
 
-- [Get Onramp Status (by Reference ID)](/v3/api-reference/onramp/get-status) — standard onramp status
-- [Get Crypto Onramp Status (by Reference ID)](/v3/api-reference/onramp/get-crypto-status) — crypto delivery status
+- [Get Onramp Status (by Reference ID)](/v3/api-reference/onramp/status): standard onramp status
+- [Get Crypto Onramp Status (by Reference ID)](/v3/api-reference/onramp/crypto-status): crypto delivery status
 
 ---
 

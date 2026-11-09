@@ -9,28 +9,30 @@ A payment link is a hosted checkout page that Kotani Pay generates for you. Crea
 
 ## Before You Start
 
-- An API key — see [API Keys](/v3/getting-started/api-keys)
 - A fiat wallet for the currency you're collecting in
-- A `callbackUrl` on your server for payment notifications
+- A `callbackUrl` on your server for payment notifications (optional; if the link has none, notifications go to your webhook URL)
+
+<Note>
+The payment link endpoints need a dashboard session, not an API key. Create and manage links from the dashboard. They are not available to API key requests.
+</Note>
 
 ---
 
 <Tip>
-If you don't need links generated programmatically, you can create and share one
-from the dashboard without writing any code — see [Payment
+Create and share a link from the dashboard without writing any code. See [Payment
 Links](/v3/essentials/payment-links).
 </Tip>
 
 ## 1. Create the Payment Link
 
-Call `POST /api/v3/dashboard/payment-links`. At a minimum you'll configure:
+In the dashboard, create a link and choose:
 
-- **Pricing type** — fixed amount, variable (customer chooses within a range), package tiers, or open customer choice
-- **Payment methods** — which of mobile money, bank checkout, card, and crypto to enable
-- **Usage limit** — single-use, limited to a max count, or unlimited
-- **callbackUrl** — where to receive payment notifications
+- **Pricing type**: fixed amount, variable (customer chooses within a range), package tiers, or open customer choice
+- **Payment methods**: which of mobile money, bank checkout, card, and crypto to enable
+- **Usage limit**: single-use, limited to a max count, or unlimited
+- **callbackUrl**: where to receive payment notifications
 
-The response includes the link URL (e.g. `https://pay.kotanipay.com/l/{shortCode}`). Share it via SMS, email, social, or embed it as a button.
+The link URL has the form `<payment page base>/pay/{shortCode}`; the dashboard shows the full URL. Share it via SMS, email, social, or embed it as a button.
 
 ---
 
@@ -47,26 +49,12 @@ The customer opens the link in their browser. What happens next depends on the m
 
 ## 3. Kotani Pay Notifies You
 
-Payment link transactions are backed by standard deposit transactions. When a payment settles, Kotani Pay fires a `transaction.deposit.status.updated` event to your `callbackUrl`. The payload includes the standard deposit fields plus identifiers for the originating payment link.
+When a payment succeeds, Kotani Pay sends a `payment.confirmed` event to the link's `callbackUrl`, or to your webhook URL if the link has none. There is no failure event.
 
-- `SUCCESSFUL` — payment received, your deposit balance will be credited
-- `FAILED` — payment failed or timed out
-
-<Note>
-If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks).
-</Note>
-
----
-
-## 4. Poll for Status
-
-- `GET /api/v3/dashboard/payment-links/transactions/reference/{referenceId}` — status of a specific payment
-- `GET /api/v3/dashboard/payment-links/{id}/transactions` — all payments for a given link
-- `GET /api/v3/dashboard/payment-links/{id}/analytics` — totals for a given link
+The payload is `{object: 'payment_link_transaction', referenceId, paymentLinkId, shortCode, status, paymentMethod, amount, currency, token?, network?, transactionHash?, depositId?, customer: {name, email}, completedAt}`. See [Payment Links](/v3/essentials/payment-links#after-the-payment) for an example.
 
 <Note>
-The per-link routes take the link's `id` as returned by the create call, not its
-short code.
+If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. See [Webhooks](/v3/essentials/webhooks).
 </Note>
 
 ---

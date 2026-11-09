@@ -138,7 +138,7 @@ As soon as the payment completes, the crypto is sent to `receiverAddress`. Deliv
 | `SUCCESSFUL` | `SUCCESSFUL` | Crypto delivered; `transactionHash` is set. |
 | `CANCELLED` or `FAILED` | `FAILED` | The customer did not pay. Nothing was collected. |
 
-You receive a callback on your `callbackUrl` when the onramp reaches a final state, and you can poll [Get Onramp Status](/v3/api-reference/onramp/get-status) at any time. The status response's `rate.hosted` holds the same breakdown as the quote.
+You receive a callback on your `callbackUrl` when the onramp reaches a final state, and you can poll [Get Onramp Status](/v3/api-reference/onramp/status) at any time. The status response's `rate.hosted` holds the same breakdown as the quote.
 
 ---
 

@@ -3,8 +3,10 @@ title: "Validate Bank Account"
 openapi: "POST /api/v3/customer/validate/bank"
 ---
 
-Checks a bank account before you pay it: the account number format, the bank code,
-and whether the country is supported.
+Checks a bank account before you pay it: the account number format and whether
+the country is supported. The bank code is not checked. The account format is
+checked strictly only for NG (exactly 10 digits); elsewhere the account number
+must be 6 to 34 alphanumeric characters.
 
 With name lookup enabled, the response also carries the name registered on the
 account and its status — a frozen or restricted account will usually reject an

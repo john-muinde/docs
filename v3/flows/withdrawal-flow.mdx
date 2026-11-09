@@ -19,13 +19,15 @@ You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl
 
 **1. Create the customer** if you haven't already. The customer record holds the recipient's phone number and network details.
 
-**2. Initiate the withdrawal** — call [Mobile Money Withdrawal](/v3/api-reference/withdrawals/mobile-money) with your `callbackUrl`. The API responds immediately with a `PENDING` transaction. Your payout balance is debited at this point.
+**2. Initiate the withdrawal**: call [Mobile Money Withdrawal](/v3/api-reference/withdrawals/mobile-money) with your `callbackUrl`. The create response returns `id`, `message`, `referenceId` and `referenceNumber`, not a status. The withdrawal is `PENDING` until the callback arrives. Your payout balance is debited at this point.
 
 **3. The recipient receives funds.** If the disbursement succeeds, the customer receives an SMS confirmation from the mobile money network.
 
-**4. Kotani Pay notifies you** via your `callbackUrl` when the transaction settles:
-- `SUCCESSFUL` — funds delivered to the recipient
-- `FAILED` — disbursement failed (invalid number, network error, etc.); your payout balance is **automatically reversed**
+**4. Kotani Pay notifies you** via your `callbackUrl` once the withdrawal reaches a final status. The callback can carry any final status: `SUCCESSFUL`, `FAILED`, `CANCELLED`, `DECLINED`, `REVERSED`, `EXPIRED` or `ERROR_OCCURRED`.
+- `SUCCESSFUL`: funds delivered to the recipient
+- `FAILED` and the other unsuccessful final statuses: the disbursement did not complete (invalid number, network error, etc.); your payout balance is **automatically reversed**
+
+**Held as a possible duplicate.** A withdrawal that looks like a duplicate of a recent one is held with the status `DUPLICATE_PENDING` and you receive a callback for it. Release it or cancel it with `POST /api/v3/withdraw/{referenceId}/resolve-duplicate` and the body `{"action": "proceed"}` or `{"action": "cancel"}`.
 
 <Note>
 If you have a webhook secret configured, the callback arrives in a signed envelope with `X-Kotani-Signature`, `X-Kotani-Event`, and `X-Kotani-Integrator` headers. Without a secret, the transaction fields are posted directly to your `callbackUrl`. See [Webhooks](/v3/essentials/webhooks) for both modes, and the [withdrawal payload](/v3/essentials/webhooks#transactionwithdrawalstatusupdated) for every field you receive with a worked example.
@@ -39,7 +41,7 @@ If you have a webhook secret configured, the callback arrives in a signed envelo
 
 Two additional disbursement methods are available for Kenya:
 
-- **Lipa na M-Pesa** — sends to a till number or triggers an STK push — [Lipa na M-Pesa Withdrawal](/v3/api-reference/withdrawals/lipa-na-mpesa)
+- **Lipa na M-Pesa**: pays a till number (Buy Goods): [Lipa na M-Pesa Withdrawal](/v3/api-reference/withdrawals/lipa-na-mpesa)
 - **Paybill** — sends to a paybill number with an account reference — [Paybill Withdrawal](/v3/api-reference/withdrawals/paybill)
 
 The flow is the same — initiate, wait for callback, poll if needed.
@@ -48,9 +50,9 @@ The flow is the same — initiate, wait for callback, poll if needed.
 
 ## Bank Withdrawal
 
-Currently supported in Kenya and South Africa.
+Supported for KES, ZAR, ETB and NGN bank accounts.
 
-**1. Get supported banks** for the target currency — [GET /api/v3/customer/support/banks](v3/api-reference/country-support/banks). This gives you the bank codes to use in the request.
+**1. Get supported banks** for the target currency: [GET /api/v3/customer/support/banks](/v3/api-reference/country-support/banks). This gives you the bank codes to use in the request.
 
 **2. Initiate the withdrawal** — call [Bank Withdrawal](/v3/api-reference/withdrawals/bank-v2) with your `callbackUrl` and the recipient's bank account details.
 

@@ -4,3 +4,9 @@ openapi: "POST /api/v3/dashboard/bulk-payments/api/validate-csv"
 ---
 
 Validate a CSV file for bulk payments with multi-currency support before creating batches.
+
+Send the file as `multipart/form-data` in the field `file` (maximum 10 MB). The optional query parameter `defaultCurrency` is used for rows that have no currency.
+
+The CSV columns are `recipient_name`, `recipient_email`, `recipient_phone`, `amount`, `reference`, `network` and `currency`. `currency` is optional when you pass `defaultCurrency`. Header names are case-insensitive.
+
+The response includes a `fileHash` and an `isDuplicate` flag.
