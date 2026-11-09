@@ -87,6 +87,33 @@ Don't build your own rounding on top of ours. Use the values we return rather th
 recalculating from `amount` and a fee percentage — you'll drift by a unit.
 </Tip>
 
+## Fee structure and transaction limits
+
+Fees and limits are set on your account for each country and service
+(collections, payouts, card payments), so two accounts can see different values
+for the same corridor. Each one has:
+
+- **A rate**: a percentage, a flat amount, or both. Some accounts have tiers,
+  where the rate depends on the size of the transaction.
+- **A minimum fee** (optional). When the rate would come to less, the minimum fee
+  is charged instead. Without one, every amount is charged at the rate.
+- **A maximum fee** (optional). The fee never goes above it, however large the
+  transaction.
+- **A minimum and maximum transaction amount**. A request outside that range is
+  rejected with `400`, and the message names the limit, for example
+  `Transaction amount is below the minimum limit of 100 KES`. See
+  [Errors](/v3/essentials/error-handling#amount-outside-your-limits).
+
+When your customer pays the fee, the limits are also checked on the amount after
+the fee: what your recipient is paid on a payout, or what your customer is
+charged on a collection. A payout just above the minimum can still be rejected
+once the fee comes off it.
+
+Your current fees and limits are in [the dashboard](https://backoffice.kotanipay.com)
+under **Settings → Pricing**, shown in the transaction currency. Because they can
+change, read them there rather than hard-coding them, and handle the `400` so
+your users see the limit in the message.
+
 ## Finding your arrangement
 
 You can see this in [the dashboard](https://backoffice.kotanipay.com) for each of

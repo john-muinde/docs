@@ -71,6 +71,27 @@ For validation failures, `data.errors` lists the individual field problems:
 Unknown fields in a request body are rejected with `400`. Send only the fields the
 endpoint documents.
 
+## Amount outside your limits
+
+Each country and service on your account has a minimum and maximum transaction
+amount. A request outside that range returns `400`, and the message names the
+limit in the transaction currency:
+
+```json
+{
+  "success": false,
+  "message": "Transaction amount is below the minimum limit of 100 KES. Please increase your transaction amount for your account.",
+  "error_code": 400,
+  "data": {}
+}
+```
+
+Above the maximum, the message reads `Transaction amount exceeds the maximum
+supported limit of ...`. When your customer pays the fee, the amount after the fee
+is checked as well, and the message starts with `Amount after fees`. Show the
+message to your user as it is: it already says what amount to send. Your current
+limits are in the dashboard; see [Fees & Billing](/v3/essentials/billing-types#fee-structure-and-transaction-limits).
+
 ## Suspended customers
 
 If a `customer_key` belongs to a suspended customer, the request returns `403` with
