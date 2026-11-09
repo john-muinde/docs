@@ -3,4 +3,4 @@ title: "Get Available Networks"
 openapi: "GET /api/v3/customer/support/networks/{countryCode}"
 ---
 
-Get the active mobile money networks available in a specific country. The response contains only `countryCode`, `networks` and `isRequired`; it does not include network codes or phone number prefixes.
+Get the mobile money networks available in a country (`networks`) and whether a network must be sent with a payment there (`isRequired`). Use these values as the `network` field when you create a customer or a payment.

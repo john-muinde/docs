@@ -3,4 +3,4 @@ title: "Get Withdraw Service Configuration"
 openapi: "GET /api/v3/customer/support/services/withdraw"
 ---
 
-Get the list of countries that support withdrawals. The response does not include payment methods, fees or limits.
+Get the countries where withdrawals are available: for each, the currency, whether the service is active, whether it is enabled for your account (`isEnabled`), and whether a network or account name must be sent with a payout there. For the cost of a payout, see [Rates](/v3/api-reference/rates/offramp-rate) and [Fees & Billing](/v3/essentials/billing-types).

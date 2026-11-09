@@ -3,6 +3,6 @@ title: "Get Country Details"
 openapi: "GET /api/v3/customer/support/countries/{countryCode}"
 ---
 
-Get details about a specific country, including supported currencies, networks and service availability. The response does not include banks.
+Get details about a country: its currencies, mobile money networks, which fields a payment there requires, and whether deposits and withdrawals are supported and enabled for your account. For the banks in a country, use [List Banks](/v3/api-reference/country-support/banks).
 
 An unknown country returns empty arrays with `isSupported` set to `false`, not a `404`.

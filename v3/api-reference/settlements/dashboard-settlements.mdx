@@ -27,7 +27,7 @@ See [Settlement Schedule](/v3/api-reference/settlements/schedule).
 | `minAmount` | number | Minimum settlement amount in USD |
 | `maxAmount` | number | Maximum settlement amount in USD |
 
-The schedule (`enabled`, `allowedDays` and the cutoff) is currently enforced only on admin-created requests. For API requests it is informational, while `minAmount` and `maxAmount` are enforced.
+The schedule and the amount limits apply to every new request, single or batch.
 
 ---
 

@@ -66,7 +66,7 @@ Key fields:
 - `minAmount` / `maxAmount`: both in USD; your local-currency amount is converted before this check. These limits are enforced on API requests.
 
 <Note>
-The schedule (`enabled`, `allowedDays` and the cutoff) is currently enforced only on requests created by Kotani Pay admins. For requests you submit through the API it is informational, while `minAmount` and `maxAmount` are enforced.
+The schedule applies to every new request, single or batch. Check it before you submit, so a request on a closed day or after the cutoff does not come back as a `400`.
 </Note>
 
 ---

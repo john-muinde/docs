@@ -380,11 +380,19 @@ Fires when a withdrawal reaches a final status: `SUCCESSFUL`, `FAILED`, `CANCELL
 </ParamField>
 
 <ParamField body="confirmationId" type="string">
-  Provider-level confirmation reference.
+  The payment receipt from the network or bank, when it gives one. Present on successful payouts only.
 </ParamField>
 
 <ParamField body="integratorFeeAmount" type="number">
-  Additional integrator fee charged on the transaction, if configured.
+  Your fee on this payout, when your wallet has one configured. `transactionAmount` is already net of it.
+</ParamField>
+
+<ParamField body="integratorFee" type="number">
+  The fee rate or flat amount configured on your wallet, when there is one. Read it with `integratorFeeType`.
+</ParamField>
+
+<ParamField body="integratorFeeType" type="string">
+  How `integratorFee` is applied: `PERCENTAGE` or `FLAT`. Sent together with `integratorFee`.
 </ParamField>
 
 <ParamField body="errorMessage" type="string">

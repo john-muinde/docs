@@ -8,7 +8,7 @@ Bulk payments let you disburse to hundreds or thousands of recipients in a singl
 ---
 
 <Note>
-You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl`, see the [Quickstart](/v3/quickstart) if you haven't set those up. For this flow you also need a funded payout wallet for every currency in your CSV. Each payment fires its own withdrawal webhook to your configured webhook URL as it settles (the batch `callbackUrl` is not used for these).
+You need [an API key](/v3/getting-started/api-keys) and a reachable `callbackUrl`, see the [Quickstart](/v3/quickstart) if you haven't set those up. For this flow you also need a funded payout wallet for every currency in your CSV. Each payment fires its own withdrawal webhook as it settles: to the batch's `callbackUrl` when you set one, otherwise to your webhook URL.
 </Note>
 
 ## 1. Validate Your CSV
@@ -24,7 +24,7 @@ Fix any errors and re-upload. The response also includes a `fileHash` and an `is
 
 ## 2. Preview Batches
 
-Call [Preview Bulk Payment Batches](/v3/api-reference/bulk-payments/preview-batches) with the same body you will send to create the batches (`recipients[]` and `walletSelections[]`). This shows you how many batches will be created and the total per currency. No fees are computed.
+Call [Preview Bulk Payment Batches](/v3/api-reference/bulk-payments/preview-batches) with the same body you will send to create the batches (`recipients[]` and `walletSelections[]`). This shows you how many batches will be created and the total per currency.
 
 ---
 

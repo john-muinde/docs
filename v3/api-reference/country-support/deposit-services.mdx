@@ -3,4 +3,4 @@ title: "Get Deposit Service Configuration"
 openapi: "GET /api/v3/customer/support/services/deposit"
 ---
 
-Get the list of countries that support deposits. The response does not include payment methods, fees or limits.
+Get the countries where deposits are available: for each, the currency, whether the service is active, whether it is enabled for your account (`isEnabled`), and whether a network must be sent with a deposit there. For the cost of a deposit, see [Fees & Billing](/v3/essentials/billing-types).
