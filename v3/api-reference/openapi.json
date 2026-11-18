@@ -7883,7 +7883,7 @@
             }
           },
           "400": {
-            "description": "Bad Request. Also returned when the request includes card details.",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
@@ -7894,7 +7894,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Card details are not accepted. Leave out card and send the customer to the hosted checkout page in redirectUrl, where they enter their card."
+                      "example": "Bad Request"
                     },
                     "error_code": {
                       "type": "number",
@@ -11194,7 +11194,17 @@
           },
           "errorMessage": {
             "type": "string",
-            "description": "Error message if failed"
+            "description": "Why the payment failed, in our words (the same text as failureReason.message). Absent unless the payment failed."
+          },
+          "failureReason": {
+            "nullable": true,
+            "description": "Why the payment failed: our message and a stable code. Null unless the payment failed.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FailureReasonCamelDto"
+              }
+            ]
           },
           "retryCount": {
             "type": "number",
@@ -12374,28 +12384,7 @@
           },
           "network": {
             "type": "string",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "YAS",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "HALOTEL",
-              "VODACOM",
-              "WAVE"
-            ],
+            "description": "A mobile network code from the mobile networks list.",
             "example": "MPESA or MTN or AIRTEL or VODAFONE"
           },
           "account_name": {
@@ -12683,6 +12672,11 @@
           "network": {
             "type": "string",
             "description": "Mobile network / payout channel (e.g. MPESA, MTN)"
+          },
+          "account_name": {
+            "type": "string",
+            "description": "Recipient name for this payout. Optional: when omitted, the name last submitted for this customer is used. Where the operator offers a name lookup, the name the operator holds is what is sent.",
+            "example": "Jane Doe"
           }
         },
         "required": [
@@ -12864,6 +12858,16 @@
             "description": "Customer key. Only returned for ZAR payments.",
             "example": "customer-key-123"
           },
+          "nextAction": {
+            "nullable": true,
+            "description": "What to show the customer next (redirect to the checkout page, bank details to pay into, a prompt to approve). The object itself uses snake_case. Null when the next step is not known.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DepositNextActionDto"
+              }
+            ]
+          },
           "bankPaymentDetails": {
             "description": "Bank transfer instructions: a KES PesaLink account for PAYBYBANK in KES, or an NGN virtual account",
             "allOf": [
@@ -12885,7 +12889,8 @@
           "id",
           "referenceId",
           "referenceNumber",
-          "message"
+          "message",
+          "nextAction"
         ]
       },
       "DepositCheckoutStatusResponseDto": {
@@ -12930,7 +12935,7 @@
             "format": "date-time",
             "type": "string",
             "description": "created at",
-            "example": "2026-11-09T09:14:35.257Z"
+            "example": "2026-11-18T15:55:09.627Z"
           },
           "transactionCost": {
             "type": "number",
@@ -12946,6 +12951,16 @@
             "type": "string",
             "description": "customer key",
             "example": ""
+          },
+          "nextAction": {
+            "nullable": true,
+            "description": "What to show the customer next, while the deposit is still open. Null once it has a final status or the instructions have expired. The object itself uses snake_case.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DepositNextActionDto"
+              }
+            ]
           },
           "initialDepositBalance": {
             "type": "number",
@@ -12967,7 +12982,99 @@
           "referenceNumber",
           "createdAt",
           "transactionCost",
-          "transactionAmount"
+          "transactionAmount",
+          "nextAction"
+        ]
+      },
+      "DepositNextActionDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "redirect",
+              "push_prompt",
+              "async_link",
+              "customer_action",
+              "address_payment",
+              "none"
+            ],
+            "description": "What to show the customer. redirect: send them to redirect_url. push_prompt: a prompt was sent to their phone to approve. async_link: a payment link was sent to them by SMS. customer_action: show instructions (bank details, a USSD string). address_payment: show a crypto address. none: nothing to show.",
+            "example": "push_prompt"
+          },
+          "redirect_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Where to send the customer, for type redirect. Null otherwise.",
+            "example": "https://checkout.example.com/pay/abc123"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true,
+            "description": "One short sentence you can show the customer as is. Null when there is nothing to show.",
+            "example": "Approve the payment prompt sent to your phone."
+          },
+          "instructions": {
+            "nullable": true,
+            "description": "What the customer must do to pay, for type customer_action and address_payment. Null otherwise.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaymentInstructionsDto"
+              }
+            ]
+          },
+          "expires_at": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISO 8601 time after which this next step stops working. Null when it does not expire or the expiry is unknown.",
+            "example": "2026-01-01T12:30:00.000Z"
+          }
+        },
+        "required": [
+          "type",
+          "redirect_url",
+          "message",
+          "instructions",
+          "expires_at"
+        ]
+      },
+      "DepositPartialPaymentDto": {
+        "type": "object",
+        "properties": {
+          "amount_requested": {
+            "type": "number",
+            "description": "What the customer was asked to pay (same as amount)",
+            "example": 1000
+          },
+          "amount_received": {
+            "type": "number",
+            "description": "What the provider confirmed arrived",
+            "example": 900
+          },
+          "amount_credited": {
+            "type": "number",
+            "nullable": true,
+            "description": "What your wallet was credited, after costs and fees",
+            "example": 855
+          },
+          "shortfall": {
+            "type": "number",
+            "description": "amount_requested minus amount_received",
+            "example": 100
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "example": "KES"
+          }
+        },
+        "required": [
+          "amount_requested",
+          "amount_received",
+          "amount_credited",
+          "shortfall",
+          "currency"
         ]
       },
       "DepositPayerDto": {
@@ -13073,13 +13180,24 @@
           },
           "redirect_url": {
             "type": "string"
+          },
+          "next_action": {
+            "nullable": true,
+            "description": "What to show the customer next. Null when the next step is not known yet (a payment queued for the payment provider): read it from the status endpoint.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DepositNextActionDto"
+              }
+            ]
           }
         },
         "required": [
           "id",
           "message",
           "reference_id",
-          "reference_number"
+          "reference_number",
+          "next_action"
         ]
       },
       "DepositStatusPublicResponseDto": {
@@ -13102,7 +13220,8 @@
               "REQUIRE_REVIEW",
               "SUCCESS",
               "RETRY",
-              "PERMANENTLY_FAILED"
+              "PERMANENTLY_FAILED",
+              "IN_RECONCILIATION"
             ],
             "description": "Current status of the deposit"
           },
@@ -13244,6 +13363,21 @@
             "nullable": true,
             "description": "Amount actually received from the customer, when it is known and may differ from amount"
           },
+          "is_partial_payment": {
+            "type": "boolean",
+            "description": "True when the deposit is SUCCESSFUL but the customer paid less than amount, and your wallet was credited from what arrived. See partial_payment.",
+            "example": false
+          },
+          "partial_payment": {
+            "nullable": true,
+            "description": "Set when is_partial_payment is true: what was asked, what arrived and what was credited. Null when the deposit was paid in full.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DepositPartialPaymentDto"
+              }
+            ]
+          },
           "payment_destination": {
             "nullable": true,
             "description": "Where the customer was told to pay. Null for rails with no destination account, such as mobile money.",
@@ -13264,6 +13398,16 @@
               }
             ]
           },
+          "next_action": {
+            "nullable": true,
+            "description": "What to show the customer next, while the deposit is still open (PENDING or IN_PROGRESS). Null once the deposit has a final status, once the instructions have expired, and when the next step is not known.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DepositNextActionDto"
+              }
+            ]
+          },
           "callback_url_status": {
             "type": "number",
             "nullable": true,
@@ -13272,7 +13416,15 @@
           },
           "error_message": {
             "type": "string",
-            "description": "Reason the deposit did not succeed. Only present once the deposit has reached a final non-successful status."
+            "description": "Our description of why the deposit did not succeed (never the provider’s own text). Only present once the deposit has reached a final non-successful status. Same text as failure_reason.message."
+          },
+          "failure_reason": {
+            "description": "Structured reason the deposit did not succeed: a stable code, our message, wording to show your customer, and whether to retry. Only present once the deposit has reached a final non-successful status.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FailureReasonSnakeDto"
+              }
+            ]
           }
         },
         "required": [
@@ -13295,8 +13447,11 @@
           "type",
           "phone_number",
           "amount_paid",
+          "is_partial_payment",
+          "partial_payment",
           "payment_destination",
           "payer",
+          "next_action",
           "callback_url_status"
         ]
       },
@@ -13332,7 +13487,8 @@
               "REQUIRE_REVIEW",
               "SUCCESS",
               "RETRY",
-              "PERMANENTLY_FAILED"
+              "PERMANENTLY_FAILED",
+              "IN_RECONCILIATION"
             ]
           },
           "amount": {
@@ -13393,7 +13549,15 @@
           },
           "error_message": {
             "type": "string",
-            "description": "Reason the transaction failed. Only present on a final non-successful status."
+            "description": "Our description of why the transaction failed (never the provider’s own text). Only present on a final non-successful status. Same text as failure_reason.message."
+          },
+          "failure_reason": {
+            "description": "Structured reason the transaction failed: a stable code, our message, wording to show your customer, and whether to retry. Only present on a final non-successful status.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FailureReasonSnakeDto"
+              }
+            ]
           },
           "created_at": {
             "format": "date-time",
@@ -13415,6 +13579,133 @@
           "network",
           "customer_key",
           "created_at"
+        ]
+      },
+      "FailureCode": {
+        "type": "string",
+        "enum": [
+          "NOT_APPROVED_IN_TIME",
+          "INSUFFICIENT_FUNDS",
+          "WRONG_PIN",
+          "ACCOUNT_LOCKED",
+          "NO_MOBILE_MONEY_ACCOUNT",
+          "INVALID_PHONE_NUMBER",
+          "CUSTOMER_LIMIT_REACHED",
+          "CANCELLED_BY_CUSTOMER",
+          "DUPLICATE_TOO_SOON",
+          "AMOUNT_OUT_OF_RANGE",
+          "NETWORK_DECLINED_NO_REASON",
+          "NETWORK_UNAVAILABLE",
+          "PROVIDER_UNREACHABLE",
+          "KOTANI_FLOAT_LOW",
+          "KOTANI_CONFIGURATION",
+          "UNKNOWN",
+          "ACCOUNT_NOT_ACTIVE",
+          "NOT_COMPLETED",
+          "CARD_AUTHENTICATION_FAILED",
+          "NAME_MISMATCH",
+          "INVALID_RECIPIENT_DETAILS",
+          "FREQUENCY_LIMIT_REACHED",
+          "PROVIDER_ERROR",
+          "NETWORK_NOT_SUPPORTED",
+          "SESSION_IN_PROGRESS",
+          "CUSTOMER_UNREACHABLE",
+          "CARD_DECLINED"
+        ],
+        "description": "Stable code for why the payment failed. The list is public and codes are never renamed or removed, so you can branch on it. Customer group: NOT_APPROVED_IN_TIME, INSUFFICIENT_FUNDS, WRONG_PIN, ACCOUNT_LOCKED, NO_MOBILE_MONEY_ACCOUNT, INVALID_PHONE_NUMBER, CUSTOMER_LIMIT_REACHED, CANCELLED_BY_CUSTOMER, DUPLICATE_TOO_SOON, AMOUNT_OUT_OF_RANGE. Network group: NETWORK_DECLINED_NO_REASON, NETWORK_UNAVAILABLE. Kotani group: PROVIDER_UNREACHABLE, KOTANI_FLOAT_LOW, KOTANI_CONFIGURATION (our team is notified automatically). Unknown group: UNKNOWN."
+      },
+      "FailureReasonCamelDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "Stable code for why the payment failed. The list is public and codes are never renamed or removed, so you can branch on it. Customer group: NOT_APPROVED_IN_TIME, INSUFFICIENT_FUNDS, WRONG_PIN, ACCOUNT_LOCKED, NO_MOBILE_MONEY_ACCOUNT, INVALID_PHONE_NUMBER, CUSTOMER_LIMIT_REACHED, CANCELLED_BY_CUSTOMER, DUPLICATE_TOO_SOON, AMOUNT_OUT_OF_RANGE. Network group: NETWORK_DECLINED_NO_REASON, NETWORK_UNAVAILABLE. Kotani group: PROVIDER_UNREACHABLE, KOTANI_FLOAT_LOW, KOTANI_CONFIGURATION (our team is notified automatically). Unknown group: UNKNOWN.",
+            "example": "INSUFFICIENT_FUNDS",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FailureCode"
+              }
+            ]
+          },
+          "group": {
+            "type": "string",
+            "enum": [
+              "customer",
+              "network",
+              "kotani",
+              "unknown"
+            ],
+            "description": "Whose side the failure is on: customer (their account, balance or action), network (the mobile network declined or was unavailable), kotani (our side, our team has been notified) or unknown.",
+            "example": "customer"
+          },
+          "message": {
+            "type": "string",
+            "description": "Our description of the failure, for you. Same text as transactionError.",
+            "example": "The customer’s mobile money balance is too low for this amount."
+          },
+          "customerMessage": {
+            "type": "string",
+            "description": "Wording you can show your own customer as is.",
+            "example": "Your mobile money balance is too low. Top up and try again."
+          },
+          "retryable": {
+            "type": "boolean",
+            "description": "Whether trying the same payment again can succeed (after the customer acts, for some codes).",
+            "example": true
+          }
+        },
+        "required": [
+          "code",
+          "group",
+          "message",
+          "customerMessage",
+          "retryable"
+        ]
+      },
+      "FailureReasonSnakeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "description": "Stable code for why the payment failed. The list is public and codes are never renamed or removed, so you can branch on it. Customer group: NOT_APPROVED_IN_TIME, INSUFFICIENT_FUNDS, WRONG_PIN, ACCOUNT_LOCKED, NO_MOBILE_MONEY_ACCOUNT, INVALID_PHONE_NUMBER, CUSTOMER_LIMIT_REACHED, CANCELLED_BY_CUSTOMER, DUPLICATE_TOO_SOON, AMOUNT_OUT_OF_RANGE. Network group: NETWORK_DECLINED_NO_REASON, NETWORK_UNAVAILABLE. Kotani group: PROVIDER_UNREACHABLE, KOTANI_FLOAT_LOW, KOTANI_CONFIGURATION (our team is notified automatically). Unknown group: UNKNOWN.",
+            "example": "INSUFFICIENT_FUNDS",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FailureCode"
+              }
+            ]
+          },
+          "group": {
+            "type": "string",
+            "enum": [
+              "customer",
+              "network",
+              "kotani",
+              "unknown"
+            ],
+            "description": "Whose side the failure is on: customer (their account, balance or action), network (the mobile network declined or was unavailable), kotani (our side, our team has been notified) or unknown.",
+            "example": "customer"
+          },
+          "message": {
+            "type": "string",
+            "description": "Our description of the failure, for you. Same text as error_message.",
+            "example": "The customer’s mobile money balance is too low for this amount."
+          },
+          "customer_message": {
+            "type": "string",
+            "description": "Wording you can show your own customer as is.",
+            "example": "Your mobile money balance is too low. Top up and try again."
+          },
+          "retryable": {
+            "type": "boolean",
+            "description": "Whether trying the same payment again can succeed (after the customer acts, for some codes).",
+            "example": true
+          }
+        },
+        "required": [
+          "code",
+          "group",
+          "message",
+          "customer_message",
+          "retryable"
         ]
       },
       "FiatRateRequestDto": {
@@ -13656,9 +13947,9 @@
           },
           "lastSyncedAt": {
             "type": "string",
+            "description": "When the token balances were last read from the chain. Null until the first sync.",
             "format": "date-time",
             "nullable": true,
-            "description": "When the token balances were last read from the chain. Null until the first sync.",
             "example": "2026-11-18T09:30:00.000Z"
           }
         },
@@ -13915,6 +14206,7 @@
                 "settlement.batch.partial",
                 "settlement.batch.cancelled",
                 "settlement.batch.consolidated",
+                "name_lookup.completed",
                 "system.event"
               ]
             }
@@ -14127,12 +14419,8 @@
             "example": "John Doe"
           },
           "network": {
-            "example": "MPESA",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Network"
-              }
-            ]
+            "type": "string",
+            "example": "MPESA"
           }
         },
         "required": [
@@ -14156,29 +14444,7 @@
           },
           "providerNetwork": {
             "type": "string",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "YAS",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "HALOTEL",
-              "VODACOM",
-              "WAVE"
-            ],
-            "description": "Mobile network of the phone number (Check Payment Providers API for the networks available in each country)",
+            "description": "Mobile network code, e.g. MTN, VODAFONE, AIRTEL or MPESA (check the Payment Providers API for the networks available per corridor).",
             "example": "MTN"
           }
         },
@@ -14201,29 +14467,7 @@
           },
           "networkProvider": {
             "type": "string",
-            "description": "Mobile money network (check the Payment Providers API for the networks available in the destination country)",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "YAS",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "HALOTEL",
-              "VODACOM",
-              "WAVE"
-            ],
+            "description": "Mobile network code, e.g. MTN, VODAFONE, AIRTEL or MPESA (check the Payment Providers API for the networks available per corridor).",
             "example": "MTN"
           }
         },
@@ -14268,31 +14512,6 @@
           "matched",
           "threshold",
           "masked"
-        ]
-      },
-      "Network": {
-        "type": "string",
-        "enum": [
-          "MTN",
-          "AIRTEL",
-          "VODAFONE",
-          "TIGO",
-          "YAS",
-          "ORANGE",
-          "NOT_SUPPORTED",
-          "ZAMTEL",
-          "MPESA",
-          "CHECKOUT",
-          "BKTRX",
-          "CRDTRX",
-          "MOOV",
-          "TMONEY",
-          "FREE",
-          "EXPRESSO",
-          "HALOPESA",
-          "HALOTEL",
-          "VODACOM",
-          "WAVE"
         ]
       },
       "NetworkAvailabilityResponseDto": {
@@ -14532,11 +14751,12 @@
               "EXPIRED",
               "REQUIRE_REVIEW",
               "NOT_INITIATED",
-              "TRANSACTION_INITIATED",
               "TRANSACTION_RETRY",
               "TRANSACTION_RETRY_SUCCESSFUL",
               "TRANSACTION_RETRY_FAILED",
-              "DUPLICATE_PENDING"
+              "DUPLICATE_PENDING",
+              "IN_RECONCILIATION",
+              "ON_HOLD"
             ],
             "description": "Status of the refund. Absent until a refund starts."
           },
@@ -14612,11 +14832,12 @@
               "EXPIRED",
               "REQUIRE_REVIEW",
               "NOT_INITIATED",
-              "TRANSACTION_INITIATED",
               "TRANSACTION_RETRY",
               "TRANSACTION_RETRY_SUCCESSFUL",
               "TRANSACTION_RETRY_FAILED",
-              "DUPLICATE_PENDING"
+              "DUPLICATE_PENDING",
+              "IN_RECONCILIATION",
+              "ON_HOLD"
             ],
             "description": "Overall status of the offramp (fiat payout)"
           },
@@ -14636,11 +14857,12 @@
               "EXPIRED",
               "REQUIRE_REVIEW",
               "NOT_INITIATED",
-              "TRANSACTION_INITIATED",
               "TRANSACTION_RETRY",
               "TRANSACTION_RETRY_SUCCESSFUL",
               "TRANSACTION_RETRY_FAILED",
-              "DUPLICATE_PENDING"
+              "DUPLICATE_PENDING",
+              "IN_RECONCILIATION",
+              "ON_HOLD"
             ],
             "description": "Status of the onchain (crypto receipt) leg"
           },
@@ -14711,11 +14933,12 @@
               "EXPIRED",
               "REQUIRE_REVIEW",
               "NOT_INITIATED",
-              "TRANSACTION_INITIATED",
               "TRANSACTION_RETRY",
               "TRANSACTION_RETRY_SUCCESSFUL",
               "TRANSACTION_RETRY_FAILED",
-              "DUPLICATE_PENDING"
+              "DUPLICATE_PENDING",
+              "IN_RECONCILIATION",
+              "ON_HOLD"
             ],
             "description": "Refund status after the retry was started"
           },
@@ -14823,7 +15046,8 @@
               "REQUIRE_REVIEW",
               "SUCCESS",
               "RETRY",
-              "PERMANENTLY_FAILED"
+              "PERMANENTLY_FAILED",
+              "IN_RECONCILIATION"
             ],
             "description": "The status of the onramp crypto transaction"
           },
@@ -15196,7 +15420,8 @@
               "REQUIRE_REVIEW",
               "SUCCESS",
               "RETRY",
-              "PERMANENTLY_FAILED"
+              "PERMANENTLY_FAILED",
+              "IN_RECONCILIATION"
             ],
             "description": "Deposit status"
           },
@@ -15217,7 +15442,8 @@
               "REQUIRE_REVIEW",
               "SUCCESS",
               "RETRY",
-              "PERMANENTLY_FAILED"
+              "PERMANENTLY_FAILED",
+              "IN_RECONCILIATION"
             ],
             "description": "Onchain status"
           },
@@ -15345,6 +15571,104 @@
         "required": [
           "paybillNumber",
           "accountNumber"
+        ]
+      },
+      "PaymentInstructionsDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "bank_transfer",
+              "ussd",
+              "mobile_money_paybill",
+              "mobile_money_till",
+              "crypto_address"
+            ],
+            "description": "What kind of instruction this is. Decides which fields below are filled.",
+            "example": "bank_transfer"
+          },
+          "bank_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "bank_transfer: the bank to pay into",
+            "example": "Example Bank"
+          },
+          "bank_code": {
+            "type": "string",
+            "nullable": true,
+            "description": "bank_transfer: the bank code, when one applies",
+            "example": "058"
+          },
+          "account_name": {
+            "type": "string",
+            "nullable": true,
+            "description": "bank_transfer: the name on the account",
+            "example": "KOTANI PAY"
+          },
+          "account_number": {
+            "type": "string",
+            "nullable": true,
+            "description": "bank_transfer: the account number to pay into",
+            "example": "0123456789"
+          },
+          "ussd_code": {
+            "type": "string",
+            "nullable": true,
+            "description": "ussd: the string the customer dials",
+            "example": "*737*000*1234#"
+          },
+          "paybill_number": {
+            "type": "string",
+            "nullable": true,
+            "description": "mobile_money_paybill: the PayBill number",
+            "example": "123456"
+          },
+          "till_number": {
+            "type": "string",
+            "nullable": true,
+            "description": "mobile_money_till: the till number",
+            "example": "654321"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true,
+            "description": "crypto_address: the address or invoice to pay",
+            "example": "bc1qexampleexampleexampleexampleexample"
+          },
+          "network": {
+            "type": "string",
+            "nullable": true,
+            "description": "crypto_address: the network the address is on",
+            "example": "bitcoin"
+          },
+          "reference": {
+            "type": "string",
+            "nullable": true,
+            "description": "What the customer must quote so the payment is matched to this deposit (a narration, a PayBill account number). Null when none is needed.",
+            "example": "KP1234567890"
+          },
+          "amount": {
+            "type": "number",
+            "nullable": true,
+            "description": "The exact amount to send, when the method needs it to match",
+            "example": 5000
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "description": "Currency of amount",
+            "example": "NGN"
+          },
+          "expires_at": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISO 8601 time after which these instructions stop working. Null when they do not expire or the expiry is unknown.",
+            "example": "2026-01-01T12:30:00.000Z"
+          }
+        },
+        "required": [
+          "type"
         ]
       },
       "PaymentProviderDto": {
@@ -15491,11 +15815,12 @@
               "EXPIRED",
               "REQUIRE_REVIEW",
               "NOT_INITIATED",
-              "TRANSACTION_INITIATED",
               "TRANSACTION_RETRY",
               "TRANSACTION_RETRY_SUCCESSFUL",
               "TRANSACTION_RETRY_FAILED",
-              "DUPLICATE_PENDING"
+              "DUPLICATE_PENDING",
+              "IN_RECONCILIATION",
+              "ON_HOLD"
             ],
             "description": "Refund status after the retry. Only present on success."
           },
@@ -16528,11 +16853,12 @@
               "EXPIRED",
               "REQUIRE_REVIEW",
               "NOT_INITIATED",
-              "TRANSACTION_INITIATED",
               "TRANSACTION_RETRY",
               "TRANSACTION_RETRY_SUCCESSFUL",
               "TRANSACTION_RETRY_FAILED",
-              "DUPLICATE_PENDING"
+              "DUPLICATE_PENDING",
+              "IN_RECONCILIATION",
+              "ON_HOLD"
             ],
             "description": "Refund status after the invoice was accepted"
           },
@@ -16639,6 +16965,7 @@
                 "settlement.batch.partial",
                 "settlement.batch.cancelled",
                 "settlement.batch.consolidated",
+                "name_lookup.completed",
                 "system.event"
               ]
             }
@@ -16659,28 +16986,7 @@
           },
           "network": {
             "type": "string",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "YAS",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "HALOTEL",
-              "VODACOM",
-              "WAVE"
-            ],
+            "description": "A mobile network code from the mobile networks list.",
             "example": "MPESA or MTN or AIRTEL or VODAFONE"
           },
           "account_name": {
@@ -16860,28 +17166,7 @@
           "network": {
             "type": "string",
             "description": "The mobile network the lookup was routed on — either the one you sent, or the one resolved from the number's prefix. Mobile money only.",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "YAS",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "HALOTEL",
-              "VODACOM",
-              "WAVE"
-            ]
+            "example": "MPESA"
           },
           "mno": {
             "type": "string",
@@ -16907,7 +17192,8 @@
               "UNSUPPORTED",
               "TIMEOUT",
               "ERROR",
-              "NOT_ENABLED"
+              "NOT_ENABLED",
+              "PENDING"
             ],
             "example": "MATCHED"
           },
@@ -17006,29 +17292,7 @@
           },
           "network": {
             "type": "string",
-            "description": "Mobile network, used to route the name lookup. Optional — it is resolved from the phone number prefix when omitted. Supply it only if the number has been ported, or if the response tells you the network could not be determined.",
-            "enum": [
-              "MTN",
-              "AIRTEL",
-              "VODAFONE",
-              "TIGO",
-              "YAS",
-              "ORANGE",
-              "NOT_SUPPORTED",
-              "ZAMTEL",
-              "MPESA",
-              "CHECKOUT",
-              "BKTRX",
-              "CRDTRX",
-              "MOOV",
-              "TMONEY",
-              "FREE",
-              "EXPRESSO",
-              "HALOPESA",
-              "HALOTEL",
-              "VODACOM",
-              "WAVE"
-            ],
+            "description": "Mobile network, used to route the name lookup. Optional — it is resolved from the phone number prefix when omitted. Supply it only if the number has been ported, or if the response tells you the network could not be determined. A mobile network code from the mobile networks list.",
             "example": "MPESA"
           },
           "accountName": {
@@ -17093,6 +17357,17 @@
           },
           "referenceNumber": {
             "type": "number"
+          },
+          "customer_key": {
+            "type": "string",
+            "description": "The customer this payout was paid to. For a bank payout, the key of the bank account in the request (found or created)."
+          },
+          "name_check": {
+            "type": "object",
+            "description": "Recipient name check. PENDING on creation: the check runs when the payout is dispatched; the withdrawal status carries the result.",
+            "example": {
+              "status": "PENDING"
+            }
           }
         },
         "required": [
@@ -17126,11 +17401,11 @@
               "EXPIRED",
               "REQUIRE_REVIEW",
               "NOT_INITIATED",
-              "TRANSACTION_INITIATED",
               "TRANSACTION_RETRY",
               "TRANSACTION_RETRY_SUCCESSFUL",
               "TRANSACTION_RETRY_FAILED",
-              "DUPLICATE_PENDING"
+              "DUPLICATE_PENDING",
+              "IN_RECONCILIATION"
             ],
             "description": "Current status of the withdrawal",
             "example": "SUCCESSFUL"
@@ -17205,7 +17480,15 @@
           },
           "transactionError": {
             "type": "string",
-            "description": "Error message from the provider or system. Only present once the withdrawal has ended unsuccessfully; never returned while it is PENDING or INITIATED, or after it is SUCCESSFUL."
+            "description": "Our description of why the withdrawal did not succeed (never the provider’s own text). Only present once the withdrawal has ended unsuccessfully; never returned while it is PENDING or INITIATED, or after it is SUCCESSFUL. Same text as failureReason.message."
+          },
+          "failureReason": {
+            "description": "Structured reason the withdrawal did not succeed: a stable code, our message, wording to show your customer, and whether to retry. Only present once the withdrawal has ended unsuccessfully.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FailureReasonCamelDto"
+              }
+            ]
           },
           "telcoId": {
             "type": "string",
@@ -17215,6 +17498,14 @@
             "format": "date-time",
             "type": "string",
             "description": "When the transaction reached a terminal status. Omitted while it is still in progress."
+          },
+          "name_check": {
+            "type": "object",
+            "description": "Recipient name check for this payout: status (PASSED, BLOCKED, RESOLVED_FROM_BANK, ...) and how the name was established (BANK_NAME_ENQUIRY, MNO_LOOKUP, STORED_VERIFICATION, NONE_AVAILABLE).",
+            "example": {
+              "status": "PASSED",
+              "source": "BANK_NAME_ENQUIRY"
+            }
           }
         },
         "required": [
@@ -17233,6 +17524,11 @@
       "WithdrawTransactionDto": {
         "type": "object",
         "properties": {
+          "customer_key": {
+            "type": "string",
+            "description": "Optional customer_key of the bank customer. The account in bankDetails always decides who is paid; the response returns the key of that account.",
+            "example": "aB3dE5gH7jK9mN1pQ3sT"
+          },
           "bankDetails": {
             "$ref": "#/components/schemas/BankDetailsDto"
           },
@@ -17295,11 +17591,11 @@
               "EXPIRED",
               "REQUIRE_REVIEW",
               "NOT_INITIATED",
-              "TRANSACTION_INITIATED",
               "TRANSACTION_RETRY",
               "TRANSACTION_RETRY_SUCCESSFUL",
               "TRANSACTION_RETRY_FAILED",
-              "DUPLICATE_PENDING"
+              "DUPLICATE_PENDING",
+              "IN_RECONCILIATION"
             ]
           },
           "amount": {
