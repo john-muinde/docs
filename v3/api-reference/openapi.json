@@ -7845,7 +7845,7 @@
     },
     "/api/v3/deposit/card": {
       "post": {
-        "description": "Charges a card. The card details are sent in this request and are never stored; only the first six and last four digits are kept. If the card issuer requires 3-D Secure authentication the response carries a redirectUrl to send the customer to, otherwise the payment proceeds without a redirect. Send browserInfo to improve authentication success. Track the outcome with the status endpoint or your callback url.",
+        "description": "Starts a card payment on a hosted checkout page. Do not send card details: the response carries a redirectUrl; send the customer there to enter their card (3-D Secure runs on that page). A request that includes card details is refused. Track the outcome with the status endpoint or your callback url.",
         "operationId": "DepositCardController_mobileMoney_api/v3",
         "parameters": [],
         "requestBody": {
@@ -7883,7 +7883,7 @@
             }
           },
           "400": {
-            "description": "",
+            "description": "Bad Request. Also returned when the request includes card details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7894,7 +7894,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Bad Request"
+                      "example": "Card details are not accepted. Leave out card and send the customer to the hosted checkout page in redirectUrl, where they enter their card."
                     },
                     "error_code": {
                       "type": "number",
@@ -11935,14 +11935,6 @@
             "description": "Currency to charge the card in. Must be a currency enabled for deposits on your account; the cardholder can be from any country.",
             "example": "ZAR"
           },
-          "card": {
-            "description": "Card Details",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CardDetailsDto"
-              }
-            ]
-          },
           "country": {
             "type": "string",
             "description": "ISO 3166-1 alpha-2 country the payment is attributed to. Optional when it can be derived from the currency. It does not restrict the cardholder.",
@@ -11965,7 +11957,7 @@
           },
           "customerRedirectUrl": {
             "type": "string",
-            "description": "Where to send the customer after the 3-D Secure challenge, when the card issuer requires one",
+            "description": "Where to send the customer when they finish on the hosted checkout page",
             "example": "https://example.com/payment-complete"
           },
           "browserInfo": {
@@ -11981,61 +11973,8 @@
           "fullName",
           "phoneNumber",
           "currency",
-          "card",
           "referenceId",
           "amount"
-        ]
-      },
-      "CardDetailsDto": {
-        "type": "object",
-        "properties": {
-          "number": {
-            "type": "string",
-            "description": "Card Number",
-            "example": "4591005500136100"
-          },
-          "holder": {
-            "type": "string",
-            "description": "Card Holder",
-            "example": "John Doe"
-          },
-          "expiryMonth": {
-            "type": "string",
-            "description": "Expiry Month",
-            "example": "01"
-          },
-          "expiryYear": {
-            "type": "string",
-            "description": "Expiry Year",
-            "example": "2025"
-          },
-          "cvv": {
-            "type": "string",
-            "description": "CVV",
-            "example": "123"
-          },
-          "paymentBrand": {
-            "type": "string",
-            "enum": [
-              "VISA",
-              "MASTER"
-            ],
-            "description": "Payment Method",
-            "example": "VISA"
-          },
-          "customerRedirectUrl": {
-            "type": "string",
-            "description": "customer redirect url",
-            "example": "https://example.com"
-          }
-        },
-        "required": [
-          "number",
-          "holder",
-          "expiryMonth",
-          "expiryYear",
-          "cvv",
-          "paymentBrand"
         ]
       },
       "Chain": {
