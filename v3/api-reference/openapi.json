@@ -13653,6 +13653,13 @@
             "type": "string",
             "description": "Block explorer URL for this wallet address",
             "example": "https://etherscan.io/address/0xabc..."
+          },
+          "lastSyncedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the token balances were last read from the chain. Null until the first sync.",
+            "example": "2026-11-18T09:30:00.000Z"
           }
         },
         "required": [
