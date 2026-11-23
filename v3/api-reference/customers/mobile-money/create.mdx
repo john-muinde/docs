@@ -5,4 +5,4 @@ openapi: "POST /api/v3/customer/mobile-money"
 
 An integrator can use this endpoint to create customers who will be either receiving or sending money using mobile money.
 
-Create is find-or-create by phone number for your account. If a customer with that phone number already exists, the existing customer is returned and there is no `409`. `network` and `account_name` are required only in countries that need them.
+Create is find-or-create by phone number for your account. If a customer with that phone number already exists, the existing customer is returned and there is no `409`. `account_name` is required only in countries that need it. `network` is optional: we work it out from the phone number. A network you send must match the number (`NETWORK_MISMATCH` otherwise), and if we cannot tell the network in a country that needs one, the request is refused with `NETWORK_REQUIRED`. See [Mobile network errors](/v3/essentials/error-handling#mobile-network-errors).

@@ -92,6 +92,41 @@ is checked as well, and the message starts with `Amount after fees`. Show the
 message to your user as it is: it already says what amount to send. Your current
 limits are in the dashboard; see [Fees & Billing](/v3/essentials/billing-types#fee-structure-and-transaction-limits).
 
+## Mobile network errors
+
+`network` is optional on mobile money requests: we work it out from the phone
+number. Two cases return `400` with a `code`:
+
+**`NETWORK_MISMATCH`**: the network you sent doesn't match the number.
+
+```json
+{
+  "success": false,
+  "message": "The phone number +233*****67 is on MTN GHANA (MTN), but network \"VODAFONE\" was sent. Send \"MTN\", or leave network out and we will use the number's network. If you believe we have classified this number wrongly, or the customer has moved it to another network, contact support.",
+  "error_code": 400,
+  "code": "NETWORK_MISMATCH",
+  "data": { "network": "VODAFONE", "detectedNetwork": "MTN" }
+}
+```
+
+**`NETWORK_REQUIRED`**: we can't tell the network from the number and the country
+needs one. Ask your customer for their network and send one of
+`data.supportedNetworks`.
+
+```json
+{
+  "success": false,
+  "message": "We could not tell the mobile network from the phone number +233*****12. Send network for Ghana: one of MTN, VODAFONE, AIRTEL.",
+  "error_code": 400,
+  "code": "NETWORK_REQUIRED",
+  "data": { "supportedNetworks": ["MTN", "VODAFONE", "AIRTEL"] }
+}
+```
+
+To check before you pay, call
+[Validate Mobile Money Account](/v3/api-reference/customers/validate-mobile-money)
+and read `networkRequired`.
+
 ## Suspended customers
 
 If a `customer_key` belongs to a suspended customer, the request returns `403` with

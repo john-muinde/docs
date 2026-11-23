@@ -14,6 +14,14 @@ For **paybill and till**, there is no useful format check: a shortcode is just
 digits, and whether it exists is exactly what the lookup answers. Those two types
 therefore require name lookup to be enabled on your account.
 
+## Network
+
+You don't need to send `network`: the response gives the `network` and `mno` the
+number belongs to. `networkRequired: true` means we can't tell the network from
+this number and the country needs one, so ask your customer and send it with the
+payment. A network you send that doesn't match the number makes `isValid` `false`.
+See [Mobile network errors](/v3/essentials/error-handling#mobile-network-errors).
+
 ## Reading the result
 
 `nameLookupStatus` tells you whether the name resolved, and `nameLookupReason`

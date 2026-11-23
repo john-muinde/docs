@@ -7,6 +7,6 @@ Validate a CSV file for bulk payments with multi-currency support before creatin
 
 Send the file as `multipart/form-data` in the field `file` (maximum 10 MB). The optional query parameter `defaultCurrency` is used for rows that have no currency.
 
-The CSV columns are `recipient_name`, `recipient_email`, `recipient_phone`, `amount`, `reference`, `network` and `currency`. `currency` is optional when you pass `defaultCurrency`. Header names are case-insensitive.
+The CSV columns are `recipient_name`, `recipient_email`, `recipient_phone`, `amount`, `reference`, `network` and `currency`. `currency` is optional when you pass `defaultCurrency`. `network` is optional: leave the cell empty and we work it out from the phone number. A row whose network does not match its number, or whose network we cannot tell in a country that needs one, is listed in `errors` with the reason. Header names are case-insensitive.
 
 The response includes a `fileHash` and an `isDuplicate` flag.

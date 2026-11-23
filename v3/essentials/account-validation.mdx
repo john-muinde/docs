@@ -41,9 +41,17 @@ useful format check for one.
 ## You don't need to send the network
 
 For mobile money, the network is resolved from the phone number's own prefix. The
-response tells you which rail the lookup used and which operator the number
-belongs to. Send it yourself only if the number has been ported, or if a response
-tells you the network couldn't be determined.
+response tells you which network and operator the number belongs to.
+
+If we can't tell the network from the number and the country needs one, the
+response has `networkRequired: true`. Ask your customer for their network and
+send it with the payment, otherwise the payment is refused with
+`NETWORK_REQUIRED`.
+
+A network you send must match the number. If it doesn't, `isValid` is `false` and
+`message` says which network the number is on; a payment sent that way is refused
+with `NETWORK_MISMATCH`. If you believe we have classified a number wrongly, or the
+customer has moved it to another network, contact support.
 
 ## Which field answers which question
 
