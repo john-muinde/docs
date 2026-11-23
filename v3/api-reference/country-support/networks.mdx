@@ -5,7 +5,7 @@ openapi: "GET /api/v3/customer/support/networks/{countryCode}"
 
 Get the mobile money networks available in a country (`networks`) and whether that country needs a network on a payment (`isRequired`).
 
-**You don't need to send `network`.** We work it out from the phone number. If you do send it, it must match the number, otherwise the request is refused with code `NETWORK_MISMATCH`.
+**You don't need to send `network`.** We work it out from the phone number. If you do send it, it must match the number. For now a network that doesn't match is accepted, and we will contact you before such requests start being refused with code `NETWORK_MISMATCH`.
 
 `isRequired: true` means: in this country, when we cannot tell the network from the phone number, the request is refused with code `NETWORK_REQUIRED` unless you send one. To know ahead of time for a specific number, call [Validate Mobile Money Account](/v3/api-reference/customers/validate-mobile-money): `networkRequired: true` means ask your customer for their network and send it. Use the values listed here.
 

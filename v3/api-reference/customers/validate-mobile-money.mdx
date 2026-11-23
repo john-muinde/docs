@@ -19,7 +19,8 @@ therefore require name lookup to be enabled on your account.
 You don't need to send `network`: the response gives the `network` and `mno` the
 number belongs to. `networkRequired: true` means we can't tell the network from
 this number and the country needs one, so ask your customer and send it with the
-payment. A network you send that doesn't match the number makes `isValid` `false`.
+payment. A network you send should match the number; the response's `network`
+is the one the number belongs to.
 See [Mobile network errors](/v3/essentials/error-handling#mobile-network-errors).
 
 ## Reading the result

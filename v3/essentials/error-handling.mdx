@@ -99,6 +99,11 @@ number. Two cases return `400` with a `code`:
 
 **`NETWORK_MISMATCH`**: the network you sent doesn't match the number.
 
+<Note>
+Not enforced yet: for now a network that doesn't match is accepted. We will
+contact you before these requests start being refused.
+</Note>
+
 ```json
 {
   "success": false,

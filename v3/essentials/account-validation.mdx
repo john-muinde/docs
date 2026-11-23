@@ -48,8 +48,8 @@ response has `networkRequired: true`. Ask your customer for their network and
 send it with the payment, otherwise the payment is refused with
 `NETWORK_REQUIRED`.
 
-A network you send must match the number. If it doesn't, `isValid` is `false` and
-`message` says which network the number is on; a payment sent that way is refused
+A network you send must match the number. For now a payment whose network doesn't
+match is accepted; we will contact you before such payments start being refused
 with `NETWORK_MISMATCH`. If you believe we have classified a number wrongly, or the
 customer has moved it to another network, contact support.
 
