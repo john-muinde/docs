@@ -13610,15 +13610,16 @@
           "NETWORK_NOT_SUPPORTED",
           "SESSION_IN_PROGRESS",
           "CUSTOMER_UNREACHABLE",
-          "CARD_DECLINED"
+          "CARD_DECLINED",
+          "BANK_DECLINED"
         ],
-        "description": "Stable code for why the payment failed. The list is public and codes are never renamed or removed, so you can branch on it. Customer group: NOT_APPROVED_IN_TIME, INSUFFICIENT_FUNDS, WRONG_PIN, ACCOUNT_LOCKED, NO_MOBILE_MONEY_ACCOUNT, INVALID_PHONE_NUMBER, CUSTOMER_LIMIT_REACHED, CANCELLED_BY_CUSTOMER, DUPLICATE_TOO_SOON, AMOUNT_OUT_OF_RANGE. Network group: NETWORK_DECLINED_NO_REASON, NETWORK_UNAVAILABLE. Kotani group: PROVIDER_UNREACHABLE, KOTANI_FLOAT_LOW, KOTANI_CONFIGURATION (our team is notified automatically). Unknown group: UNKNOWN."
+        "description": "Stable code for why the payment failed. The list is public and codes are never renamed or removed, so you can branch on it. Customer group: NOT_APPROVED_IN_TIME, INSUFFICIENT_FUNDS, WRONG_PIN, ACCOUNT_LOCKED, NO_MOBILE_MONEY_ACCOUNT, INVALID_PHONE_NUMBER, CUSTOMER_LIMIT_REACHED, CANCELLED_BY_CUSTOMER, DUPLICATE_TOO_SOON, AMOUNT_OUT_OF_RANGE. Network group: NETWORK_DECLINED_NO_REASON, NETWORK_UNAVAILABLE, BANK_DECLINED (the receiving bank declined a transfer without a reason; retrying straight away is unlikely to help). Kotani group: PROVIDER_UNREACHABLE, KOTANI_FLOAT_LOW, KOTANI_CONFIGURATION (our team is notified automatically). Unknown group: UNKNOWN."
       },
       "FailureReasonCamelDto": {
         "type": "object",
         "properties": {
           "code": {
-            "description": "Stable code for why the payment failed. The list is public and codes are never renamed or removed, so you can branch on it. Customer group: NOT_APPROVED_IN_TIME, INSUFFICIENT_FUNDS, WRONG_PIN, ACCOUNT_LOCKED, NO_MOBILE_MONEY_ACCOUNT, INVALID_PHONE_NUMBER, CUSTOMER_LIMIT_REACHED, CANCELLED_BY_CUSTOMER, DUPLICATE_TOO_SOON, AMOUNT_OUT_OF_RANGE. Network group: NETWORK_DECLINED_NO_REASON, NETWORK_UNAVAILABLE. Kotani group: PROVIDER_UNREACHABLE, KOTANI_FLOAT_LOW, KOTANI_CONFIGURATION (our team is notified automatically). Unknown group: UNKNOWN.",
+            "description": "Stable code for why the payment failed. The list is public and codes are never renamed or removed, so you can branch on it. Customer group: NOT_APPROVED_IN_TIME, INSUFFICIENT_FUNDS, WRONG_PIN, ACCOUNT_LOCKED, NO_MOBILE_MONEY_ACCOUNT, INVALID_PHONE_NUMBER, CUSTOMER_LIMIT_REACHED, CANCELLED_BY_CUSTOMER, DUPLICATE_TOO_SOON, AMOUNT_OUT_OF_RANGE. Network group: NETWORK_DECLINED_NO_REASON, NETWORK_UNAVAILABLE, BANK_DECLINED (the receiving bank declined a transfer without a reason; retrying straight away is unlikely to help). Kotani group: PROVIDER_UNREACHABLE, KOTANI_FLOAT_LOW, KOTANI_CONFIGURATION (our team is notified automatically). Unknown group: UNKNOWN.",
             "example": "INSUFFICIENT_FUNDS",
             "allOf": [
               {
@@ -13665,7 +13666,7 @@
         "type": "object",
         "properties": {
           "code": {
-            "description": "Stable code for why the payment failed. The list is public and codes are never renamed or removed, so you can branch on it. Customer group: NOT_APPROVED_IN_TIME, INSUFFICIENT_FUNDS, WRONG_PIN, ACCOUNT_LOCKED, NO_MOBILE_MONEY_ACCOUNT, INVALID_PHONE_NUMBER, CUSTOMER_LIMIT_REACHED, CANCELLED_BY_CUSTOMER, DUPLICATE_TOO_SOON, AMOUNT_OUT_OF_RANGE. Network group: NETWORK_DECLINED_NO_REASON, NETWORK_UNAVAILABLE. Kotani group: PROVIDER_UNREACHABLE, KOTANI_FLOAT_LOW, KOTANI_CONFIGURATION (our team is notified automatically). Unknown group: UNKNOWN.",
+            "description": "Stable code for why the payment failed. The list is public and codes are never renamed or removed, so you can branch on it. Customer group: NOT_APPROVED_IN_TIME, INSUFFICIENT_FUNDS, WRONG_PIN, ACCOUNT_LOCKED, NO_MOBILE_MONEY_ACCOUNT, INVALID_PHONE_NUMBER, CUSTOMER_LIMIT_REACHED, CANCELLED_BY_CUSTOMER, DUPLICATE_TOO_SOON, AMOUNT_OUT_OF_RANGE. Network group: NETWORK_DECLINED_NO_REASON, NETWORK_UNAVAILABLE, BANK_DECLINED (the receiving bank declined a transfer without a reason; retrying straight away is unlikely to help). Kotani group: PROVIDER_UNREACHABLE, KOTANI_FLOAT_LOW, KOTANI_CONFIGURATION (our team is notified automatically). Unknown group: UNKNOWN.",
             "example": "INSUFFICIENT_FUNDS",
             "allOf": [
               {
