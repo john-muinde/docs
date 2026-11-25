@@ -108,6 +108,8 @@ Call [Create Onramp](/v3/api-reference/onramp/create) with `hostedCheckout: true
   "hostedCheckout": true,
   "rateId": "6ae9c7178c219480ed06e509",
   "receiverAddress": "0x...",
+  "customerFirstName": "Amina",
+  "customerLastName": "Otieno",
   "referenceId": "your-unique-reference",
   "callbackUrl": "https://example.com/callback"
 }
@@ -115,6 +117,7 @@ Call [Create Onramp](/v3/api-reference/onramp/create) with `hostedCheckout: true
 
 The response carries the `redirectUrl` to send the customer to, and the same `hosted` block as the quote.
 
+- `customerFirstName` and `customerLastName` are required: the customer's name as on the mobile money or bank account they pay from. The payment is matched to this name, so a different name stops the customer at the checkout page.
 - `currency`, `token` and `chain` must match the quote.
 - `receiverAddress` must be a valid address for `chain` (a `0x...` address on EVM chains, a base58 address on Solana). An invalid address is refused here, before the customer pays.
 - Without a `rateId`, the onramp is quoted from `fiatAmount` at that moment.
@@ -184,6 +187,7 @@ Send the amount it names as `fiatAmount`, not the total.
 | `Amount too small to deliver ... Send at least N` | Send at least `N` as `fiatAmount`, or use a cheaper chain. |
 | `<token> on <chain> is not supported for hosted checkout` | Use a chain and token from the table above. |
 | `receiverAddress is not a valid <chain> address` | Check the address belongs to that chain. |
+| `customerFirstName and customerLastName are required for hosted checkout` | Send the customer's first and last name as on the account they pay from. |
 | `Rate expired` | Quote again and create within 60 seconds. |
 | `Rate has already been used in another transaction` | Each `rateId` works once: quote again. |
 | `This rate was quoted for a different currency, token or chain` | Create the onramp with the same `currency`, `token` and `chain` as the quote. |
@@ -196,6 +200,6 @@ Use small amounts and a wallet you control.
 
 1. Quote 100 KES on `SOLANA`: it is refused with the minimum.
 2. Quote about 300 KES on `CELO` with `hostedCheckout: true`. Note `hosted.receiveAmount` and `hosted.estimatedFiatAmount`.
-3. Within 60 seconds, create the onramp with that `rateId` and a Celo `0x...` address.
+3. Within 60 seconds, create the onramp with that `rateId`, a Celo `0x...` address, and the customer's `customerFirstName` and `customerLastName`.
 4. Open `redirectUrl`. The page should ask for roughly `estimatedFiatAmount` in local currency.
 5. Pay, then check the wallet receives exactly `hosted.receiveAmount`, and that your callback arrives with `onchainStatus` `SUCCESSFUL` and a `transactionHash`.
