@@ -384,7 +384,7 @@ Fires when a withdrawal reaches a final status: `SUCCESSFUL`, `FAILED`, `CANCELL
 </ParamField>
 
 <ParamField body="integratorFeeAmount" type="number">
-  Your fee on this payout, when your wallet has one configured. `transactionAmount` is already net of it.
+  Your fee on this payout, when your wallet has one configured. The recipient receives `transactionAmount`, which is already net of it, and the fee stays in your balance: we debit `amount` less this fee (plus the transaction cost when billed to you). Your wallet statement shows it on the payout's row. Payouts only: collections carry no integrator fee.
 </ParamField>
 
 <ParamField body="integratorFee" type="number">
