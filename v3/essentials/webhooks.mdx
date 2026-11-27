@@ -11,6 +11,12 @@ Kotani Pay pushes notifications to your server when key events happen, transacti
 
 How notifications are delivered depends on whether a webhook secret is configured on your account.
 
+<Warning>
+**Set a webhook secret before you build your callback handler.** Every payload example on this page shows the signed format (`event`, `data`, `signature`). Accounts without a secret receive the direct format: the transaction fields posted on their own, with no wrapper, no signature and no `timestamp`. A handler written against these examples rejects them.
+
+Set it in the dashboard under **Settings → Webhooks**. The change applies to every callback sent after you save, including resends of earlier transactions.
+</Warning>
+
 ---
 
 ### Signed webhooks
@@ -145,6 +151,10 @@ app.post('/webhook', express.json(), (req, res) => {
 ---
 
 ## Event Payloads
+
+<Note>
+  **Examples show the signed format.** Without a webhook secret, your `callbackUrl` receives the transaction fields from `data` as the whole body, without `timestamp`. See [Two Delivery Modes](#two-delivery-modes).
+</Note>
 
 <Note>
   **Casing conventions:** Deposit fields use `snake_case` (`reference_id`, `wallet_id`, `customer_key`). Withdrawal, onramp, and offramp fields use `camelCase` (`referenceId`, `walletId`, `customerKey`). Handle both in your webhook handler.

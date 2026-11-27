@@ -51,7 +51,20 @@ don't work against production, or the reverse.
   API key
 </Card>
 
-## 3. Pick what you're building
+## 3. Set your webhook secret
+
+In the dashboard: **Settings → Webhooks → generate a signing secret**, pick the events, and save. Copy the secret: your server needs it to verify each callback.
+
+Do this before your first transaction. It decides the shape of every callback you receive:
+
+| Webhook secret | Callback body | Signed |
+|---|---|---|
+| Set | `{ "event": ..., "data": { ... }, "signature": ... }` | Yes, `X-Kotani-Signature` header |
+| Not set | The transaction fields on their own, no `event`/`data` wrapper | No |
+
+Every example in these docs shows the signed format. Without a secret your server receives a different shape, and a handler built from the examples rejects it. [Webhooks →](/v3/essentials/webhooks)
+
+## 4. Pick what you're building
 
 <CardGroup cols={2}>
   <Card title="Collect payments" icon="arrow-down" href="/v3/flows/deposit-flow">
